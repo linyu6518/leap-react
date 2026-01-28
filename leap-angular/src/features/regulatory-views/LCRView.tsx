@@ -16,10 +16,12 @@ function LCRView() {
     const loadParams = () => {
       // Try loading from LCRView params first, then fall back to LCR query params
       let savedParams = loadLCRViewParams()
+      console.log('LCRView: Loaded LCRView params:', savedParams)
       
       // If no LCRView params, try loading from LCR query params (in case user modified in Detail page)
       if (!savedParams.enterprise && !savedParams.segment && !savedParams.prior && !savedParams.current) {
         const queryParams = loadLCRQueryParams()
+        console.log('LCRView: Loaded LCR query params:', queryParams)
         if (queryParams.region || queryParams.segment || queryParams.prior || queryParams.current) {
           savedParams = {
             enterprise: queryParams.region,
@@ -32,12 +34,15 @@ function LCRView() {
       
       // Always set form values if we have any saved params
       if (savedParams.enterprise || savedParams.segment || savedParams.prior || savedParams.current) {
+        console.log('LCRView: Setting form values:', savedParams)
         form.setFieldsValue({
           enterprise: savedParams.enterprise || undefined,
           segment: savedParams.segment || undefined,
           prior: savedParams.prior || undefined,
           current: savedParams.current || undefined,
         })
+      } else {
+        console.log('LCRView: No saved params found')
       }
     }
     
@@ -49,6 +54,7 @@ function LCRView() {
   }, [form]) // Run when form is available
 
   const handleView = (values: any) => {
+    console.log('LCRView: Saving params:', values)
     // Save to sessionStorage when user submits
     saveLCRViewParams({
       enterprise: values.enterprise,
@@ -56,6 +62,7 @@ function LCRView() {
       prior: values.prior,
       current: values.current,
     })
+    console.log('LCRView: Params saved to sessionStorage')
     
     navigate('/regulatory/lcr/detail', {
       state: {
