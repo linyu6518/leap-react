@@ -7,15 +7,11 @@ interface AnimatedNumberProps {
 }
 
 function AnimatedNumber({ value, duration = 1000, decimals = 0 }: AnimatedNumberProps) {
-  // Initialize with value if it's valid, otherwise 0
-  // This prevents showing 0 and then animating to the target value
-  const [displayValue, setDisplayValue] = useState(() => {
-    return (value != null && !isNaN(value) && value >= 0) ? value : 0
-  })
-  const previousValue = useRef<number | null>((value != null && !isNaN(value) && value >= 0) ? value : null)
+  // Always start from 0 for animation effect
+  const [displayValue, setDisplayValue] = useState(0)
+  const previousValue = useRef<number | null>(null)
   const animationFrameId = useRef<number | null>(null)
-  const displayValueRef = useRef((value != null && !isNaN(value) && value >= 0) ? value : 0)
-  const isInitialMount = useRef(true)
+  const displayValueRef = useRef(0)
 
   // Keep ref in sync with state
   useEffect(() => {
@@ -41,26 +37,10 @@ function AnimatedNumber({ value, duration = 1000, decimals = 0 }: AnimatedNumber
       animationFrameId.current = null
     }
 
+    // Always animate from current display value (or 0 if first time) to target value
     const startValue = displayValueRef.current
 
-    // If this is initial mount, or value changes from 0/null to a valid value,
-    // or the change is very large (likely initial load), set directly without animation
-    // This prevents showing intermediate values (like 251) during initial load
-    if (
-      isInitialMount.current ||
-      previousValue.current == null ||
-      previousValue.current === 0 ||
-      startValue === 0 ||
-      Math.abs(endValue - startValue) > Math.max(endValue * 0.5, 100) // Large change threshold
-    ) {
-      setDisplayValue(endValue)
-      previousValue.current = endValue
-      displayValueRef.current = endValue
-      isInitialMount.current = false
-      return
-    }
-
-    // Animate only when value changes from one valid value to another
+    // Animate from startValue to endValue
     let startTime: number | null = null
 
     const animate = (currentTime: number) => {
@@ -85,7 +65,6 @@ function AnimatedNumber({ value, duration = 1000, decimals = 0 }: AnimatedNumber
         displayValueRef.current = endValue
         previousValue.current = endValue
         animationFrameId.current = null
-        isInitialMount.current = false
       }
     }
 
