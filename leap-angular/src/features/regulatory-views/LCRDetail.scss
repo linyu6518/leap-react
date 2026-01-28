@@ -3,7 +3,7 @@
 .lcr-detail-container {
   width: 100%;
   margin: 0;
-  height: 100%;
+  // Remove height: 100% to allow content to expand and enable scrolling
   display: flex;
   flex-direction: column;
   // Prevent flash on initial render
