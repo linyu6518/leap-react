@@ -1,7 +1,7 @@
 {
   "version": 2,
-  "buildCommand": "npm run build:prod",
-  "outputDirectory": "dist/leap-angular/browser",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
   "rewrites": [
     {
       "source": "/(.*)",
