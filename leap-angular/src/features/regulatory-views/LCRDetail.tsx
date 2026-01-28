@@ -97,34 +97,40 @@ function LCRDetail() {
   }, [location.state])
 
   // Ensure queryParams are loaded from sessionStorage on mount if location.state is empty
+  // This matches the behavior of Deposits page
   useEffect(() => {
     // If no location.state, always try loading from sessionStorage
     // This ensures that when user navigates back, params are loaded
     if (!location.state) {
       const savedParams = loadLCRQueryParams()
       if (savedParams.region || savedParams.segment || savedParams.prior || savedParams.current) {
-        // Always update queryParams from sessionStorage to ensure they're loaded
-        // This handles the case when component remounts after navigation
-        setQueryParams(savedParams)
+        // Check if current queryParams are different from saved ones
+        const currentHasValues = queryParams.region || queryParams.segment || queryParams.prior || queryParams.current
+        if (!currentHasValues) {
+          // Update queryParams from sessionStorage
+          setQueryParams(savedParams)
+        }
       }
     }
-  }, [location.state]) // Run when location.state changes
+  }, []) // Only run once on mount, like Deposits page
 
   // Load data when component mounts or queryParams change
+  // Always try to load data if we have any params (like Deposits page)
   useEffect(() => {
     // Mark initial mount as complete after first render
     if (isInitialMount) {
       setIsInitialMount(false)
     }
     updateLastUpdateDate()
-    // Only load data if form is complete
-    if (isFormComplete) {
+    // Always load data if we have any queryParams (similar to Deposits page behavior)
+    // This ensures table displays when navigating back
+    if (queryParams.region || queryParams.segment || queryParams.prior || queryParams.current) {
       loadData()
     } else {
-      // Clear data if form is not complete
+      // Only clear data if we have no params at all
       setLcrData(null)
     }
-  }, [queryParams, isFormComplete])
+  }, [queryParams])
 
   const updateLastUpdateDate = () => {
     const now = new Date()
