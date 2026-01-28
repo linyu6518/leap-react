@@ -3,7 +3,7 @@
 .query-panel {
   background: transparent;
   padding: 0;
-  margin-bottom: $spacing-lg;
+  margin-bottom: calc(#{$spacing-lg} - 30px); // Reduced by 30px for LCR page
   margin-top: 5px;
   width: 100%;
   

@@ -83,6 +83,7 @@
     grid-template-columns: repeat(3, 1fr);
     gap: 12px;
     margin-bottom: 24px;
+    margin-top: -30px; // Reduce distance from QueryPanel by 30px
   }
 
   .status-card {
