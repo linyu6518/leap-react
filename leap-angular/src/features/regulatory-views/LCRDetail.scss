@@ -77,9 +77,9 @@
     }
   }
   
-  // Remove margin-bottom from QueryPanel
+  // Add margin-bottom to QueryPanel for spacing between dropdown and cards
   .query-panel {
-    margin-bottom: 0 !important;
+    margin-bottom: $spacing-lg !important;
   }
   
   // Empty state prompt
