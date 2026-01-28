@@ -1,0 +1,99 @@
+<div class="nsfr-detail-container">
+  <div class="page-header">
+    <div class="page-title">
+      <mat-icon class="material-icons-outlined">gavel</mat-icon>
+      <div class="title-breadcrumb">
+        <a routerLink="/regulatory" class="breadcrumb-link">Regulatory</a>
+        <mat-icon class="breadcrumb-separator material-icons-outlined">chevron_right</mat-icon>
+        <a routerLink="/regulatory/nsfr" class="breadcrumb-link">Metrics</a>
+        <mat-icon class="breadcrumb-separator material-icons-outlined">chevron_right</mat-icon>
+        <span class="breadcrumb-current">NSFR</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Query Panel -->
+  <app-query-panel
+    [initialValues]="queryInitialValues"
+    (query)="onQuery($event)"
+    (reset)="onReset()"
+  ></app-query-panel>
+
+  <!-- Metric Cards -->
+  <div class="status-row">
+    <mat-card class="status-card">
+      <div class="status-top">
+        <div class="status-label">ASF (Available Stable Funding)</div>
+        <mat-icon class="status-corner material-icons-outlined">account_balance</mat-icon>
+      </div>
+      <div class="status-update">Last update: 2023-05-01</div>
+      <div class="status-value-row">
+        <div class="status-value">$ {{ asf.value | number }}</div>
+        <div class="status-trend" [class.positive]="asf.trend === 'up'">
+          <mat-icon class="trend-icon material-icons-outlined">{{ asf.trend === 'up' ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
+        </div>
+      </div>
+    </mat-card>
+
+    <mat-card class="status-card">
+      <div class="status-top">
+        <div class="status-label">RSF (Required Stable Funding)</div>
+        <mat-icon class="status-corner material-icons-outlined">swap_horiz</mat-icon>
+      </div>
+      <div class="status-update">Last update: 2023-05-01</div>
+      <div class="status-value-row">
+        <div class="status-value">$ {{ rsf.value | number }}</div>
+        <div class="status-trend" [class.positive]="rsf.trend === 'up'">
+          <mat-icon class="trend-icon material-icons-outlined">{{ rsf.trend === 'up' ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
+        </div>
+      </div>
+    </mat-card>
+
+    <mat-card class="status-card">
+      <div class="status-top">
+        <div class="status-label">NSFR Ratio</div>
+        <mat-icon class="status-corner material-icons-outlined">trending_up</mat-icon>
+      </div>
+      <div class="status-update">Last update: 2023-05-01</div>
+      <div class="status-value-row">
+        <div class="status-value">{{ nsfrRatio.value }}%</div>
+        <div class="status-trend" [class.positive]="nsfrRatio.trend === 'up'">
+          <mat-icon class="trend-icon material-icons-outlined">{{ nsfrRatio.trend === 'up' ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
+          <span>{{ nsfrRatio.change > 0 ? '+' : '' }}{{ nsfrRatio.change }}%</span>
+        </div>
+      </div>
+    </mat-card>
+  </div>
+
+  <!-- Action Bar -->
+  <div class="action-bar">
+    <div class="action-info">
+      <span class="info-item">
+        <mat-icon class="info-icon sign-offs-icon material-icons">fiber_manual_record</mat-icon>
+        <span class="info-text"><strong class="info-number sign-offs">12</strong> sign-offs</span>
+      </span>
+      <span class="info-item">
+        <mat-icon class="info-icon adjustments-icon material-icons">fiber_manual_record</mat-icon>
+        <span class="info-text"><strong class="info-number adjustments">3</strong> adjustments</span>
+      </span>
+    </div>
+    <button mat-flat-button color="primary" class="publish-button">Publish</button>
+  </div>
+
+  <!-- Data Grid -->
+  <div class="grid-section">
+    <div class="grid-container">
+      <ag-grid-angular
+        class="ag-theme-material"
+        [rowData]="rowData"
+        [columnDefs]="columnDefs"
+        [defaultColDef]="defaultColDef"
+        [pagination]="false"
+        [animateRows]="true"
+        (gridReady)="onGridReady($event)"
+        domLayout="autoHeight"
+      >
+      </ag-grid-angular>
+    </div>
+  </div>
+</div>

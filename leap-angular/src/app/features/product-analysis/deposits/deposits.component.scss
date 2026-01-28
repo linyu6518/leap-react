@@ -1,0 +1,613 @@
+@import 'variables';
+
+
+.deposits-container {
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.tabs-container {
+  display: flex;
+  gap: 48px;
+  background-color: transparent;
+  padding: 0 8px;
+  border-radius: 0;
+  border: none;
+  border-bottom: 1px solid #E7E7E7;
+  margin-bottom: 0; // 移除间距，使表格紧贴 Tab
+  overflow-x: auto;
+  
+  &::-webkit-scrollbar {
+    height: 0;
+  }
+
+  .tab-item {
+    padding: 12px 0;
+    font-size: 15px;
+    font-weight: 400;
+    color: #96A496; // 默认使用较淡的辅助色
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    white-space: nowrap;
+    border-bottom: 3px solid transparent; // 预留底部指示线
+    margin-bottom: -1px; // 与容器底线重合
+
+    &:hover {
+      color: #133F28;
+    }
+
+    &.active {
+      background-color: transparent; // 移除灰色背景
+      color: #000000; // 选中后使用纯黑
+      font-weight: 600;
+      border-bottom: 3px solid #00B624; // 使用明显的绿色指示线
+      
+      &::after {
+        display: none; // 移除之前的绝对定位指示线，改用边框控制
+      }
+    }
+  }
+}
+
+.page-header {
+  margin-bottom: $spacing-md;
+  display: flex;
+  align-items: center;
+
+  .page-title {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    color: $color-text-primary;
+    font-size: $font-size-h3;
+    font-weight: 400;
+    font-family: 'Graphik', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+    mat-icon:first-child {
+      color: #133F28; // 使用深绿色
+      font-size: 28px;
+      width: 28px;
+      height: 28px;
+    }
+
+    .title-breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .breadcrumb-link {
+        color: #96A496; // 未激活颜色
+        text-decoration: none;
+        transition: color $duration-fast;
+        cursor: pointer;
+
+        &:hover {
+          color: #133F28;
+        }
+      }
+
+      .breadcrumb-separator {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+        color: #96A496;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .breadcrumb-current {
+        color: $color-text-primary;
+        font-weight: 500;
+      }
+    }
+  }
+}
+
+.table-header {
+  padding: 12px 16px;
+  background-color: #FFFFFF;
+  border-bottom: 1px solid #E7E7E7;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+
+  .table-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1A1A1A;
+    font-family: 'Graphik', sans-serif;
+  }
+
+  .table-subtitle {
+    font-size: 13px;
+    font-weight: 400;
+    color: #666666;
+    font-family: 'Graphik', sans-serif;
+  }
+}
+
+.grid-container {
+  background: $color-bg-card;
+  border-radius: 0 0 3px 3px;
+  padding: 0; // Remove padding to let table fill container
+  box-shadow: $shadow-sm;
+  border: 1px solid #E7E7E7;
+  border-top: none;
+  width: 100%;
+  overflow: hidden;
+
+  ::ng-deep {
+    .ag-theme-material {
+      --ag-header-background-color: #f8f8f8;
+      --ag-header-foreground-color: #666666;
+      --ag-header-column-separator-display: none;
+      --ag-pinned-column-border-display: block;
+      --ag-pinned-column-border-color: #E7E7E7;
+      --ag-row-hover-color: #F4F9F4; // 品牌淡绿高亮
+      --ag-selected-row-background-color: #F0F4F0;
+      --ag-font-size: 13px;
+      --ag-font-family: 'Graphik', sans-serif;
+      --ag-border-color: #F0F0F0;
+      width: 100% !important;
+    }
+    
+    .ag-root-wrapper {
+      width: 100% !important;
+    }
+    
+    .ag-body-viewport {
+      width: 100% !important;
+    }
+    
+    .ag-center-cols-container {
+      width: 100% !important;
+    }
+
+    // 组表头采用扁平化灰色块区分
+    .ag-header-group-cell {
+      background-color: #F8F9FB !important;
+      border-bottom: 1px solid #E7E7E7 !important;
+      font-weight: 600 !important;
+      font-size: 13px !important;
+
+      &.group-separator-left {
+        border-left: 1px solid #E7E7E7 !important;
+      }
+    }
+
+    .deposits-header-group {
+      border-bottom: none !important;
+      background-color: #F8F9F8 !important;
+      border-right: 1px solid #E7E7E7 !important; // 恢复表头组右侧线
+      
+      .ag-header-group-cell-label {
+        height: 100% !important;
+        display: flex !important;
+        align-items: center !important;
+        
+        &::after {
+          content: '(in Millions CAD)';
+          color: #2F83E5;
+          font-size: 11px;
+          font-weight: 400;
+          margin-left: 8px;
+          text-transform: none;
+        }
+      }
+    }
+
+    .category-header-cell {
+      border-top: none !important;
+      background-color: #F8F9F8 !important;
+      border-right: 1px solid #E7E7E7 !important; // 恢复子表头右侧线
+    }
+
+    // 确保固定列正确显示
+    .ag-pinned-left-cols-container {
+      z-index: 10 !important;
+      box-shadow: 4px 0 8px rgba(0, 0, 0, 0.02) !important;
+      border-right: 1px solid #E7E7E7 !important;
+    }
+
+    .ag-pinned-left-header {
+      border-right: 1px solid #E7E7E7 !important;
+    }
+
+    .ag-header-group-cell-label {
+      font-weight: 600;
+      color: #1A1A1A;
+      font-size: 14px;
+    }
+
+    .withdrawal-risk-header {
+      background-color: #F8F9F8 !important;
+      border-right: 1px solid #E7E7E7 !important;
+      
+      .ag-header-group-cell-label {
+        font-weight: 600;
+        color: #1A1A1A;
+        font-size: 14px;
+      }
+    }
+
+    .amount-header-group {
+      background-color: #F8F9FB !important;
+      
+      .ag-header-group-cell-label {
+        font-weight: 600;
+        color: #1A1A1A;
+        font-size: 14px;
+      }
+    }
+
+    .ag-header {
+      background-color: #f8f8f8 !important;
+      border-bottom: 2px solid #e0e0e0 !important;
+    }
+
+    .ag-header-cell {
+      font-weight: 600 !important;
+      font-size: 13px !important;
+      color: $color-text-primary !important;
+    }
+
+    .ag-header-cell-label {
+      // 重置表头对齐
+    }
+
+    .ag-cell {
+      display: flex;
+      align-items: center;
+      border-right: none !important;
+      font-variant-numeric: tabular-nums;
+      color: #000000 !important;
+      font-weight: 400 !important; // 默认细体（其他列）
+      padding: 0 16px !important;
+    }
+
+    // Total 列数字更粗（600）
+    .total-column-cell {
+      font-weight: 600 !important;
+    }
+
+    .ag-cell[col-id="category"] {
+      background-color: #FFFFFF !important;
+      z-index: 5;
+      padding: 0 20px !important;
+      font-weight: 400 !important;
+      border-right: 1px solid #E7E7E7 !important; // 唯一的分割竖线
+      box-shadow: 4px 0 8px rgba(0, 0, 0, 0.02); // 微弱的固定列投影
+      position: sticky !important;
+      left: 0 !important;
+
+      &.header-row-cell {
+        font-weight: 500 !important;
+        color: #133F28 !important;
+      }
+
+      &.child-row-cell {
+        font-weight: 400 !important;
+        color: #666666 !important;
+        padding-left: 32px !important;
+        position: relative;
+        
+        // 使用现代的垂直条指示层级
+        &::before {
+          content: '';
+          position: absolute;
+          left: 20px;
+          top: 30%;
+          bottom: 30%;
+          width: 2px;
+          background-color: #E7E7E7;
+          border-radius: 1px;
+        }
+      }
+    }
+    
+    // 确保固定列在滚动时保持可见
+    .ag-pinned-left-cols-container {
+      z-index: 10 !important;
+    }
+
+    .ag-header-cell[col-id="category"] {
+      border-right: 1px solid #E7E7E7 !important; // 恢复表头右侧线
+    }
+
+        .group-separator-left {
+          border-left: 1px solid #E7E7E7 !important;
+          
+          // Ensure first column in group has border
+          .ag-header-cell:first-child {
+            border-left: 1px solid #E7E7E7 !important;
+          }
+        }
+
+        .segment-column-with-border {
+          border-left: 1px solid #E7E7E7 !important;
+        }
+        
+        // Ensure data cells also have border
+        .ag-cell.segment-column-with-border {
+          border-left: 1px solid #E7E7E7 !important;
+        }
+        
+        // Ensure header cells also have border
+        .ag-header-cell.segment-column-with-border {
+          border-left: 1px solid #E7E7E7 !important;
+        }
+
+        // 突出显示的列标题样式
+        .highlight-header {
+          background-color: #F0F4F0 !important;
+          font-weight: 700 !important;
+          color: #133F28 !important;
+          font-size: 14px !important;
+          border-left: 2px solid #00B624 !important;
+          border-right: 2px solid #00B624 !important;
+          position: relative;
+          
+          &::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background-color: #00B624;
+          }
+        }
+
+        // 突出显示的单元格样式
+        .highlight-cell {
+          background-color: #FAFCFA !important;
+          border-left: 2px solid #E7E7E7 !important;
+          border-right: 2px solid #E7E7E7 !important;
+          font-weight: 500 !important;
+          position: relative;
+          
+          &:hover {
+            background-color: #F4F9F4 !important;
+          }
+        }
+
+    .variance-up {
+      color: #08781E !important;
+      &::after { 
+        content: ' ↑'; 
+        font-size: 10px; 
+        margin-left: 2px;
+        opacity: 0.8;
+      }
+    }
+
+    .variance-down {
+      color: #FF6767 !important;
+      &::after { 
+        content: ' ↓'; 
+        font-size: 10px; 
+        margin-left: 2px;
+        opacity: 0.8;
+      }
+    }
+
+    // FR2052A 表格样式
+    .grand-total-row {
+      background-color: #F8F9F8 !important;
+      font-weight: 600 !important;
+    }
+
+    .negative-amount {
+      color: #FF6767 !important;
+    }
+  }
+}
+
+// Global styles for table headers (matching LCR style)
+::ng-deep {
+  .deposits-container {
+    .ag-theme-material {
+      .ag-header {
+        background-color: #f8f8f8 !important;
+        border-bottom: 2px solid #e0e0e0 !important;
+      }
+      
+      // Remove bottom border from the top-left header cell - override header border
+      .ag-header-row:first-child .ag-header-cell.lcr-title-header {
+        border-bottom: none !important;
+        position: relative;
+        
+        // Override the header's bottom border for this cell
+        &::before {
+          content: '';
+          position: absolute;
+          bottom: -2px;
+          left: 0;
+          right: 0;
+          height: 2px;
+          background-color: #f8f8f8; // Match header background to hide the border
+          z-index: 10;
+        }
+      }
+
+      .ag-header-cell {
+        font-weight: 600 !important;
+        font-size: 13px !important;
+        color: $color-text-primary !important;
+      }
+
+      .ag-header-group-cell {
+        font-weight: 600 !important;
+        font-size: 13px !important;
+      }
+
+      .ag-pinned-left-cols-container {
+        border-right: 1px solid #E7E7E7 !important;
+      }
+
+      .ag-pinned-left-header {
+        border-right: 1px solid #E7E7E7 !important;
+      }
+      
+      // Remove right border from pinned column for summary table (top-left cell)
+      .summary-table.ag-theme-material .ag-pinned-left-cols-container {
+        border-right: none !important;
+      }
+      
+      .summary-table.ag-theme-material .ag-pinned-left-header {
+        border-right: none !important;
+      }
+      
+      .summary-table.ag-theme-material .ag-pinned-left-cols-viewport {
+        border-right: none !important;
+      }
+
+      .segment-column-with-border {
+        border-left: 1px solid #E7E7E7 !important;
+      }
+      
+      // Ensure segment-column-with-border applies to both header and cells
+      .ag-header-cell.segment-column-with-border,
+      .ag-cell.segment-column-with-border {
+        border-left: 1px solid #E7E7E7 !important;
+      }
+      
+      // Ensure group-separator-left applies to header group
+      .ag-header-group-cell.group-separator-left {
+        border-left: 1px solid #E7E7E7 !important;
+      }
+
+      // Custom style for the top-left header cell (Summary and US LCR tables)
+      .lcr-title-header {
+        text-align: left !important;
+        vertical-align: middle !important;
+        border-bottom: none !important; // Remove bottom border
+        
+        .ag-header-cell-text {
+          display: flex !important;
+          flex-direction: column !important;
+          align-items: flex-start !important;
+          justify-content: center !important;
+          height: 100% !important;
+          line-height: 1.4 !important;
+          font-size: 0 !important; // Hide default text
+          padding-left: 16px !important;
+        }
+      }
+      
+      // Summary table title (default) - more specific selector
+      .summary-table.ag-theme-material .lcr-title-header .ag-header-cell-text::before {
+        content: 'Deposit' !important;
+        font-size: 18px !important;
+        font-weight: 600 !important;
+        color: $color-text-primary !important;
+        display: block !important;
+        margin-bottom: 4px !important;
+        line-height: 1.2 !important;
+      }
+      
+      .summary-table.ag-theme-material .lcr-title-header .ag-header-cell-text::after {
+        content: '(Amount in Millions CAD)' !important;
+        font-size: 14px !important;
+        font-weight: 400 !important;
+        color: $color-text-secondary !important;
+        display: block !important;
+        line-height: 1.2 !important;
+      }
+      
+      // Ensure default title is hidden for summary table
+      .summary-table.ag-theme-material .lcr-title-header .ag-header-cell-text {
+        font-size: 0 !important;
+      }
+      
+      // US LCR table title - override for US LCR tab
+      .us-lcr-table .lcr-title-header .ag-header-cell-text::before {
+        content: 'Withdrawal Risk' !important;
+        font-size: 18px !important;
+        font-weight: 600 !important;
+        color: $color-text-primary !important;
+        display: block !important;
+        margin-bottom: 4px !important;
+        line-height: 1.2 !important;
+      }
+      
+      .us-lcr-table .lcr-title-header .ag-header-cell-text::after {
+        content: 'Amount (in Millions CAD)' !important;
+        font-size: 14px !important;
+        font-weight: 400 !important;
+        color: $color-text-secondary !important;
+        display: block !important;
+        line-height: 1.2 !important;
+      }
+      
+      // Remove bottom border from the header cell itself - more specific selectors
+      .ag-header-cell.lcr-title-header,
+      .ag-header-row .ag-header-cell.lcr-title-header,
+      .ag-header-row:first-child .ag-header-cell.lcr-title-header,
+      .ag-header-row:last-child .ag-header-cell.lcr-title-header {
+        border-bottom: none !important;
+        border-bottom-width: 0 !important;
+        border-bottom-style: none !important;
+      }
+      
+      // Remove border from the header container for this specific cell
+      // Note: Don't remove ::after as it's used for the title text
+      .ag-header-cell.lcr-title-header::before {
+        border-bottom: none !important;
+      }
+      
+      // Remove bottom border specifically for summary table - highest priority
+      .summary-table.ag-theme-material .ag-header-row:first-child .ag-header-cell.lcr-title-header {
+        border-bottom: none !important;
+        border-bottom-width: 0 !important;
+        border-bottom-style: none !important;
+        position: relative !important;
+        overflow: visible !important;
+      }
+      
+      // Create white overlay to hide header row's bottom border for summary table
+      // Use a pseudo-element on the cell itself, not on the text element
+      .summary-table.ag-theme-material .ag-header-row:first-child .ag-header-cell.lcr-title-header::before {
+        content: '' !important;
+        position: absolute !important;
+        bottom: -2px !important;
+        left: 0 !important;
+        right: 0 !important;
+        height: 2px !important;
+        background-color: #f8f8f8 !important;
+        z-index: 1 !important;
+        display: block !important;
+        border: none !important;
+      }
+      
+      // Ensure text content is above the overlay and visible
+      .summary-table.ag-theme-material .lcr-title-header .ag-header-cell-text {
+        position: relative !important;
+        z-index: 2 !important;
+      }
+      
+      .summary-table.ag-theme-material .lcr-title-header .ag-header-cell-text::before {
+        position: relative !important;
+        z-index: 2 !important;
+      }
+      
+      .summary-table.ag-theme-material .lcr-title-header .ag-header-cell-text::after {
+        position: relative !important;
+        z-index: 2 !important;
+      }
+
+      // Ensure segment-header-with-border applies to group headers
+      .ag-header-group-cell.segment-header-with-border {
+        border-left: 1px solid #E7E7E7 !important;
+      }
+      
+      // Ensure header group cells have consistent background
+      .ag-header-group-cell {
+        background-color: #F8F9FB !important;
+        border-bottom: 1px solid #E7E7E7 !important;
+      }
+    }
+  }
+}

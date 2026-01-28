@@ -1,0 +1,119 @@
+<div class="dashboard-container">
+  <div class="page-header">
+    <div class="page-title">
+      <mat-icon class="material-icons-outlined">home</mat-icon>
+      <span>Dashboard</span>
+    </div>
+  </div>
+
+  <div class="dashboard-grid">
+    <div class="grid-main">
+      <div class="status-row">
+        <mat-card *ngFor="let stat of stats" class="status-card" [ngClass]="stat.theme">
+          <div class="status-top">
+            <div class="status-label">{{ stat.label }}</div>
+            <mat-icon class="status-corner material-icons-outlined">{{ stat.cornerIcon }}</mat-icon>
+          </div>
+          <div class="status-update">Last update: {{ lastUpdateDate }}</div>
+          <div class="status-value-row">
+            <div class="status-value">{{ stat.value }}</div>
+            <div class="status-trend" [class.positive]="stat.trend.direction === 'up'">
+              <mat-icon class="trend-icon material-icons-outlined">{{ stat.trend.direction === 'up' ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
+              <span *ngIf="stat.trend.value">{{ stat.trend.value }}</span>
+            </div>
+          </div>
+        </mat-card>
+      </div>
+
+      <div class="chart-stack">
+        <mat-card class="chart-card variance-card">
+          <div class="card-title">Variance Top 10</div>
+          <div class="card-update">Last update: {{ lastUpdateDate }}</div>
+          <div echarts [options]="varianceChartOption" class="chart"></div>
+        </mat-card>
+
+        <mat-card class="chart-card threshold-card">
+          <div class="card-title">Threshold Exceedance</div>
+          <div class="card-update">Last update: {{ lastUpdateDate }}</div>
+          <div echarts [options]="thresholdChartOption" class="chart"></div>
+          <div class="threshold-legend">
+            <div class="legend-item normal">
+              <span class="dot"></span>
+              <span>Normal</span>
+            </div>
+            <div class="legend-item warning">
+              <span class="dot"></span>
+              <span>Warning</span>
+            </div>
+            <div class="legend-item critical">
+              <span class="dot"></span>
+              <span>Critical</span>
+            </div>
+          </div>
+        </mat-card>
+      </div>
+
+      <mat-card class="chart-card trend-card">
+        <div class="card-title">LCR/NSFR Trend (Last 12 Months)</div>
+        <div class="card-update">Last update: {{ lastUpdateDate }}</div>
+        <div echarts [options]="trendChartOption" class="chart"></div>
+      </mat-card>
+    </div>
+
+    <mat-card class="activities-card">
+      <div class="card-title">Recent Activity</div>
+      <div class="activity-date">Today</div>
+      <div class="activity-item">
+        <div class="activity-avatar">YL</div>
+        <div class="activity-details">
+          <div class="activity-title"><span class="activity-name">Lin</span> signed off Reciprocal</div>
+          <div class="activity-meta">9:50 am • View</div>
+        </div>
+      </div>
+      <div class="activity-item">
+        <div class="activity-avatar purple">YL</div>
+        <div class="activity-details">
+          <div class="activity-title"><span class="activity-name">Lin</span> Submitted LCR Analysis</div>
+          <div class="activity-meta">9:42 am • View</div>
+        </div>
+      </div>
+      <div class="activity-item">
+        <div class="activity-avatar orange">YL</div>
+        <div class="activity-details">
+          <div class="activity-title"><span class="activity-name">Lin</span> Escalated NSFR Report</div>
+          <div class="activity-meta">9:13 am • View</div>
+        </div>
+      </div>
+
+      <div class="activity-date">Yesterday</div>
+      <div class="activity-item">
+        <div class="activity-avatar green">YL</div>
+        <div class="activity-details">
+          <div class="activity-title"><span class="activity-name">Lin</span> Approved Cashable</div>
+          <div class="activity-meta">1:22 pm • View</div>
+        </div>
+      </div>
+      <div class="activity-item">
+        <div class="activity-avatar green">YL</div>
+        <div class="activity-details">
+          <div class="activity-title"><span class="activity-name">Lin</span> Submitted LCR Analysis</div>
+          <div class="activity-meta">11:25 am • View</div>
+        </div>
+      </div>
+      <div class="activity-item">
+        <div class="activity-avatar purple">YL</div>
+        <div class="activity-details">
+          <div class="activity-title"><span class="activity-name">Lin</span> Escalated NSFR Report</div>
+          <div class="activity-meta">10:54 am • View</div>
+        </div>
+      </div>
+      <div class="activity-item">
+        <div class="activity-avatar muted">YL</div>
+        <div class="activity-details">
+          <div class="activity-title"><span class="activity-name">Lin</span> Published Deposits Review</div>
+          <div class="activity-meta">9:21 am • View</div>
+        </div>
+      </div>
+    </mat-card>
+  </div>
+</div>

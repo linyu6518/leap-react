@@ -1,0 +1,48 @@
+<div class="navigation-tree" [class.sidebar-collapsed]="!sidebarOpened">
+  <ng-container *ngFor="let item of navItems">
+    <div class="nav-item level-1"
+         [class.active]="isActive(item.route)"
+         [class.has-children]="item.children"
+         (click)="navigate(item)">
+      <div class="nav-item-content">
+        <mat-icon *ngIf="item.icon" class="nav-icon material-icons-outlined">{{ item.icon }}</mat-icon>
+        <span class="nav-label" *ngIf="sidebarOpened">{{ item.label }}</span>
+        <mat-icon *ngIf="item.children && sidebarOpened" class="expand-icon material-icons-outlined" [class.expanded]="item.expanded">
+          keyboard_arrow_down
+        </mat-icon>
+      </div>
+    </div>
+
+    <!-- Level 2 Children -->
+    <div *ngIf="item.children && item.expanded && sidebarOpened" class="nav-children">
+      <ng-container *ngFor="let child of item.children">
+        <div class="nav-item level-2"
+             [class.active]="isActive(child.route)"
+             [class.has-children]="child.children"
+             (click)="navigate(child); $event.stopPropagation()">
+          <div class="nav-item-content">
+            <span class="nav-dot"></span>
+            <span class="nav-label">{{ child.label }}</span>
+            <mat-icon *ngIf="child.children" class="expand-icon material-icons-outlined" [class.expanded]="child.expanded">
+              keyboard_arrow_down
+            </mat-icon>
+          </div>
+        </div>
+
+        <!-- Level 3 Children -->
+        <div *ngIf="child.children && child.expanded" class="nav-children">
+          <ng-container *ngFor="let subChild of child.children">
+            <div class="nav-item level-3"
+                 [class.active]="isActive(subChild.route)"
+                 (click)="navigate(subChild); $event.stopPropagation()">
+            <div class="nav-item-content">
+              <span class="nav-dot"></span>
+              <span class="nav-label">{{ subChild.label }}</span>
+            </div>
+            </div>
+          </ng-container>
+        </div>
+      </ng-container>
+    </div>
+  </ng-container>
+</div>

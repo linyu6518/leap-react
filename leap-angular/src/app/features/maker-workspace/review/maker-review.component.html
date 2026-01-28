@@ -1,0 +1,65 @@
+<div class="maker-review-container">
+  <div class="page-header">
+    <h2>Maker Workspace - Review & Submit</h2>
+    <p class="subtitle">Adjust product data, add commentary, and submit for approval</p>
+    <button mat-raised-button color="primary" (click)="submitForReview()" class="submit-btn">
+      <mat-icon>send</mat-icon>
+      Submit for Review
+    </button>
+  </div>
+
+  <!-- Data Grid -->
+  <div class="grid-container">
+    <ag-grid-angular
+      class="ag-theme-material"
+      [rowData]="rowData"
+      [columnDefs]="columnDefs"
+      [defaultColDef]="defaultColDef"
+      [pagination]="true"
+      [paginationPageSize]="20"
+      [animateRows]="true"
+      (gridReady)="onGridReady($event)"
+      domLayout="autoHeight"
+    >
+    </ag-grid-angular>
+  </div>
+
+  <!-- Adjustment Dialog -->
+  <div class="dialog-overlay" *ngIf="showAdjustDialog" (click)="closeAdjustDialog()">
+    <mat-card class="adjust-dialog" (click)="$event.stopPropagation()">
+      <h3>Adjust Value</h3>
+      <div class="dialog-content">
+        <div class="info-row">
+          <strong>Product:</strong> {{ selectedItem?.productName }}
+        </div>
+        <div class="info-row">
+          <strong>Current Value:</strong> {{ selectedItem?.currentValue | currency }}
+        </div>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Adjusted Value</mat-label>
+          <input matInput type="number" [(ngModel)]="adjustmentValue">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Adjustment Reason</mat-label>
+          <textarea matInput rows="4" [(ngModel)]="adjustmentReason" required></textarea>
+        </mat-form-field>
+      </div>
+
+      <div class="dialog-actions">
+        <button mat-button (click)="closeAdjustDialog()">Cancel</button>
+        <button mat-raised-button color="primary" (click)="saveAdjustment()">Save Adjustment</button>
+      </div>
+    </mat-card>
+  </div>
+
+  <!-- Commentary Drawer -->
+  <app-commentary-drawer
+    [isOpen]="commentaryOpen"
+    [historyComments]="historyComments"
+    [productName]="selectedItem?.productName || ''"
+    (close)="closeCommentary()"
+    (save)="saveCommentary($event)"
+  ></app-commentary-drawer>
+</div>

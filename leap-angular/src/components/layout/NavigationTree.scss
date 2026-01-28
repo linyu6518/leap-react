@@ -1,0 +1,334 @@
+@import '@styles/variables.scss';
+
+.navigation-tree {
+  padding: $spacing-sm 0 80px 0; // 底部留出空间给 footer
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+
+  &.sidebar-collapsed {
+    .nav-label,
+    .expand-icon,
+    .nav-children {
+      display: none !important;
+    }
+
+    .nav-item-content {
+      justify-content: center;
+      padding: 0 !important;
+    }
+
+    .nav-icon {
+      margin-right: 0 !important;
+    }
+  }
+}
+
+.nav-item {
+  cursor: pointer;
+  transition: all $duration-base $easing-out;
+  color: #96a496;
+  margin: 2px $spacing-xs;
+  border-radius: 8px;
+  position: relative;
+
+  &-content {
+    display: flex;
+    align-items: center;
+    height: 40px;
+    padding: 0 $spacing-sm;
+    color: inherit;
+    transition: all $duration-base $easing-out;
+    font-weight: 400; // Restored to original
+    font-size: 15px;
+  }
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.9);
+
+    .nav-item-content {
+      color: rgba(255, 255, 255, 0.9);
+    }
+  }
+
+  &.active {
+    background-color: #0c321e;
+    color: #ffffff;
+
+    .nav-item-content {
+      color: #ffffff;
+      font-weight: 500;
+      padding-left: $spacing-sm;
+    }
+
+    .nav-icon {
+      color: #00b624;
+    }
+  }
+
+  // Level 1
+  &.level-1 {
+    .nav-icon {
+      margin-right: 14px;
+      font-size: 18px; // Smaller icon size
+      width: 18px;
+      height: 18px;
+      color: #96a496;
+      transition: all $duration-base $easing-out;
+      font-weight: 200;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    .nav-label {
+      flex: 1;
+      font-size: 15px;
+      letter-spacing: 0.1px;
+      font-weight: 400; // Restored to original
+      color: #96a496;
+      font-family: 'Graphik', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    }
+
+    &:hover .nav-icon {
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    &:hover .nav-label {
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    &.active .nav-icon {
+      color: #00b624;
+    }
+
+    &.has-active-child .nav-icon {
+      color: #00b624; // Green icon when child is active
+    }
+
+    &.active .nav-label {
+      color: #ffffff;
+    }
+  }
+
+  // Level 2
+  &.level-2 {
+    margin-left: 0;
+    margin-right: $spacing-xs;
+    position: relative;
+
+    .nav-item-content {
+      padding-left: calc(#{$spacing-md} + 20px);
+      position: relative;
+    }
+
+    &.active .nav-item-content {
+      padding-left: calc(#{$spacing-md} + 20px);
+    }
+
+    .nav-dot {
+      position: absolute;
+      left: 23px; // Align with line center - moved right by 15px (8px + 15px)
+      top: 50%;
+      transform: translate(-50%, -50%); // Center the dot on the line
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background-color: rgba(255, 255, 255, 0.4);
+      display: inline-block;
+      z-index: 2; // Above the line
+    }
+
+    .nav-label {
+      flex: 1;
+      font-size: 15px;
+      letter-spacing: 0.1px;
+      font-weight: 400; // Restored to original
+      color: #96a496;
+      margin-left: 12px;
+      font-family: 'Graphik', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    }
+
+    &:hover .nav-label {
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    &.active .nav-label {
+      color: #ffffff;
+    }
+
+    &:hover .nav-dot {
+      background-color: rgba(255, 255, 255, 0.7);
+    }
+
+    &.active .nav-dot {
+      background-color: #00b624; // Green color for active dot
+    }
+  }
+
+  // Level 3
+  &.level-3 {
+    margin-left: 0;
+    margin-right: $spacing-xs;
+    position: relative;
+
+    .nav-item-content {
+      padding-left: calc(#{$spacing-md} + 36px);
+      position: relative;
+
+      // Horizontal line connecting dot to vertical line
+      &::before {
+        content: '';
+        position: absolute;
+        // Level 2 vertical line absolute: 24px (nav-children margin) + 23px (line left) = 47px
+        // Level 3 nav-children absolute: 24px (Level 2 nav-children margin) + 16px (Level 3 nav-children margin) = 40px
+        // Level 3 nav-item-content absolute: 40px + 60px (padding-left) = 100px
+        // Level 2 line relative to nav-item-content: 47px - 100px = -53px
+        // But we want it relative to nav-item-content, so we need to account for the structure
+        // Actually, simpler: Level 2 line is at 23px from Level 2 nav-children start
+        // Level 3 nav-children starts 16px from Level 2 nav-children start
+        // Level 3 nav-item-content starts 60px from Level 3 nav-children start
+        // So Level 2 line relative to Level 3 nav-item-content: 23px - 16px - 60px = -53px
+        left: -53px; // Start from Level 2 vertical line
+        // Dot is at calc(24px + 24px) = 48px relative to nav-item-content
+        // Line should end at dot center: 48px - 1.5px = 46.5px
+        width: calc(46.5px - (-53px)); // From line to dot center
+        top: 50%;
+        height: 1px;
+        background-color: rgba(255, 255, 255, 0.08);
+        transform: translateY(-50%);
+        z-index: 0;
+      }
+    }
+
+    &.active .nav-item-content {
+      padding-left: calc(#{$spacing-md} + 36px);
+    }
+
+    .nav-dot {
+      position: absolute;
+      left: calc(#{$spacing-md} + 24px); // Moved left by 15px (39px - 15px = 24px)
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background-color: rgba(255, 255, 255, 0.35);
+      display: inline-block;
+      z-index: 1; // Above the horizontal line
+    }
+
+    .nav-label {
+      font-size: 14px;
+      font-weight: 400; // Restored to original
+      color: #96a496;
+      margin-left: 12px;
+    }
+
+    &:hover .nav-label {
+      color: rgba(255, 255, 255, 0.85);
+    }
+
+    &.active .nav-label {
+      color: #ffffff;
+    }
+
+    &:hover .nav-dot {
+      background-color: rgba(255, 255, 255, 0.6);
+    }
+
+    &.active .nav-dot {
+      background-color: #00b624; // Green color for active dot
+    }
+  }
+}
+
+.expand-icon {
+  font-size: 0;
+  width: 14px; // Slightly larger
+  height: 14px; // Slightly larger
+  margin-left: auto;
+  margin-top: -7px; // Adjusted for larger size
+  transition: transform $duration-base $easing-out, color $duration-base $easing-out;
+  color: rgba(255, 255, 255, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  // Hide any icon content
+  .anticon {
+    display: none;
+  }
+
+  // Create elegant chevron icon using CSS (same as Select dropdown)
+  &::after {
+    content: '';
+    display: block;
+    width: 6px; // Slightly larger
+    height: 6px; // Slightly larger
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    transform: rotate(45deg) scale(0.9);
+    transition: transform $duration-base $easing-out, color $duration-base $easing-out;
+  }
+
+  &.expanded {
+    color: rgba(255, 255, 255, 0.7);
+    
+    &::after {
+      transform: rotate(225deg) scale(0.9); // Rotate to point up when expanded
+    }
+  }
+}
+
+.nav-children {
+  overflow: hidden;
+  animation: slideDown 0.2s ease-out;
+  position: relative;
+  margin-left: $spacing-md;
+  padding-left: 0;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 23px; // Line position - moved right by 15px (8px + 15px)
+    top: 20px; // Start from first dot center (nav-item-content height is 40px, so center is 20px)
+    bottom: 20px; // End at last dot center (from bottom, 20px up)
+    width: 1px;
+    background-color: rgba(255, 255, 255, 0.08); // Solid color, no gradient
+    z-index: 0;
+  }
+
+  .nav-children {
+    margin-left: 16px;
+
+    &::before {
+      display: none; // Hide the vertical line for Level 3 items (LCR, NSFR, NCCF)
+    }
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    max-height: 1000px;
+  }
+}
+
+// Responsive
+@media (max-width: 960px) {
+  .nav-label {
+    display: none;
+  }
+
+  .nav-item.level-2,
+  .nav-item.level-3 {
+    display: none;
+  }
+
+  .expand-icon {
+    display: none;
+  }
+}

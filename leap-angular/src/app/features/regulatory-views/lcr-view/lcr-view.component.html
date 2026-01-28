@@ -1,0 +1,55 @@
+<div class="lcr-container">
+  <div class="page-header">
+    <div class="page-title">
+      <mat-icon class="material-icons-outlined">gavel</mat-icon>
+      <span>LCR</span>
+    </div>
+  </div>
+
+  <!-- Metrics Cards -->
+  <div class="metrics-grid">
+    <mat-card *ngFor="let metric of metrics" class="metric-card" [class.warning]="metric.status === 'warning'">
+      <div class="metric-label">{{ metric.label }}</div>
+      <div class="metric-value">
+        {{ metric.unit === '$' ? (metric.value | currency:'USD':'symbol':'1.0-0') : (metric.value + '%') }}
+      </div>
+      <mat-icon *ngIf="metric.status === 'warning'" class="warning-icon">warning</mat-icon>
+    </mat-card>
+  </div>
+
+  <!-- Product Distribution Table -->
+  <mat-card class="table-card">
+    <h3 class="card-title">Product Distribution</h3>
+    <table mat-table [dataSource]="dataSource" class="lcr-table">
+      <ng-container matColumnDef="region">
+        <th mat-header-cell *matHeaderCellDef>Region</th>
+        <td mat-cell *matCellDef="let element">{{ element.region }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="product">
+        <th mat-header-cell *matHeaderCellDef>Product</th>
+        <td mat-cell *matCellDef="let element">{{ element.product }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="hqla">
+        <th mat-header-cell *matHeaderCellDef>HQLA</th>
+        <td mat-cell *matCellDef="let element">{{ element.hqla | currency:'USD':'symbol':'1.0-0' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="nco">
+        <th mat-header-cell *matHeaderCellDef>NCO</th>
+        <td mat-cell *matCellDef="let element">{{ element.nco | currency:'USD':'symbol':'1.0-0' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="lcrRatio">
+        <th mat-header-cell *matHeaderCellDef>LCR Ratio</th>
+        <td mat-cell *matCellDef="let element" [class.lcr-warning]="isLowRatio(element.lcrRatio)">
+          {{ element.lcrRatio }}%
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;" [class.total-row]="isTotalRow(row)"></tr>
+    </table>
+  </mat-card>
+</div>

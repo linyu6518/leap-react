@@ -1,0 +1,55 @@
+<div class="deposits-container">
+  <div class="page-header">
+    <div class="page-title">
+      <mat-icon class="material-icons-outlined">inventory_2</mat-icon>
+      <div class="title-breadcrumb">
+        <a routerLink="/product" class="breadcrumb-link">Products</a>
+        <mat-icon class="breadcrumb-separator material-icons-outlined">chevron_right</mat-icon>
+        <span class="breadcrumb-current">Deposits</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Query Panel -->
+  <app-query-panel
+    [initialValues]="queryInitialValues"
+    (query)="onQuery($event)"
+    (reset)="onReset()"
+  ></app-query-panel>
+
+  <!-- Tabs Area -->
+  <div class="tabs-container">
+    <div class="tab-item" 
+         *ngFor="let tab of tabs" 
+         [class.active]="activeTab === tab"
+         (click)="onTabChange(tab)">
+      {{ tab }}
+    </div>
+  </div>
+
+  <!-- Data Grid -->
+  <div class="grid-container">
+    <ag-grid-angular
+      class="ag-theme-material"
+      [ngClass]="{'us-lcr-table': activeTab === 'US LCR', 'summary-table': activeTab === 'Summary'}"
+      [rowData]="rowData"
+      [columnDefs]="columnDefs"
+      [defaultColDef]="defaultColDef"
+      [pagination]="true"
+      [paginationPageSize]="50"
+      [animateRows]="true"
+      (gridReady)="onGridReady($event)"
+      domLayout="autoHeight"
+    >
+    </ag-grid-angular>
+  </div>
+
+  <!-- Commentary Drawer -->
+  <app-commentary-drawer
+    [isOpen]="commentaryOpen"
+    [historyComments]="historyComments"
+    [productName]="selectedProduct?.product || ''"
+    (close)="closeCommentary()"
+    (save)="saveCommentary($event)"
+  ></app-commentary-drawer>
+</div>

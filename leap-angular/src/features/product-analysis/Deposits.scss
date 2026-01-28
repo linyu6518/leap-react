@@ -1,0 +1,385 @@
+@import '@styles/variables.scss';
+
+.deposits-container {
+  width: 100%;
+  margin: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  .page-header {
+    margin-bottom: 12px;
+    margin-top: -15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $spacing-md;
+    flex-wrap: wrap;
+    flex-shrink: 0;
+
+    .page-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: $color-text-primary;
+      font-size: 15px; // Match navigation menu
+      font-weight: 400;
+      line-height: 1.2;
+      font-family: 'Graphik', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+
+      .page-icon {
+        color: $color-primary;
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+      }
+
+      .title-breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 15px;
+        font-weight: 400;
+
+        .breadcrumb-link {
+          color: #96A496;
+          text-decoration: none;
+          transition: color 0.2s;
+          cursor: pointer;
+          font-size: 15px;
+          font-weight: 400;
+
+          &:hover {
+            color: #133F28;
+          }
+        }
+
+        .breadcrumb-separator {
+          color: #96A496;
+          font-size: 15px;
+          font-weight: 400;
+          margin: 0 4px;
+        }
+
+        .breadcrumb-current {
+          color: $color-text-primary;
+          font-size: 15px;
+          font-weight: 400;
+        }
+      }
+    }
+  }
+
+  // Ensure QueryPanel is visible
+  .query-panel {
+    display: block !important;
+    visibility: visible !important;
+    margin-bottom: 24px;
+  }
+
+  // Remove Card white background
+  .ant-card {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    min-height: 500px;
+
+    .ant-card-body {
+      padding: 0 !important;
+      background: transparent !important;
+      min-height: 500px;
+      display: flex;
+      flex-direction: column;
+    }
+  }
+
+  // Summary table header
+  .summary-table-header {
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    .summary-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: $color-text-primary;
+      font-family: 'Graphik', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    }
+
+    .summary-subtitle {
+      font-size: 12px;
+      font-weight: 400;
+      color: #1890ff;
+      font-family: 'Graphik', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    }
+  }
+
+  // Empty state prompt
+  .deposits-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 120px 20px;
+    min-height: 500px;
+    background: transparent;
+
+    .empty-state-icon {
+      font-size: 32px;
+      color: #999;
+      margin-bottom: 8px;
+    }
+
+    .empty-state-text {
+      font-size: 14px;
+      color: #999;
+      font-weight: 400;
+      font-family: 'Graphik', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      text-align: center;
+    }
+  }
+
+  // AG Grid custom styles for Summary table
+  .ag-theme-material {
+    width: 100%;
+    display: block;
+    border: 1px solid #d9d9d9;
+    border-top: none;
+    border-radius: 4px;
+    overflow: hidden;
+    box-sizing: border-box;
+    height: auto;
+    
+    .ag-root-wrapper {
+      width: 100%;
+      border: none;
+      box-sizing: border-box;
+      height: auto;
+    }
+    
+    .ag-root {
+      box-sizing: border-box;
+      height: auto;
+    }
+    
+    .ag-body-viewport {
+      width: 100%;
+    }
+    
+    .ag-center-cols-container {
+      width: 100%;
+    }
+    
+    .ag-body-horizontal-scroll {
+      width: 100%;
+    }
+    
+    .ag-header {
+      background-color: #fafafa;
+      border-bottom: 1px solid #d9d9d9;
+      box-sizing: border-box;
+      width: 100%;
+      position: relative;
+      
+      // Ensure border extends to container edge
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background-color: #d9d9d9;
+        pointer-events: none;
+      }
+      
+      .ag-header-row {
+        width: 100%;
+        
+        .ag-header-cell:last-child,
+        .ag-header-group-cell:last-child {
+          border-right: none;
+        }
+      }
+      
+      .ag-header-cell {
+        border-right: 1px solid #d9d9d9;
+        font-weight: 400;
+        font-size: 13px;
+        color: #6B8E6B;
+        box-sizing: border-box;
+        
+        .ag-header-cell-text {
+          font-weight: 400;
+          color: #6B8E6B;
+        }
+      }
+      
+      .ag-header-group-cell {
+        border-right: 1px solid #d9d9d9;
+        font-weight: 500;
+        font-size: 14px;
+        color: #6B8E6B;
+        box-sizing: border-box;
+        
+        .ag-header-group-cell-label {
+          font-weight: 500;
+          color: #6B8E6B;
+        }
+      }
+    }
+    
+    .ag-row {
+      border-bottom: 1px solid #f0f0f0;
+      cursor: pointer;
+      box-sizing: border-box;
+      width: 100%;
+      
+      &:hover {
+        background-color: #fafafa;
+      }
+      
+      &.ag-row-selected {
+        background-color: #EEF9F0 !important;
+        
+        &:hover {
+          background-color: #EEF9F0 !important;
+        }
+        
+        .ag-cell {
+          background-color: #EEF9F0 !important;
+        }
+      }
+      
+      .ag-cell:last-child {
+        border-right: none;
+      }
+    }
+    
+    // Ensure table fills container width
+    .ag-body-viewport-wrapper {
+      width: 100%;
+    }
+    
+    .ag-center-cols-viewport {
+      width: 100%;
+    }
+    
+    // Ensure rows extend to container edge
+    .ag-body-viewport {
+      overflow-x: visible;
+    }
+    
+    .ag-center-cols-container {
+      min-width: 100%;
+    }
+    
+    // Ensure header extends to container edge
+    .ag-header-viewport {
+      width: 100%;
+    }
+    
+    .ag-header-container {
+      width: 100%;
+      min-width: 100%;
+    }
+    
+    .ag-cell {
+      border-right: 1px solid #f0f0f0;
+      font-size: 13px;
+      font-family: 'Graphik', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      box-sizing: border-box;
+      
+      // Ensure pinned left column (first column) has right border
+      &[col-id="name"] {
+        border-right: 1px solid #f0f0f0 !important;
+      }
+      
+      // Make numbers medium weight and pure black
+      &[col-id*="current"],
+      &[col-id*="previous"],
+      &[col-id*="variance"] {
+        font-weight: 500;
+        color: #000000;
+      }
+    }
+    
+    // Ensure pinned left columns have right border
+    .ag-pinned-left-cols-container .ag-cell {
+      border-right: 1px solid #f0f0f0 !important;
+    }
+    
+    // Ensure pinned left header has right border
+    .ag-pinned-left-header .ag-header-cell {
+      border-right: 1px solid #d9d9d9 !important;
+    }
+    
+    // Ensure header first column has right border
+    .ag-header-cell[col-id="name"] {
+      border-right: 1px solid #d9d9d9 !important;
+    }
+  }
+
+  // Tab styles
+  .ant-tabs {
+    background: transparent !important;
+    margin-top: 5px;
+
+    .ant-tabs-nav {
+      margin-bottom: 0;
+      background: transparent !important;
+
+      &::before {
+        border-bottom: 1px solid #d9d9d9;
+      }
+    }
+
+    .ant-tabs-tab {
+      padding: 12px 24px;
+      color: $color-primary !important;
+      font-weight: 400;
+      font-size: 15px;
+      transition: all 0.2s ease;
+      border: none !important;
+      position: relative;
+      margin-right: 8px;
+      background: transparent !important;
+
+      &:hover {
+        background-color: #E5E5E5 !important;
+        color: $color-primary !important;
+      }
+
+      .ant-tabs-tab-btn {
+        color: $color-primary !important;
+        font-weight: 400;
+      }
+    }
+
+    .ant-tabs-tab-active {
+      font-weight: 500 !important;
+
+      .ant-tabs-tab-btn {
+        color: $color-text-primary !important;
+        font-weight: 500 !important;
+      }
+
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background-color: $color-primary;
+        z-index: 1;
+      }
+    }
+
+    .ant-tabs-ink-bar {
+      display: none !important;
+    }
+  }
+}

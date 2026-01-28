@@ -1,0 +1,103 @@
+// TD Brand Colors
+$color-primary: #00843D;
+$color-primary-dark: #133F28;
+$color-primary-light: #E8F5E9;
+
+// Status Colors
+$color-draft: #9E9E9E;
+$color-pending: #1976D2;
+$color-approved: #4CAF50;
+$color-rejected: #E53935;
+$color-escalated: #FF6F00;
+
+// Functional Colors
+$color-warning: #FFC107;
+$color-error: #E53935;
+$color-info: #1976D2;
+$color-success: #4CAF50;
+
+// Neutral Colors
+$color-text-primary: #1A1A1A;
+$color-text-secondary: #4A4A4A;
+$color-text-hint: #757575;
+$color-text-tertiary: #757575;
+$color-text-white: #FFFFFF;
+
+$color-border: #E0E0E0;
+$color-border-light: #E0E0E0;
+$color-border-medium: #BDBDBD;
+
+$color-background: #F5F5F5;
+$color-bg-page: #F5F5F5;
+$color-bg-card: #FFFFFF;
+$color-bg-hover: #FAFAFA;
+$color-surface: #FFFFFF;
+
+// Typography
+$font-family: 'Graphik', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+$font-weight-light: 300;
+$font-weight-regular: 400;
+$font-weight-medium: 500;
+$font-weight-bold: 700;
+
+$font-size-h1: 28px;
+$font-size-h2: 24px;
+$font-size-h3: 20px;
+$font-size-h4: 18px;
+$font-size-body: 16px;
+$font-size-caption: 14px;
+$font-size-small: 12px;
+
+// Spacing
+$spacing-xs: 8px;
+$spacing-sm: 16px;
+$spacing-md: 24px;
+$spacing-lg: 32px;
+$spacing-xl: 48px;
+
+// Layout
+$header-height: 64px;
+$sidebar-width: 270px; // Reduced by 30px
+$sidebar-collapsed-width: 80px;
+
+// Border Radius
+$border-radius-sm: 4px;
+$border-radius-md: 8px;
+$border-radius-lg: 16px;
+$radius-sm: 4px;
+$radius-md: 8px;
+$radius-lg: 12px;
+
+// Shadows
+$shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08); // Blur: 3px
+$shadow-md: 0 2px 3px rgba(0, 0, 0, 0.1); // Blur: 3px
+$shadow-lg: 0 4px 3px rgba(0, 0, 0, 0.1); // Blur: 3px
+
+// Z-index
+$z-header: 1000;
+$z-sidebar: 900;
+$z-drawer: 1100;
+$z-modal: 1200;
+
+// Animation durations
+$duration-fast: 150ms;
+$duration-base: 200ms;
+$duration-slow: 300ms;
+$duration-chart: 500ms;
+
+// Easing functions
+$easing-in: cubic-bezier(0.4, 0, 1, 1);
+$easing-out: cubic-bezier(0, 0, 0.2, 1);
+$easing-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+// Status Badge Colors
+$status-draft-bg: #F5F5F5;
+$status-draft-text: #616161;
+$status-pending-bg: #E3F2FD;
+$status-pending-text: #1565C0;
+$status-approved-bg: #E8F5E9;
+$status-approved-text: #2E7D32;
+$status-rejected-bg: #FFEBEE;
+$status-rejected-text: #C62828;
+$status-escalated-bg: #FFF3E0;
+$status-escalated-text: #E65100;

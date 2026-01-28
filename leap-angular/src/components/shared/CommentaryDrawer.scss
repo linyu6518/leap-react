@@ -1,0 +1,62 @@
+@import '@styles/variables.scss';
+
+.commentary-drawer {
+  .drawer-body {
+    padding: 0;
+  }
+
+  .section-title {
+    font-size: $font-size-body;
+    font-weight: 500;
+    color: $color-text-primary;
+    margin-bottom: $spacing-sm;
+    margin-top: 0;
+  }
+
+  .history-section {
+    margin-bottom: $spacing-lg;
+  }
+
+  .comment-item {
+    padding: $spacing-sm;
+    background: $color-bg-hover;
+    border-radius: $radius-sm;
+    border-left: 3px solid $color-primary;
+    margin-bottom: $spacing-sm;
+  }
+
+  .comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .user-name {
+    font-size: $font-size-caption;
+    font-weight: 500;
+    color: $color-text-primary;
+  }
+
+  .comment-time {
+    font-size: $font-size-small;
+    color: $color-text-tertiary;
+  }
+
+  .comment-content {
+    font-size: $font-size-caption;
+    color: $color-text-secondary;
+    line-height: 1.5;
+    white-space: pre-wrap;
+  }
+
+  .new-comment-section {
+    margin-top: $spacing-lg;
+  }
+
+  .drawer-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: $spacing-sm;
+  }
+}

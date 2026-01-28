@@ -1,0 +1,661 @@
+.report-container {
+  padding: 24px;
+  max-width: 1600px;
+  margin: 0 auto;
+  background: #f8f9fa;
+}
+
+//================== Report Header ==================
+.page-header {
+  background: linear-gradient(135deg, #ffffff 0%, #f0f4f8 100%);
+  padding: 32px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  margin-bottom: 24px;
+
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+
+    .title-section {
+      h1 {
+        font-size: 32px;
+        font-weight: 700;
+        color: #1A1A1A;
+        margin: 0 0 8px;
+        letter-spacing: -0.5px;
+      }
+
+      h2 {
+        font-size: 24px;
+        font-weight: 600;
+        color: #00843D;
+        margin: 0 0 8px;
+      }
+
+      .subtitle {
+        color: #757575;
+        font-size: 14px;
+        margin: 0;
+        font-style: italic;
+      }
+    }
+
+    .date-section {
+      text-align: right;
+      background: #ffffff;
+      padding: 16px;
+      border-radius: 6px;
+      border-left: 4px solid #00843D;
+      font-size: 13px;
+      line-height: 1.8;
+
+      strong {
+        color: #1A1A1A;
+      }
+    }
+  }
+}
+
+//================== Action Buttons ==================
+.report-actions {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+
+  button {
+    mat-icon {
+      margin-right: 8px;
+    }
+  }
+}
+
+//================== Executive Summary ==================
+.executive-summary {
+  margin-bottom: 32px;
+  background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
+  border-left: 6px solid #00843D;
+
+  mat-card-header {
+    margin-bottom: 16px;
+  }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 20px;
+
+    .summary-item {
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+
+      &.highlight {
+        border: 2px solid #00843D;
+        box-shadow: 0 4px 12px rgba(0, 132, 61, 0.15);
+      }
+
+      .label {
+        font-size: 13px;
+        font-weight: 500;
+        color: #757575;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .value {
+        font-size: 28px;
+        font-weight: 700;
+        color: #1A1A1A;
+
+        &.compliant {
+          color: #00843D;
+        }
+
+        &.warning {
+          color: #D84315;
+        }
+
+        &.positive {
+          color: #00843D;
+        }
+
+        &.negative {
+          color: #D84315;
+        }
+      }
+
+      .status {
+        font-size: 12px;
+        font-weight: 600;
+        color: #00843D;
+
+        &.warning {
+          color: #D84315;
+        }
+      }
+    }
+  }
+
+  .formula-box {
+    background: #ffffff;
+    padding: 16px;
+    border-radius: 6px;
+    border-left: 4px solid #1976D2;
+    font-size: 14px;
+    line-height: 1.8;
+
+    strong {
+      color: #1976D2;
+    }
+
+    em {
+      color: #757575;
+    }
+  }
+}
+
+//================== Report Parts ==================
+.report-part {
+  margin-bottom: 48px;
+
+  .part-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1A1A1A;
+    margin: 0 0 24px;
+    padding: 16px 0;
+    border-bottom: 3px solid #00843D;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+}
+
+//================== Report Sections ==================
+.report-section {
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+
+  mat-card-header {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 16px 20px;
+    margin: -16px -16px 16px;
+    border-radius: 8px 8px 0 0;
+
+    mat-card-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1A1A1A;
+      margin: 0;
+    }
+
+    mat-card-subtitle {
+      font-size: 13px;
+      color: #757575;
+      margin-top: 4px;
+    }
+  }
+
+  mat-card-content {
+    padding: 20px;
+  }
+}
+
+//================== Tables ==================
+.table-wrapper {
+  overflow-x: auto;
+  margin-bottom: 16px;
+}
+
+.report-table {
+  width: 100%;
+  box-shadow: none;
+  border: 1px solid #e0e0e0;
+
+  th {
+    background: #f5f5f5;
+    font-weight: 600;
+    color: #424242;
+    padding: 14px 16px;
+    border-bottom: 2px solid #00843D;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  td {
+    padding: 12px 16px;
+    border-bottom: 1px solid #e0e0e0;
+    font-size: 14px;
+
+    &.number-cell {
+      text-align: right;
+      font-family: 'Roboto Mono', monospace;
+      font-weight: 500;
+
+      &.highlight {
+        background: #E8F5E9;
+        font-weight: 600;
+        color: #00843D;
+      }
+    }
+
+    &.center-cell {
+      text-align: center;
+      font-weight: 500;
+    }
+
+    &.notes-cell {
+      font-size: 12px;
+      color: #757575;
+      font-style: italic;
+    }
+  }
+
+  tr:hover {
+    background: #f9fafb;
+  }
+}
+
+//================== Subtotals ==================
+.subtotal-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%);
+  border-radius: 6px;
+  margin-top: 8px;
+  font-size: 15px;
+  font-weight: 600;
+
+  strong {
+    color: #1A1A1A;
+  }
+
+  .subtotal-amounts {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+
+    span {
+      font-family: 'Roboto Mono', monospace;
+      font-size: 14px;
+
+      &.weighted {
+        font-size: 16px;
+        font-weight: 700;
+        color: #1976D2;
+      }
+    }
+  }
+
+  .weighted {
+    color: #1976D2;
+    font-size: 16px;
+    font-weight: 700;
+    font-family: 'Roboto Mono', monospace;
+  }
+}
+
+//================== Total Cards ==================
+.total-card {
+  margin-bottom: 32px;
+  background: linear-gradient(135deg, #FFF9E6 0%, #FFE0B2 100%);
+  border: 2px solid #F57C00;
+  box-shadow: 0 4px 12px rgba(245, 124, 0, 0.2);
+
+  mat-card-content {
+    padding: 24px;
+  }
+
+  .total-calculations {
+    .calc-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+      font-size: 15px;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      &.total-row {
+        background: rgba(0, 132, 61, 0.1);
+        border-radius: 6px;
+        padding: 16px;
+        margin-top: 8px;
+        font-size: 18px;
+
+        .amount {
+          font-size: 20px;
+        }
+      }
+
+      .amount {
+        font-family: 'Roboto Mono', monospace;
+        font-weight: 600;
+        color: #1A1A1A;
+
+        &.highlight-green {
+          color: #00843D;
+          font-size: 24px;
+        }
+
+        &.highlight-red {
+          color: #D84315;
+          font-size: 24px;
+        }
+
+        &.highlight-blue {
+          color: #1976D2;
+          font-size: 24px;
+        }
+      }
+    }
+  }
+}
+
+//================== Calculation Card ==================
+.calculation-card {
+  background: linear-gradient(135deg, #E8EAF6 0%, #C5CAE9 100%);
+  border: 3px solid #3F51B5;
+  box-shadow: 0 6px 16px rgba(63, 81, 181, 0.25);
+
+  mat-card-content {
+    padding: 32px;
+  }
+
+  .lcr-calculation {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    margin-bottom: 32px;
+
+    .calc-step {
+      background: #ffffff;
+      padding: 24px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      min-width: 280px;
+
+      .step-number {
+        width: 32px;
+        height: 32px;
+        background: #3F51B5;
+        color: #ffffff;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 16px;
+        margin-bottom: 12px;
+      }
+
+      .step-content {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+
+        .step-label {
+          font-size: 13px;
+          font-weight: 500;
+          color: #757575;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
+        .step-value {
+          font-size: 20px;
+          font-weight: 700;
+          color: #1A1A1A;
+          font-family: 'Roboto Mono', monospace;
+        }
+
+        .step-calculation {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          flex-wrap: wrap;
+          font-family: 'Roboto Mono', monospace;
+          font-size: 14px;
+          margin-top: 8px;
+        }
+      }
+    }
+
+    .calc-operator {
+      font-size: 36px;
+      font-weight: 700;
+      color: #3F51B5;
+    }
+
+    .calc-result {
+      background: #ffffff;
+      padding: 32px;
+      border-radius: 12px;
+      border: 3px solid #00843D;
+      box-shadow: 0 4px 16px rgba(0, 132, 61, 0.2);
+      text-align: center;
+      min-width: 320px;
+
+      .result-label {
+        font-size: 14px;
+        font-weight: 600;
+        color: #757575;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 12px;
+      }
+
+      .result-value {
+        font-size: 48px;
+        font-weight: 900;
+        margin-bottom: 16px;
+        font-family: 'Roboto Mono', monospace;
+
+        &.compliant {
+          color: #00843D;
+        }
+
+        &.warning {
+          color: #D84315;
+        }
+      }
+
+      .result-status {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+
+        .status-icon {
+          font-size: 24px;
+
+          &.success {
+            color: #00843D;
+          }
+
+          &.warning {
+            color: #D84315;
+          }
+        }
+
+        .status-text {
+          font-size: 14px;
+          font-weight: 600;
+
+          &.success {
+            color: #00843D;
+          }
+
+          &.warning {
+            color: #D84315;
+          }
+        }
+      }
+    }
+  }
+
+  .excess-section {
+    background: #ffffff;
+    padding: 24px;
+    border-radius: 8px;
+    border-left: 6px solid #1976D2;
+
+    .excess-label {
+      font-size: 15px;
+      font-weight: 600;
+      color: #424242;
+      margin-bottom: 8px;
+    }
+
+    .excess-value {
+      font-size: 32px;
+      font-weight: 700;
+      font-family: 'Roboto Mono', monospace;
+      margin-bottom: 12px;
+
+      &.positive {
+        color: #00843D;
+      }
+
+      &.negative {
+        color: #D84315;
+      }
+    }
+
+    .excess-note {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px;
+      background: #E8F5E9;
+      border-radius: 6px;
+      font-size: 13px;
+      color: #2E7D32;
+
+      &.warning {
+        background: #FFEBEE;
+        color: #C62828;
+      }
+
+      mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+      }
+    }
+  }
+}
+
+//================== Report Footer ==================
+.report-footer {
+  margin-top: 48px;
+  padding-top: 24px;
+
+  mat-divider {
+    margin-bottom: 24px;
+  }
+
+  .footer-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    font-size: 12px;
+    line-height: 1.8;
+
+    .footer-section {
+      padding: 12px;
+      background: #f8f9fa;
+      border-radius: 6px;
+
+      strong {
+        color: #1A1A1A;
+        font-weight: 600;
+      }
+
+      em {
+        color: #757575;
+      }
+    }
+  }
+}
+
+//================== Print Styles ==================
+@media print {
+  .report-container {
+    padding: 0;
+    background: white;
+  }
+
+  .report-actions {
+    display: none;
+  }
+
+  .report-section {
+    box-shadow: none;
+    page-break-inside: avoid;
+  }
+
+  .report-table {
+    page-break-inside: avoid;
+
+    th {
+      background: #f5f5f5 !important;
+    }
+  }
+
+  .total-card {
+    page-break-inside: avoid;
+  }
+}
+
+//================== Responsive Design ==================
+@media (max-width: 1200px) {
+  .executive-summary .summary-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .calculation-card .lcr-calculation {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-header .header-content {
+    flex-direction: column;
+    gap: 16px;
+
+    .date-section {
+      text-align: left;
+    }
+  }
+
+  .executive-summary .summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .calculation-card .lcr-calculation {
+    flex-direction: column;
+
+    .calc-operator {
+      transform: rotate(90deg);
+    }
+  }
+
+  .footer-content {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,46 @@
+<div class="query-panel" [formGroup]="queryForm">
+  <div class="query-row">
+    <!-- Region -->
+    <mat-form-field appearance="outline" class="filter-field">
+      <mat-select formControlName="region" placeholder="Region *">
+        <mat-option value="US">US</mat-option>
+        <mat-option value="CAD">CAD</mat-option>
+        <mat-option value="Europe">Europe</mat-option>
+        <mat-option value="Enterprise">Enterprise</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <!-- Segment -->
+    <mat-form-field appearance="outline" class="filter-field">
+      <mat-select formControlName="segment" placeholder="Segment *">
+        <mat-option value="Enterprise">Enterprise</mat-option>
+        <mat-option value="CAD Retail">CAD Retail</mat-option>
+        <mat-option value="US Retail">US Retail</mat-option>
+        <mat-option value="Wholesale">Wholesale</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <!-- Prior -->
+    <mat-form-field appearance="outline" class="filter-field date-field">
+      <input matInput [matDatepicker]="priorPicker" formControlName="prior" placeholder="Prior *">
+      <mat-datepicker-toggle matIconSuffix [for]="priorPicker">
+        <mat-icon matDatepickerToggleIcon class="material-icons-outlined">calendar_today</mat-icon>
+      </mat-datepicker-toggle>
+      <mat-datepicker #priorPicker></mat-datepicker>
+    </mat-form-field>
+
+    <!-- Current -->
+    <mat-form-field appearance="outline" class="filter-field date-field">
+      <input matInput [matDatepicker]="currentPicker" formControlName="current" placeholder="Current *">
+      <mat-datepicker-toggle matIconSuffix [for]="currentPicker">
+        <mat-icon matDatepickerToggleIcon class="material-icons-outlined">calendar_today</mat-icon>
+      </mat-datepicker-toggle>
+      <mat-datepicker #currentPicker></mat-datepicker>
+    </mat-form-field>
+
+    <button mat-flat-button color="primary" (click)="onQuery()" class="query-button" [disabled]="queryForm.invalid">
+      View Analytics
+      <mat-icon>arrow_forward</mat-icon>
+    </button>
+  </div>
+</div>

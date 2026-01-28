@@ -1,0 +1,80 @@
+<div class="login-page">
+  <!-- Main Content Area -->
+  <div class="login-container">
+    <div class="login-card">
+      <!-- Card Header -->
+      <div class="login-card-header">
+        <div class="app-icon-wrapper">
+          <mat-icon class="app-icon">swap_horiz</mat-icon>
+        </div>
+        <h2 class="app-title">Adjustment Framework</h2>
+      </div>
+
+      <!-- Login Form -->
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Username*</mat-label>
+          <input matInput formControlName="username" autocomplete="username">
+          <mat-error *ngIf="loginForm.get('username')?.hasError('required')">
+            Username is required
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Password*</mat-label>
+          <input matInput type="password" formControlName="password" autocomplete="current-password">
+          <mat-error *ngIf="loginForm.get('password')?.hasError('required')">
+            Password is required
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Key*</mat-label>
+          <input matInput formControlName="key" autocomplete="off">
+          <mat-error *ngIf="loginForm.get('key')?.hasError('required')">
+            Key is required
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Error Message -->
+        <div class="error-message" *ngIf="error">
+          <mat-icon>error_outline</mat-icon>
+          <span>{{ error }}</span>
+        </div>
+
+        <!-- Login Button -->
+        <button mat-raised-button type="submit" class="login-button" [disabled]="loading">
+          <span *ngIf="!loading">Login</span>
+          <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
+        </button>
+
+        <!-- Cancel Link -->
+        <div class="cancel-link">
+          <a (click)="onCancel()" class="cancel-text">Cancel</a>
+        </div>
+      </form>
+
+      <!-- Quick Login Buttons -->
+      <div class="quick-login-section">
+        <div class="quick-login-divider">
+          <span>or</span>
+        </div>
+        <div class="quick-login-buttons">
+          <button mat-stroked-button class="quick-login-btn maker-btn" (click)="quickLoginMaker()" [disabled]="loading">
+            <mat-icon>person</mat-icon>
+            <span>Maker</span>
+          </button>
+          <button mat-stroked-button class="quick-login-btn checker-btn" (click)="quickLoginChecker()" [disabled]="loading">
+            <mat-icon>verified_user</mat-icon>
+            <span>Checker</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Description Text -->
+      <p class="description-text">
+        ADJF is a tool that allows users to create, edit, and manage data adjustments in a structured, rule-based workflow.
+      </p>
+    </div>
+  </div>
+</div>

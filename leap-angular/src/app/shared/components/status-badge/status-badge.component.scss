@@ -1,0 +1,44 @@
+@import 'variables';
+
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 24px;
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: $font-size-small;
+  font-weight: 500;
+
+  .status-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+
+  &.draft {
+    background: $status-draft-bg;
+    color: $status-draft-text;
+  }
+
+  &.pending {
+    background: $status-pending-bg;
+    color: $status-pending-text;
+  }
+
+  &.approved {
+    background: $status-approved-bg;
+    color: $status-approved-text;
+  }
+
+  &.rejected {
+    background: $status-rejected-bg;
+    color: $status-rejected-text;
+  }
+
+  &.escalated {
+    background: $status-escalated-bg;
+    color: $status-escalated-text;
+  }
+}

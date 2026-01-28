@@ -1,0 +1,74 @@
+<div class="checker-approve-container">
+  <div class="page-header">
+    <div>
+      <h2>Checker Workspace - Review & Approve</h2>
+      <p class="subtitle">Review maker adjustments and approve/reject/escalate submissions</p>
+    </div>
+    <div class="bulk-actions">
+      <button mat-raised-button color="primary" (click)="approveBulk()" [disabled]="selectedItems.length === 0">
+        <mat-icon>done_all</mat-icon>
+        Approve Selected ({{ selectedItems.length }})
+      </button>
+      <button mat-raised-button color="warn" (click)="rejectBulk()" [disabled]="selectedItems.length === 0">
+        <mat-icon>clear</mat-icon>
+        Reject Selected
+      </button>
+    </div>
+  </div>
+
+  <!-- Statistics -->
+  <div class="stats-row">
+    <mat-card class="stat-card">
+      <div class="stat-label">Pending Review</div>
+      <div class="stat-value">{{ rowData.length }}</div>
+    </mat-card>
+    <mat-card class="stat-card">
+      <div class="stat-label">Selected</div>
+      <div class="stat-value">{{ selectedItems.length }}</div>
+    </mat-card>
+  </div>
+
+  <!-- Data Grid -->
+  <div class="grid-container">
+    <ag-grid-angular
+      class="ag-theme-material"
+      [rowData]="rowData"
+      [columnDefs]="columnDefs"
+      [defaultColDef]="defaultColDef"
+      [rowSelection]="'multiple'"
+      [pagination]="true"
+      [paginationPageSize]="20"
+      [animateRows]="true"
+      (gridReady)="onGridReady($event)"
+      (selectionChanged)="onSelectionChanged($event)"
+      domLayout="autoHeight"
+    >
+    </ag-grid-angular>
+  </div>
+
+  <!-- Rejection Dialog -->
+  <div class="dialog-overlay" *ngIf="showRejectDialog" (click)="closeRejectDialog()">
+    <mat-card class="reject-dialog" (click)="$event.stopPropagation()">
+      <h3>Reject Submission</h3>
+      <div class="dialog-content">
+        <div class="info-row" *ngIf="selectedItem">
+          <strong>Item:</strong> {{ selectedItem.id }} - {{ selectedItem.productName }}
+        </div>
+        <div class="info-row" *ngIf="!selectedItem && selectedItems.length > 0">
+          <strong>Items:</strong> {{ selectedItems.length }} selected
+        </div>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Rejection Reason</mat-label>
+          <textarea matInput rows="4" [(ngModel)]="rejectionReason" required
+                    placeholder="Provide a detailed reason for rejection"></textarea>
+        </mat-form-field>
+      </div>
+
+      <div class="dialog-actions">
+        <button mat-button (click)="closeRejectDialog()">Cancel</button>
+        <button mat-raised-button color="warn" (click)="confirmReject()">Confirm Rejection</button>
+      </div>
+    </mat-card>
+  </div>
+</div>

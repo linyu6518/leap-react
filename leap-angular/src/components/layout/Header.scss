@@ -1,0 +1,206 @@
+@import '@styles/variables.scss';
+
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: $z-header;
+  height: $header-height;
+  background: #ffffff;
+  border-bottom: 1px solid #e0e0e0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  padding: 0 $spacing-lg !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  color: $color-text-primary;
+  min-height: $header-height !important;
+  max-height: $header-height !important;
+  box-sizing: border-box !important;
+}
+
+// 左侧：搜索框
+.header-left {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  width: 400px !important; // Fixed width 400px
+  margin-left: -18px; // Move left 3px (from -15px to -18px)
+  margin-top: -3px; // Move up 3px (2px + 1px)
+
+  .search-input {
+    width: 100%;
+
+    // Disable floating label effect - use normal placeholder instead
+    .td-input-floating-label {
+      display: none !important;
+    }
+
+    // Ensure placeholder is visible
+    .ant-input::placeholder,
+    .ant-input-affix-wrapper .ant-input::placeholder {
+      opacity: 1 !important;
+      visibility: visible !important;
+    }
+
+    // Override TDInput height to 40px
+    .ant-input,
+    .ant-input-affix-wrapper {
+      height: 40px !important;
+      display: flex !important;
+      align-items: center !important;
+    }
+
+    // Input text style
+    .ant-input {
+      font-size: 16px !important;
+      font-weight: 500 !important; // Bolder text for input
+      line-height: 1.5 !important;
+      padding: 0 8px !important; // Less padding to bring text closer to icon
+
+      &::placeholder {
+        font-size: 16px !important;
+        font-weight: 400 !important;
+        color: #1C1C1C !important;
+        padding-left: 0 !important; // No left padding for placeholder
+      }
+    }
+
+    .ant-input-affix-wrapper {
+      padding-left: 12px !important; // Adjust wrapper padding
+      
+      .ant-input {
+        font-size: 16px !important;
+        font-weight: 500 !important; // Bolder text for input
+        line-height: 1.5 !important;
+        padding: 0 8px 0 0 !important; // Less right padding, no left padding
+
+        &::placeholder {
+          font-size: 16px !important;
+          font-weight: 400 !important;
+          color: #1C1C1C !important;
+          padding-left: 0 !important; // No left padding for placeholder
+        }
+      }
+    }
+
+    // Green icon color
+    .td-input-leading {
+      color: #00843D !important; // Green color for icon
+      display: flex !important;
+      align-items: center !important;
+      margin-right: 4px !important; // Reduce margin to bring text closer to icon
+    }
+
+    .search-icon {
+      color: #00843D !important; // Green color for icon
+    }
+
+    // Clear button style - lighter gray circular background with X (no circle on icon)
+    .td-input-clear-btn {
+      background-color: #F5F5F5 !important; // Lighter gray circular background
+      border-radius: 50% !important;
+      width: 22px !important; // Larger circle
+      height: 22px !important; // Larger circle
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      padding: 0 !important;
+      margin-left: 8px !important;
+      transition: all 0.2s ease;
+
+      .anticon {
+        color: #6B6B6B !important; // Darker color to match input border
+        font-size: 14px !important; // Larger icon
+        
+        // Make X icon thicker
+        svg {
+          stroke-width: 2px !important; // Increase stroke width by 1px
+        }
+      }
+
+      &:hover {
+        background-color: #E0E0E0 !important; // Slightly darker gray on hover
+        .anticon {
+          color: #6B6B6B !important;
+        }
+      }
+    }
+  }
+}
+
+// 右侧：通知和用户信息
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  flex-shrink: 0;
+}
+
+.notification-button {
+  color: $color-text-primary;
+  margin-right: 20px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 20px;
+  padding: 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+}
+
+.user-menu-button {
+  min-width: auto !important;
+  padding: 4px !important;
+  border-radius: 50% !important;
+  transition: all 0.2s ease;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+
+  &:hover {
+    background-color: rgba(170, 80, 222, 0.08);
+  }
+
+  .user-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background-color: #aa50de;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 8px rgba(170, 80, 222, 0.3);
+  }
+}
+
+.user-dropdown-menu {
+  margin-top: 12px;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+  min-width: 240px !important;
+  border: 1px solid rgba(0, 0, 0, 0.05) !important;
+  padding: 0 !important;
+  overflow: hidden;
+}
+
+// 响应式
+@media (max-width: 768px) {
+  .search-box {
+    display: none;
+  }
+}

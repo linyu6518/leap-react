@@ -1,0 +1,73 @@
+<div class="lcr-form-container">
+  <div class="page-header">
+    <div class="page-title">
+      <mat-icon class="material-icons-outlined">gavel</mat-icon>
+      <span>LCR</span>
+    </div>
+  </div>
+
+  <div class="lcr-form-page-content">
+    <div class="selection-card">
+      <div class="header">
+        <h2>Report Config</h2>
+        <p class="subtitle">Configure the enterprise, segment and time parameters to analyze LCR metrics.</p>
+      </div>
+
+      <form [formGroup]="lcrForm" (ngSubmit)="onView()" class="compact-form">
+        <!-- Enterprise -->
+        <div class="form-group">
+          <mat-form-field appearance="outline">
+            <mat-select formControlName="enterprise" placeholder="Enterprise *">
+              <mat-option value="Enterprise">Enterprise</mat-option>
+              <mat-option value="CAD Retail">CAD Retail</mat-option>
+              <mat-option value="US Retail">US Retail</mat-option>
+              <mat-option value="Wholesale">Wholesale</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <!-- Segment -->
+        <div class="form-group">
+          <mat-form-field appearance="outline">
+            <mat-select formControlName="segment" placeholder="Segment *">
+              <mat-option value="Enterprise">Enterprise</mat-option>
+              <mat-option value="CAD Retail">CAD Retail</mat-option>
+              <mat-option value="US Retail">US Retail</mat-option>
+              <mat-option value="Wholesale">Wholesale</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="date-row">
+          <!-- Prior -->
+          <div class="form-group">
+            <mat-form-field appearance="outline">
+              <input matInput [matDatepicker]="priorPicker" formControlName="prior" placeholder="Prior *">
+              <mat-datepicker-toggle matIconSuffix [for]="priorPicker">
+                <mat-icon matDatepickerToggleIcon class="material-icons-outlined">calendar_today</mat-icon>
+              </mat-datepicker-toggle>
+              <mat-datepicker #priorPicker></mat-datepicker>
+            </mat-form-field>
+          </div>
+
+          <!-- Current -->
+          <div class="form-group">
+            <mat-form-field appearance="outline">
+              <input matInput [matDatepicker]="currentPicker" formControlName="current" placeholder="Current *">
+              <mat-datepicker-toggle matIconSuffix [for]="currentPicker">
+                <mat-icon matDatepickerToggleIcon class="material-icons-outlined">calendar_today</mat-icon>
+              </mat-datepicker-toggle>
+              <mat-datepicker #currentPicker></mat-datepicker>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button mat-flat-button color="primary" type="submit" [disabled]="lcrForm.invalid">
+            View Analytics
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

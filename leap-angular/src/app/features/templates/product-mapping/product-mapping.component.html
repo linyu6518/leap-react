@@ -1,0 +1,125 @@
+<div class="mapping-container">
+  <div class="page-header">
+    <h2>Product Mapping</h2>
+    <p class="subtitle">Configure regulatory treatment for internal products</p>
+  </div>
+
+  <div class="actions-bar">
+    <button mat-raised-button color="primary" (click)="addNewMapping()">
+      <mat-icon>add</mat-icon>
+      Add New Mapping
+    </button>
+    <button mat-raised-button (click)="exportMappings()">
+      <mat-icon>download</mat-icon>
+      Export Mappings
+    </button>
+  </div>
+
+  <mat-card class="mapping-card">
+    <mat-card-content>
+      <table mat-table [dataSource]="mappings" class="mapping-table">
+        <ng-container matColumnDef="internalProduct">
+          <th mat-header-cell *matHeaderCellDef>Internal Product</th>
+          <td mat-cell *matCellDef="let row">
+            <span *ngIf="!isEditing(row)">{{row.internalProduct}}</span>
+            <mat-form-field *ngIf="isEditing(row)" appearance="outline">
+              <input matInput [(ngModel)]="editingRow!.internalProduct">
+            </mat-form-field>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="regulatoryCategory">
+          <th mat-header-cell *matHeaderCellDef>Regulatory Category</th>
+          <td mat-cell *matCellDef="let row">
+            <span *ngIf="!isEditing(row)">{{row.regulatoryCategory}}</span>
+            <mat-form-field *ngIf="isEditing(row)" appearance="outline">
+              <mat-select [(ngModel)]="editingRow!.regulatoryCategory">
+                <mat-option *ngFor="let cat of regulatoryCategories" [value]="cat">
+                  {{cat}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="lcrTreatment">
+          <th mat-header-cell *matHeaderCellDef>LCR Treatment</th>
+          <td mat-cell *matCellDef="let row">
+            <span *ngIf="!isEditing(row)">{{row.lcrTreatment}}</span>
+            <mat-form-field *ngIf="isEditing(row)" appearance="outline">
+              <mat-select [(ngModel)]="editingRow!.lcrTreatment">
+                <mat-option *ngFor="let treatment of lcrTreatments" [value]="treatment">
+                  {{treatment}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="nsfrTreatment">
+          <th mat-header-cell *matHeaderCellDef>NSFR Treatment</th>
+          <td mat-cell *matCellDef="let row">
+            <span *ngIf="!isEditing(row)">{{row.nsfrTreatment}}</span>
+            <mat-form-field *ngIf="isEditing(row)" appearance="outline">
+              <mat-select [(ngModel)]="editingRow!.nsfrTreatment">
+                <mat-option *ngFor="let treatment of nsfrTreatments" [value]="treatment">
+                  {{treatment}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="outflowRate">
+          <th mat-header-cell *matHeaderCellDef>Outflow Rate (%)</th>
+          <td mat-cell *matCellDef="let row">
+            <span *ngIf="!isEditing(row)">{{row.outflowRate}}%</span>
+            <mat-form-field *ngIf="isEditing(row)" appearance="outline">
+              <input matInput type="number" [(ngModel)]="editingRow!.outflowRate" min="0" max="100">
+            </mat-form-field>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="active">
+          <th mat-header-cell *matHeaderCellDef>Active</th>
+          <td mat-cell *matCellDef="let row">
+            <mat-slide-toggle
+              [checked]="row.active"
+              (change)="toggleActive(row)"
+              [disabled]="isEditing(row)"
+              color="primary">
+            </mat-slide-toggle>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <td mat-cell *matCellDef="let row">
+            <div class="action-buttons" *ngIf="!isEditing(row)">
+              <button mat-icon-button (click)="editRow(row)" matTooltip="Edit">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button (click)="deleteMapping(row)" matTooltip="Delete">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+            <div class="action-buttons" *ngIf="isEditing(row)">
+              <button mat-icon-button (click)="saveRow()" matTooltip="Save" color="primary">
+                <mat-icon>check</mat-icon>
+              </button>
+              <button mat-icon-button (click)="cancelEdit()" matTooltip="Cancel">
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+            [class.editing-row]="isEditing(row)"
+            [class.inactive-row]="!row.active">
+        </tr>
+      </table>
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -1,0 +1,91 @@
+<div class="threshold-container">
+  <div class="page-header">
+    <h2>Threshold Settings</h2>
+    <p class="subtitle">Configure warning and critical thresholds for liquidity monitoring</p>
+  </div>
+
+  <div class="actions-bar">
+    <mat-form-field appearance="outline">
+      <mat-label>Select Category</mat-label>
+      <mat-select [(ngModel)]="selectedCategory">
+        <mat-option *ngFor="let category of categories" [value]="category.name">
+          {{category.name}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <div class="action-buttons">
+      <button mat-raised-button (click)="exportSettings()">
+        <mat-icon>download</mat-icon>
+        Export Settings
+      </button>
+      <button mat-raised-button color="warn" (click)="resetToDefaults()">
+        <mat-icon>restore</mat-icon>
+        Reset to Defaults
+      </button>
+    </div>
+  </div>
+
+  <!-- Thresholds List -->
+  <div class="thresholds-grid">
+    <mat-card *ngFor="let threshold of getCurrentThresholds()" class="threshold-card">
+      <mat-card-header>
+        <mat-card-title>{{threshold.metric}}</mat-card-title>
+        <button mat-icon-button (click)="editThreshold(threshold)" *ngIf="!editingThreshold">
+          <mat-icon>edit</mat-icon>
+        </button>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="threshold-info" *ngIf="editingThreshold?.id !== threshold.id">
+          <div class="threshold-level warning">
+            <span class="label">Warning Level:</span>
+            <span class="value">{{threshold.warningLevel | number}} {{threshold.unit}}</span>
+          </div>
+          <div class="threshold-level critical">
+            <span class="label">Critical Level:</span>
+            <span class="value">{{threshold.criticalLevel | number}} {{threshold.unit}}</span>
+          </div>
+          <p class="description">{{threshold.description}}</p>
+        </div>
+
+        <form [formGroup]="thresholdForm" *ngIf="editingThreshold?.id === threshold.id" class="edit-form">
+          <mat-form-field appearance="outline">
+            <mat-label>Metric Name</mat-label>
+            <input matInput formControlName="metric">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Warning Level</mat-label>
+            <input matInput type="number" formControlName="warningLevel">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Critical Level</mat-label>
+            <input matInput type="number" formControlName="criticalLevel">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Unit</mat-label>
+            <input matInput formControlName="unit">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Description</mat-label>
+            <textarea matInput formControlName="description" rows="2"></textarea>
+          </mat-form-field>
+
+          <div class="form-actions">
+            <button mat-raised-button color="primary" (click)="saveThreshold()" [disabled]="!thresholdForm.valid">
+              <mat-icon>check</mat-icon>
+              Save
+            </button>
+            <button mat-raised-button (click)="cancelEdit()">
+              <mat-icon>close</mat-icon>
+              Cancel
+            </button>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

@@ -1,0 +1,136 @@
+<div class="user-management-container">
+  <div class="page-header">
+    <h2>User Management</h2>
+    <p class="subtitle">Manage user accounts and permissions</p>
+  </div>
+
+  <div class="actions-bar">
+    <button mat-raised-button color="primary" (click)="addUser()">
+      <mat-icon>person_add</mat-icon>
+      Add New User
+    </button>
+    <button mat-raised-button (click)="exportUsers()">
+      <mat-icon>download</mat-icon>
+      Export Users
+    </button>
+  </div>
+
+  <mat-card class="users-card">
+    <mat-card-content>
+      <div class="table-container">
+        <table mat-table [dataSource]="users" class="users-table">
+          <ng-container matColumnDef="username">
+            <th mat-header-cell *matHeaderCellDef>Username</th>
+            <td mat-cell *matCellDef="let user">
+              <span *ngIf="!isEditing(user)">{{user.username}}</span>
+              <mat-form-field *ngIf="isEditing(user)" appearance="outline">
+                <input matInput [(ngModel)]="editingUser!.username">
+              </mat-form-field>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="fullName">
+            <th mat-header-cell *matHeaderCellDef>Full Name</th>
+            <td mat-cell *matCellDef="let user">
+              <span *ngIf="!isEditing(user)">{{user.fullName}}</span>
+              <mat-form-field *ngIf="isEditing(user)" appearance="outline">
+                <input matInput [(ngModel)]="editingUser!.fullName">
+              </mat-form-field>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="email">
+            <th mat-header-cell *matHeaderCellDef>Email</th>
+            <td mat-cell *matCellDef="let user">
+              <span *ngIf="!isEditing(user)">{{user.email}}</span>
+              <mat-form-field *ngIf="isEditing(user)" appearance="outline">
+                <input matInput type="email" [(ngModel)]="editingUser!.email">
+              </mat-form-field>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="role">
+            <th mat-header-cell *matHeaderCellDef>Role</th>
+            <td mat-cell *matCellDef="let user">
+              <span *ngIf="!isEditing(user)" class="role-badge" [ngClass]="getRoleBadgeClass(user.role)">
+                {{user.role | titlecase}}
+              </span>
+              <mat-form-field *ngIf="isEditing(user)" appearance="outline">
+                <mat-select [(ngModel)]="editingUser!.role">
+                  <mat-option *ngFor="let role of roles" [value]="role">
+                    {{role | titlecase}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="department">
+            <th mat-header-cell *matHeaderCellDef>Department</th>
+            <td mat-cell *matCellDef="let user">
+              <span *ngIf="!isEditing(user)">{{user.department}}</span>
+              <mat-form-field *ngIf="isEditing(user)" appearance="outline">
+                <mat-select [(ngModel)]="editingUser!.department">
+                  <mat-option *ngFor="let dept of departments" [value]="dept">
+                    {{dept}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="active">
+            <th mat-header-cell *matHeaderCellDef>Active</th>
+            <td mat-cell *matCellDef="let user">
+              <mat-slide-toggle
+                [checked]="user.active"
+                (change)="toggleActive(user)"
+                [disabled]="isEditing(user)"
+                color="primary">
+              </mat-slide-toggle>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="lastLogin">
+            <th mat-header-cell *matHeaderCellDef>Last Login</th>
+            <td mat-cell *matCellDef="let user">
+              <span *ngIf="user.lastLogin">{{user.lastLogin | date:'short'}}</span>
+              <span *ngIf="!user.lastLogin" class="never-logged-in">Never</span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let user">
+              <div class="action-buttons" *ngIf="!isEditing(user)">
+                <button mat-icon-button (click)="editUser(user)" matTooltip="Edit">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button (click)="resetPassword(user)" matTooltip="Reset Password">
+                  <mat-icon>lock_reset</mat-icon>
+                </button>
+                <button mat-icon-button (click)="deleteUser(user)" matTooltip="Delete">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+              <div class="action-buttons" *ngIf="isEditing(user)">
+                <button mat-icon-button (click)="saveUser()" matTooltip="Save" color="primary">
+                  <mat-icon>check</mat-icon>
+                </button>
+                <button mat-icon-button (click)="cancelEdit()" matTooltip="Cancel">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </div>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let user; columns: displayedColumns;"
+              [class.editing-row]="isEditing(user)"
+              [class.inactive-row]="!user.active">
+          </tr>
+        </table>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

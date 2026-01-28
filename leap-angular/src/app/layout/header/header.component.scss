@@ -1,0 +1,202 @@
+@import 'variables';
+
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: $z-header;
+  height: $header-height;
+  background: #FFFFFF;
+  border-bottom: 1px solid #E0E0E0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  padding: 0 $spacing-lg !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  color: $color-text-primary;
+  min-height: $header-height !important;
+  max-height: $header-height !important;
+  box-sizing: border-box !important;
+
+  // 覆盖 mat-toolbar 默认样式
+  &.mat-toolbar {
+    padding: 0 $spacing-lg !important;
+    gap: 0;
+  }
+
+  // 确保内容不换行
+  &.mat-toolbar-multiple-rows {
+    min-height: $header-height;
+  }
+}
+
+// 左侧：搜索框
+.header-left {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  min-width: 300px;
+  max-width: 500px;
+  width: 100%;
+  height: 36px;
+  background-color: #F5F5F5;
+  border-radius: 6px;
+  padding: 0 16px;
+  gap: 8px;
+  margin-left: -15px;
+  transition: background-color 0.2s ease;
+
+  &:focus-within {
+    background-color: #EEEEEE;
+  }
+
+  .search-icon {
+    color: rgba(0, 0, 0, 0.4);
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+
+  .search-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    outline: none;
+    font-size: $font-size-caption;
+    color: $color-text-primary;
+    font-weight: 400;
+    font-family: 'Graphik', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+    &::placeholder {
+      color: rgba(0, 0, 0, 0.4);
+      font-weight: 400;
+    }
+  }
+}
+
+// 右侧：通知和用户信息
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  flex-shrink: 0;
+}
+
+.notification-button {
+  color: $color-text-primary;
+  margin-right: 20px;
+}
+
+.user-menu-button {
+  min-width: auto !important;
+  padding: 4px !important;
+  border-radius: 50% !important;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: rgba(170, 80, 222, 0.08);
+  }
+
+  .user-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background-color: #AA50DE;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 8px rgba(170, 80, 222, 0.3);
+  }
+}
+
+.user-dropdown-menu {
+  margin-top: 12px;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+  min-width: 240px !important;
+  border: 1px solid rgba(0, 0, 0, 0.05) !important;
+  padding: 0 !important;
+  overflow: hidden;
+}
+
+.user-header {
+  padding: 20px;
+  background-color: #FFFFFF;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  .user-name-full {
+    font-weight: 600;
+    font-size: 16px;
+    color: #1A1A1A;
+    font-family: 'Graphik', sans-serif;
+  }
+
+  .user-role {
+    font-size: 12px;
+    color: #666666;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    &::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      background-color: #00B624;
+      border-radius: 50%;
+    }
+  }
+}
+
+::ng-deep .user-dropdown-menu {
+  .mat-mdc-menu-content {
+    padding: 8px 0 !important;
+  }
+
+  .mat-mdc-menu-item {
+    min-height: 44px !important;
+    
+    .mat-icon {
+      color: #666666 !important;
+      margin-right: 12px !important;
+      font-size: 20px !important;
+      width: 20px !important;
+      height: 20px !important;
+    }
+
+    span {
+      font-size: 14px !important;
+      color: #333333 !important;
+      font-weight: 400 !important;
+    }
+
+    &:hover {
+      background-color: #F8F9F8 !important;
+    }
+  }
+}
+
+// 响应式
+@media (max-width: 768px) {
+  .search-field {
+    display: none;
+  }
+
+  .user-name,
+  .user-role-inline {
+    display: none;
+  }
+}

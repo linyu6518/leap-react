@@ -1,0 +1,58 @@
+@import 'variables';
+
+.audit-log-container {
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.page-header {
+  margin-bottom: $spacing-md;
+
+  h2 {
+    margin: 0;
+    color: $color-text-primary;
+  }
+
+  .subtitle {
+    margin: $spacing-xs 0 0;
+    color: $color-text-secondary;
+    font-size: 14px;
+  }
+}
+
+.filter-card {
+  padding: $spacing-md;
+  margin-bottom: $spacing-md;
+
+  .filter-form {
+    .filter-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: $spacing-md;
+      margin-bottom: $spacing-md;
+
+      mat-form-field {
+        width: 100%;
+      }
+    }
+
+    .filter-actions {
+      display: flex;
+      gap: $spacing-sm;
+      align-items: center;
+
+      .export-buttons {
+        margin-left: auto;
+        display: flex;
+        gap: $spacing-sm;
+      }
+    }
+  }
+}
+
+.grid-container {
+  background: $color-bg-card;
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  box-shadow: $shadow-sm;
+}

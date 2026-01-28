@@ -1,0 +1,140 @@
+/* Global Styles - TD Green Theme */
+
+/* AG Grid Styles - MUST be imported first */
+@import 'ag-grid-community/styles/ag-grid.css';
+@import 'ag-grid-community/styles/ag-theme-material.css';
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  font-family: 'Graphik', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-weight: 300;
+  font-size: 16px;
+  color: #1a1a1a;
+  background-color: #f5f5f5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  height: 100%;
+}
+
+/* AG Grid Theme */
+.ag-theme-material {
+  font-family: 'Graphik', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-weight: 300;
+}
+
+.ag-header {
+  background-color: #fafafa;
+}
+
+.variance-alert {
+  background-color: #fff9e6 !important;
+  font-weight: 600;
+}
+
+/* Ant Design overrides */
+.ant-layout {
+  min-height: 100vh;
+}
+
+.ant-layout-sider {
+  background: #133f28 !important;
+}
+
+.ant-menu-dark {
+  background: #005a29 !important;
+}
+
+.ant-menu-dark .ant-menu-item-selected {
+  background-color: rgba(0, 132, 61, 0.3) !important;
+  border-left: 4px solid #00843d;
+}
+
+.ant-menu-dark .ant-menu-item:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Ensure all Ant Design components use Graphik font */
+.ant-btn,
+.ant-input,
+.ant-select,
+.ant-picker,
+.ant-form-item-label > label,
+.ant-form-item-extra,
+.ant-form-item-explain,
+.ant-table,
+.ant-card,
+.ant-menu,
+.ant-dropdown,
+.ant-tooltip,
+.ant-popover,
+.ant-modal,
+.ant-drawer,
+.ant-message,
+.ant-notification,
+.ant-alert {
+  font-family: 'Graphik', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+}
+
+
+/* Error Alert Styles */
+.ant-alert-error {
+  background-color: #F8E7E8 !important;
+  border: none !important;
+  border-radius: 4px;
+  padding: 14px 20px !important; /* Increased padding for more edge space */
+  display: flex !important;
+  gap: 8px !important; /* Add gap between icon and content */
+
+  .ant-alert-message {
+    color: #1A1A1A !important; /* Black text for title */
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.5;
+    margin-bottom: 6px !important;
+    text-align: left; /* Center text */
+  }
+
+  .ant-alert-icon {
+    color: #AD1100 !important;
+    font-size: 14px;
+    display: flex !important;
+    align-items: flex-start;
+    justify-content: center;
+    margin-top: 5px; /* Moved down 3px from 2px */
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+
+    svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+  }
+
+  .ant-alert-content {
+    flex: 1;
+    min-width: 0;
+    text-align: left; /* Center content */
+  }
+
+  .ant-alert-description {
+    color: #1A1A1A !important; /* Black text for description */
+    font-size: 12px;
+    font-weight: 400; /* Lighter weight */
+    line-height: 1.5;
+    margin-top: 0 !important;
+    text-align: left; /* Center description */
+  }
+}

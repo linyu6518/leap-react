@@ -1,0 +1,38 @@
+<div class="loan-commitments-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <h2>Loan Commitments - Product Analysis</h2>
+    <p class="subtitle">Monitor loan commitment exposure and credit line utilization</p>
+  </div>
+
+  <!-- Query Panel -->
+  <app-query-panel
+    (query)="onQuery($event)"
+    (reset)="onReset()"
+  ></app-query-panel>
+
+  <!-- Data Grid -->
+  <div class="grid-container">
+    <ag-grid-angular
+      class="ag-theme-material"
+      [rowData]="rowData"
+      [columnDefs]="columnDefs"
+      [defaultColDef]="defaultColDef"
+      [pagination]="true"
+      [paginationPageSize]="20"
+      [animateRows]="true"
+      (gridReady)="onGridReady($event)"
+      domLayout="autoHeight"
+    >
+    </ag-grid-angular>
+  </div>
+
+  <!-- Commentary Drawer -->
+  <app-commentary-drawer
+    [isOpen]="commentaryOpen"
+    [historyComments]="historyComments"
+    [productName]="selectedProduct?.product || ''"
+    (close)="closeCommentary()"
+    (save)="saveCommentary($event)"
+  ></app-commentary-drawer>
+</div>

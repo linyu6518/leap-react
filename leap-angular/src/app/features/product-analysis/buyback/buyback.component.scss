@@ -1,0 +1,55 @@
+@import 'variables';
+
+.buyback-container {
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.page-header {
+  margin-bottom: $spacing-md;
+
+  h2 {
+    margin: 0;
+    color: $color-text-primary;
+  }
+
+  .subtitle {
+    margin: $spacing-xs 0 0;
+    color: $color-text-secondary;
+    font-size: 14px;
+  }
+}
+
+.grid-container {
+  background: $color-bg-card;
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  box-shadow: $shadow-sm;
+
+  ::ng-deep .commentary-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: $color-primary;
+    padding: 4px;
+    border-radius: $radius-sm;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color $duration-fast;
+
+    &:hover {
+      background-color: $color-primary-light;
+    }
+
+    i {
+      font-size: 20px;
+    }
+  }
+
+  ::ng-deep .variance-alert {
+    background-color: rgba(255, 152, 0, 0.1);
+    font-weight: 600;
+    color: #e65100;
+  }
+}

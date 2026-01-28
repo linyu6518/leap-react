@@ -1,0 +1,679 @@
+<div class="report-container">
+  <!-- Report Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="title-section">
+        <h1>Federal Reserve Form FR 2052a</h1>
+        <h2>Liquidity Coverage Ratio (LCR)</h2>
+        <p class="subtitle">Complex Institution Liquidity Monitoring Report</p>
+      </div>
+      <div class="date-section">
+        <strong>Report Date:</strong> {{reportDate | date:'longDate'}}<br>
+        <strong>Reporting Period:</strong> 30-Day Stress Scenario<br>
+        <strong>Currency:</strong> U.S. Dollars (in millions)
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="report-actions">
+    <button mat-raised-button color="primary" (click)="exportToExcel()">
+      <mat-icon>table_chart</mat-icon>
+      Export to Excel
+    </button>
+    <button mat-raised-button (click)="exportToPDF()">
+      <mat-icon>picture_as_pdf</mat-icon>
+      Export to PDF
+    </button>
+    <button mat-raised-button (click)="printReport()">
+      <mat-icon>print</mat-icon>
+      Print Report
+    </button>
+  </div>
+
+  <!-- Executive Summary Card -->
+  <mat-card class="executive-summary">
+    <mat-card-header>
+      <mat-card-title>Executive Summary</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="summary-grid">
+        <div class="summary-item highlight">
+          <span class="label">LCR Ratio</span>
+          <span class="value" [class.compliant]="lcrRatio >= 100" [class.warning]="lcrRatio < 100">
+            {{lcrRatio | number:'1.2-2'}}%
+          </span>
+          <span class="status" *ngIf="lcrRatio >= 100">✓ Compliant</span>
+          <span class="status warning" *ngIf="lcrRatio < 100">⚠ Below Minimum</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Total HQLA</span>
+          <span class="value">${{(totalHQLA / 1000000000) | number:'1.2-2'}}B</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Net Cash Outflows</span>
+          <span class="value">${{(netCashOutflows / 1000000000) | number:'1.2-2'}}B</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Excess / (Shortfall)</span>
+          <span class="value" [class.positive]="excess >= 0" [class.negative]="excess < 0">
+            ${{(excess / 1000000000) | number:'1.2-2'}}B
+          </span>
+        </div>
+      </div>
+      <div class="formula-box">
+        <strong>LCR Formula:</strong> LCR = HQLA / Net Cash Outflows × 100%<br>
+        <em>Minimum Requirement: 100% | Inflows Capped at 75% of Outflows</em>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- PART I: HIGH-QUALITY LIQUID ASSETS (HQLA) -->
+  <div class="report-part">
+    <h2 class="part-title">PART I: HIGH-QUALITY LIQUID ASSETS (HQLA)</h2>
+
+    <!-- Level 1 Assets -->
+    <mat-card class="report-section">
+      <mat-card-header>
+        <mat-card-title>A. Level 1 Liquid Assets (0% Haircut)</mat-card-title>
+        <mat-card-subtitle>Assets with zero haircut and no cap on holdings</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="table-wrapper">
+          <table mat-table [dataSource]="level1Assets" class="report-table">
+            <ng-container matColumnDef="lineNumber">
+              <th mat-header-cell *matHeaderCellDef>Line</th>
+              <td mat-cell *matCellDef="let row">{{row.lineNumber}}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="description">
+              <th mat-header-cell *matHeaderCellDef>Description</th>
+              <td mat-cell *matCellDef="let row">{{row.description}}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="unweightedAmount">
+              <th mat-header-cell *matHeaderCellDef>Unweighted Amount (USD)</th>
+              <td mat-cell *matCellDef="let row" class="number-cell">
+                {{row.unweightedAmount | currency:'USD':'symbol':'1.0-0'}}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="haircut">
+              <th mat-header-cell *matHeaderCellDef>Haircut</th>
+              <td mat-cell *matCellDef="let row" class="center-cell">{{row.haircut}}%</td>
+            </ng-container>
+
+            <ng-container matColumnDef="weightedAmount">
+              <th mat-header-cell *matHeaderCellDef>Fair Value Amount (USD)</th>
+              <td mat-cell *matCellDef="let row" class="number-cell highlight">
+                {{row.weightedAmount | currency:'USD':'symbol':'1.0-0'}}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="notes">
+              <th mat-header-cell *matHeaderCellDef>Notes</th>
+              <td mat-cell *matCellDef="let row" class="notes-cell">{{row.notes}}</td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="hqlaColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: hqlaColumns;"></tr>
+          </table>
+        </div>
+        <div class="subtotal-row">
+          <strong>Total Level 1 Assets:</strong>
+          <div class="subtotal-amounts">
+            <span>Unweighted: {{totalLevel1.unweighted | currency:'USD':'symbol':'1.0-0'}}</span>
+            <span class="weighted">Fair Value: {{totalLevel1.weighted | currency:'USD':'symbol':'1.0-0'}}</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Level 2A Assets -->
+    <mat-card class="report-section">
+      <mat-card-header>
+        <mat-card-title>B. Level 2A Liquid Assets (15% Haircut)</mat-card-title>
+        <mat-card-subtitle>GSE and highly rated securities</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="table-wrapper">
+          <table mat-table [dataSource]="level2aAssets" class="report-table">
+            <ng-container matColumnDef="lineNumber">
+              <th mat-header-cell *matHeaderCellDef>Line</th>
+              <td mat-cell *matCellDef="let row">{{row.lineNumber}}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="description">
+              <th mat-header-cell *matHeaderCellDef>Description</th>
+              <td mat-cell *matCellDef="let row">{{row.description}}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="unweightedAmount">
+              <th mat-header-cell *matHeaderCellDef>Unweighted Amount (USD)</th>
+              <td mat-cell *matCellDef="let row" class="number-cell">
+                {{row.unweightedAmount | currency:'USD':'symbol':'1.0-0'}}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="haircut">
+              <th mat-header-cell *matHeaderCellDef>Haircut</th>
+              <td mat-cell *matCellDef="let row" class="center-cell">{{row.haircut}}%</td>
+            </ng-container>
+
+            <ng-container matColumnDef="weightedAmount">
+              <th mat-header-cell *matHeaderCellDef>Fair Value Amount (USD)</th>
+              <td mat-cell *matCellDef="let row" class="number-cell highlight">
+                {{row.weightedAmount | currency:'USD':'symbol':'1.0-0'}}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="notes">
+              <th mat-header-cell *matHeaderCellDef>Notes</th>
+              <td mat-cell *matCellDef="let row" class="notes-cell">{{row.notes}}</td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="hqlaColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: hqlaColumns;"></tr>
+          </table>
+        </div>
+        <div class="subtotal-row">
+          <strong>Total Level 2A Assets:</strong>
+          <div class="subtotal-amounts">
+            <span>Unweighted: {{totalLevel2A.unweighted | currency:'USD':'symbol':'1.0-0'}}</span>
+            <span class="weighted">Fair Value: {{totalLevel2A.weighted | currency:'USD':'symbol':'1.0-0'}}</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Level 2B Assets -->
+    <mat-card class="report-section">
+      <mat-card-header>
+        <mat-card-title>C. Level 2B Liquid Assets (50% Haircut)</mat-card-title>
+        <mat-card-subtitle>Investment grade corporate and equity securities</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="table-wrapper">
+          <table mat-table [dataSource]="level2bAssets" class="report-table">
+            <ng-container matColumnDef="lineNumber">
+              <th mat-header-cell *matHeaderCellDef>Line</th>
+              <td mat-cell *matCellDef="let row">{{row.lineNumber}}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="description">
+              <th mat-header-cell *matHeaderCellDef>Description</th>
+              <td mat-cell *matCellDef="let row">{{row.description}}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="unweightedAmount">
+              <th mat-header-cell *matHeaderCellDef>Unweighted Amount (USD)</th>
+              <td mat-cell *matCellDef="let row" class="number-cell">
+                {{row.unweightedAmount | currency:'USD':'symbol':'1.0-0'}}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="haircut">
+              <th mat-header-cell *matHeaderCellDef>Haircut</th>
+              <td mat-cell *matCellDef="let row" class="center-cell">{{row.haircut}}%</td>
+            </ng-container>
+
+            <ng-container matColumnDef="weightedAmount">
+              <th mat-header-cell *matHeaderCellDef>Fair Value Amount (USD)</th>
+              <td mat-cell *matCellDef="let row" class="number-cell highlight">
+                {{row.weightedAmount | currency:'USD':'symbol':'1.0-0'}}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="notes">
+              <th mat-header-cell *matHeaderCellDef>Notes</th>
+              <td mat-cell *matCellDef="let row" class="notes-cell">{{row.notes}}</td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="hqlaColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: hqlaColumns;"></tr>
+          </table>
+        </div>
+        <div class="subtotal-row">
+          <strong>Total Level 2B Assets:</strong>
+          <div class="subtotal-amounts">
+            <span>Unweighted: {{totalLevel2B.unweighted | currency:'USD':'symbol':'1.0-0'}}</span>
+            <span class="weighted">Fair Value: {{totalLevel2B.weighted | currency:'USD':'symbol':'1.0-0'}}</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- HQLA Totals -->
+    <mat-card class="total-card">
+      <mat-card-content>
+        <div class="total-calculations">
+          <div class="calc-row">
+            <span>Level 1 Assets (No Cap):</span>
+            <span class="amount">{{totalLevel1.weighted | currency:'USD':'symbol':'1.0-0'}}</span>
+          </div>
+          <div class="calc-row">
+            <span>Level 2A + 2B Assets (Before Cap):</span>
+            <span class="amount">{{(totalLevel2A.weighted + totalLevel2B.weighted) | currency:'USD':'symbol':'1.0-0'}}</span>
+          </div>
+          <div class="calc-row">
+            <span>Level 2 Cap (67% of Level 1):</span>
+            <span class="amount">{{(totalLevel1.weighted * 0.67) | currency:'USD':'symbol':'1.0-0'}}</span>
+          </div>
+          <div class="calc-row">
+            <span>Level 2 Assets (After Cap):</span>
+            <span class="amount">{{adjustedLevel2 | currency:'USD':'symbol':'1.0-0'}}</span>
+          </div>
+          <div class="calc-row total-row">
+            <strong>TOTAL HQLA (Part I):</strong>
+            <strong class="amount highlight-green">{{totalHQLA | currency:'USD':'symbol':'1.0-0'}}</strong>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- PART II: CASH OUTFLOWS -->
+  <div class="report-part">
+    <h2 class="part-title">PART II: CASH OUTFLOWS (30-Day Scenario)</h2>
+
+    <!-- Retail Deposits -->
+    <mat-card class="report-section">
+      <mat-card-header>
+        <mat-card-title>A. Retail Deposits and Small Business Customer Deposits</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="table-wrapper">
+          <table mat-table [dataSource]="retailDeposits" class="report-table">
+            <ng-container matColumnDef="lineNumber">
+              <th mat-header-cell *matHeaderCellDef>Line</th>
+              <td mat-cell *matCellDef="let row">{{row.lineNumber}}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="description">
+              <th mat-header-cell *matHeaderCellDef>Description</th>
+              <td mat-cell *matCellDef="let row">{{row.description}}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="unweightedAmount">
+              <th mat-header-cell *matHeaderCellDef>Outstanding Balance (USD)</th>
+              <td mat-cell *matCellDef="let row" class="number-cell">
+                {{row.unweightedAmount | currency:'USD':'symbol':'1.0-0'}}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="rate">
+              <th mat-header-cell *matHeaderCellDef>Outflow Rate</th>
+              <td mat-cell *matCellDef="let row" class="center-cell">{{row.rate}}%</td>
+            </ng-container>
+
+            <ng-container matColumnDef="weightedAmount">
+              <th mat-header-cell *matHeaderCellDef>Expected Outflow (USD)</th>
+              <td mat-cell *matCellDef="let row" class="number-cell highlight">
+                {{row.weightedAmount | currency:'USD':'symbol':'1.0-0'}}
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="outflowColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: outflowColumns;"></tr>
+          </table>
+        </div>
+        <div class="subtotal-row">
+          <strong>Total Retail Outflows:</strong>
+          <span class="weighted">{{totalRetailOutflows.weighted | currency:'USD':'symbol':'1.0-0'}}</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Unsecured Wholesale Funding -->
+    <mat-card class="report-section">
+      <mat-card-header>
+        <mat-card-title>B. Unsecured Wholesale Funding</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="table-wrapper">
+          <table mat-table [dataSource]="unsecuredWholesale" class="report-table">
+            <ng-container matColumnDef="lineNumber">
+              <th mat-header-cell *matHeaderCellDef>Line</th>
+              <td mat-cell *matCellDef="let row">{{row.lineNumber}}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="description">
+              <th mat-header-cell *matHeaderCellDef>Description</th>
+              <td mat-cell *matCellDef="let row">{{row.description}}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="unweightedAmount">
+              <th mat-header-cell *matHeaderCellDef>Outstanding Balance (USD)</th>
+              <td mat-cell *matCellDef="let row" class="number-cell">
+                {{row.unweightedAmount | currency:'USD':'symbol':'1.0-0'}}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="rate">
+              <th mat-header-cell *matHeaderCellDef>Outflow Rate</th>
+              <td mat-cell *matCellDef="let row" class="center-cell">{{row.rate}}%</td>
+            </ng-container>
+
+            <ng-container matColumnDef="weightedAmount">
+              <th mat-header-cell *matHeaderCellDef>Expected Outflow (USD)</th>
+              <td mat-cell *matCellDef="let row" class="number-cell highlight">
+                {{row.weightedAmount | currency:'USD':'symbol':'1.0-0'}}
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="outflowColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: outflowColumns;"></tr>
+          </table>
+        </div>
+        <div class="subtotal-row">
+          <strong>Total Unsecured Wholesale Outflows:</strong>
+          <span class="weighted">{{totalUnsecuredWholesale.weighted | currency:'USD':'symbol':'1.0-0'}}</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Secured Funding -->
+    <mat-card class="report-section">
+      <mat-card-header>
+        <mat-card-title>C. Secured Funding Transactions</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="table-wrapper">
+          <table mat-table [dataSource]="securedFunding" class="report-table">
+            <tr mat-header-row *matHeaderRowDef="outflowColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: outflowColumns;"></tr>
+          </table>
+        </div>
+        <div class="subtotal-row">
+          <strong>Total Secured Funding Outflows:</strong>
+          <span class="weighted">{{totalSecuredFunding.weighted | currency:'USD':'symbol':'1.0-0'}}</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Additional Requirements -->
+    <mat-card class="report-section">
+      <mat-card-header>
+        <mat-card-title>D. Additional Requirements</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="table-wrapper">
+          <table mat-table [dataSource]="additionalRequirements" class="report-table">
+            <tr mat-header-row *matHeaderRowDef="outflowColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: outflowColumns;"></tr>
+          </table>
+        </div>
+        <div class="subtotal-row">
+          <strong>Total Additional Requirements:</strong>
+          <span class="weighted">{{totalAdditionalReq.weighted | currency:'USD':'symbol':'1.0-0'}}</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Other Contractual Funding -->
+    <mat-card class="report-section">
+      <mat-card-header>
+        <mat-card-title>E. Other Contractual Funding Obligations</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="table-wrapper">
+          <table mat-table [dataSource]="otherContractualFunding" class="report-table">
+            <tr mat-header-row *matHeaderRowDef="outflowColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: outflowColumns;"></tr>
+          </table>
+        </div>
+        <div class="subtotal-row">
+          <strong>Total Other Contractual Funding:</strong>
+          <span class="weighted">{{totalOtherContractualFunding.weighted | currency:'USD':'symbol':'1.0-0'}}</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Other Contingent Funding -->
+    <mat-card class="report-section">
+      <mat-card-header>
+        <mat-card-title>F. Other Contingent Funding Obligations</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="table-wrapper">
+          <table mat-table [dataSource]="otherContingentFunding" class="report-table">
+            <tr mat-header-row *matHeaderRowDef="outflowColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: outflowColumns;"></tr>
+          </table>
+        </div>
+        <div class="subtotal-row">
+          <strong>Total Other Contingent Funding:</strong>
+          <span class="weighted">{{totalOtherContingentFunding.weighted | currency:'USD':'symbol':'1.0-0'}}</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Total Outflows -->
+    <mat-card class="total-card">
+      <mat-card-content>
+        <div class="total-calculations">
+          <div class="calc-row">
+            <span>A. Retail Deposits:</span>
+            <span class="amount">{{totalRetailOutflows.weighted | currency:'USD':'symbol':'1.0-0'}}</span>
+          </div>
+          <div class="calc-row">
+            <span>B. Unsecured Wholesale:</span>
+            <span class="amount">{{totalUnsecuredWholesale.weighted | currency:'USD':'symbol':'1.0-0'}}</span>
+          </div>
+          <div class="calc-row">
+            <span>C. Secured Funding:</span>
+            <span class="amount">{{totalSecuredFunding.weighted | currency:'USD':'symbol':'1.0-0'}}</span>
+          </div>
+          <div class="calc-row">
+            <span>D. Additional Requirements:</span>
+            <span class="amount">{{totalAdditionalReq.weighted | currency:'USD':'symbol':'1.0-0'}}</span>
+          </div>
+          <div class="calc-row">
+            <span>E. Other Contractual Funding:</span>
+            <span class="amount">{{totalOtherContractualFunding.weighted | currency:'USD':'symbol':'1.0-0'}}</span>
+          </div>
+          <div class="calc-row">
+            <span>F. Other Contingent Funding:</span>
+            <span class="amount">{{totalOtherContingentFunding.weighted | currency:'USD':'symbol':'1.0-0'}}</span>
+          </div>
+          <div class="calc-row total-row">
+            <strong>TOTAL OUTFLOWS (Part II):</strong>
+            <strong class="amount highlight-red">{{totalOutflows | currency:'USD':'symbol':'1.0-0'}}</strong>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- PART III: CASH INFLOWS -->
+  <div class="report-part">
+    <h2 class="part-title">PART III: CASH INFLOWS (30-Day Scenario)</h2>
+
+    <!-- Secured Lending -->
+    <mat-card class="report-section">
+      <mat-card-header>
+        <mat-card-title>A. Secured Lending Transactions</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="table-wrapper">
+          <table mat-table [dataSource]="securedLending" class="report-table">
+            <tr mat-header-row *matHeaderRowDef="inflowColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: inflowColumns;"></tr>
+          </table>
+        </div>
+        <div class="subtotal-row">
+          <strong>Total Secured Lending Inflows:</strong>
+          <span class="weighted">{{totalSecuredLending.weighted | currency:'USD':'symbol':'1.0-0'}}</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Inflows from Counterparties -->
+    <mat-card class="report-section">
+      <mat-card-header>
+        <mat-card-title>B. Inflows from Fully Performing Exposures</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="table-wrapper">
+          <table mat-table [dataSource]="inflowsFromCounterparties" class="report-table">
+            <tr mat-header-row *matHeaderRowDef="inflowColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: inflowColumns;"></tr>
+          </table>
+        </div>
+        <div class="subtotal-row">
+          <strong>Total Counterparty Inflows:</strong>
+          <span class="weighted">{{totalInflowsFromCounterparties.weighted | currency:'USD':'symbol':'1.0-0'}}</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Other Cash Inflows -->
+    <mat-card class="report-section">
+      <mat-card-header>
+        <mat-card-title>C. Other Cash Inflows</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="table-wrapper">
+          <table mat-table [dataSource]="otherCashInflows" class="report-table">
+            <tr mat-header-row *matHeaderRowDef="inflowColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: inflowColumns;"></tr>
+          </table>
+        </div>
+        <div class="subtotal-row">
+          <strong>Total Other Inflows:</strong>
+          <span class="weighted">{{totalOtherInflows.weighted | currency:'USD':'symbol':'1.0-0'}}</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Total Inflows -->
+    <mat-card class="total-card">
+      <mat-card-content>
+        <div class="total-calculations">
+          <div class="calc-row">
+            <span>A. Secured Lending:</span>
+            <span class="amount">{{totalSecuredLending.weighted | currency:'USD':'symbol':'1.0-0'}}</span>
+          </div>
+          <div class="calc-row">
+            <span>B. Inflows from Counterparties:</span>
+            <span class="amount">{{totalInflowsFromCounterparties.weighted | currency:'USD':'symbol':'1.0-0'}}</span>
+          </div>
+          <div class="calc-row">
+            <span>C. Other Cash Inflows:</span>
+            <span class="amount">{{totalOtherInflows.weighted | currency:'USD':'symbol':'1.0-0'}}</span>
+          </div>
+          <div class="calc-row">
+            <span>Total Inflows (Before Cap):</span>
+            <span class="amount">{{totalInflows | currency:'USD':'symbol':'1.0-0'}}</span>
+          </div>
+          <div class="calc-row">
+            <span>Inflow Cap (75% of Outflows):</span>
+            <span class="amount">{{(totalOutflows * 0.75) | currency:'USD':'symbol':'1.0-0'}}</span>
+          </div>
+          <div class="calc-row total-row">
+            <strong>TOTAL INFLOWS (Part III):</strong>
+            <strong class="amount highlight-blue">{{cappedInflows | currency:'USD':'symbol':'1.0-0'}}</strong>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- PART IV: LCR CALCULATION -->
+  <div class="report-part">
+    <h2 class="part-title">PART IV: LIQUIDITY COVERAGE RATIO CALCULATION</h2>
+
+    <mat-card class="calculation-card">
+      <mat-card-content>
+        <div class="lcr-calculation">
+          <div class="calc-step">
+            <div class="step-number">1</div>
+            <div class="step-content">
+              <span class="step-label">Total High-Quality Liquid Assets (HQLA)</span>
+              <span class="step-value">{{totalHQLA | currency:'USD':'symbol':'1.0-0'}}</span>
+            </div>
+          </div>
+
+          <div class="calc-operator">÷</div>
+
+          <div class="calc-step">
+            <div class="step-number">2</div>
+            <div class="step-content">
+              <span class="step-label">Net Cash Outflows (Outflows - Capped Inflows)</span>
+              <div class="step-calculation">
+                <span>{{totalOutflows | currency:'USD':'symbol':'1.0-0'}}</span>
+                <span> − </span>
+                <span>{{cappedInflows | currency:'USD':'symbol':'1.0-0'}}</span>
+                <span> = </span>
+                <span class="step-value">{{netCashOutflows | currency:'USD':'symbol':'1.0-0'}}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="calc-operator">×</div>
+
+          <div class="calc-step">
+            <div class="step-number">3</div>
+            <div class="step-content">
+              <span class="step-label">Convert to Percentage</span>
+              <span class="step-value">100%</span>
+            </div>
+          </div>
+
+          <div class="calc-operator">=</div>
+
+          <div class="calc-result">
+            <div class="result-label">LIQUIDITY COVERAGE RATIO</div>
+            <div class="result-value" [class.compliant]="lcrRatio >= 100" [class.warning]="lcrRatio < 100">
+              {{lcrRatio | number:'1.2-2'}}%
+            </div>
+            <div class="result-status">
+              <mat-icon *ngIf="lcrRatio >= 100" class="status-icon success">check_circle</mat-icon>
+              <mat-icon *ngIf="lcrRatio < 100" class="status-icon warning">warning</mat-icon>
+              <span *ngIf="lcrRatio >= 100" class="status-text success">
+                Compliant - Exceeds 100% Minimum Requirement
+              </span>
+              <span *ngIf="lcrRatio < 100" class="status-text warning">
+                Non-Compliant - Below 100% Minimum Requirement
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="excess-section">
+          <div class="excess-label">Excess / (Shortfall) HQLA:</div>
+          <div class="excess-value" [class.positive]="excess >= 0" [class.negative]="excess < 0">
+            {{excess | currency:'USD':'symbol':'1.0-0'}}
+          </div>
+          <div class="excess-note" *ngIf="excess >= 0">
+            <mat-icon>info</mat-icon>
+            Institution holds sufficient HQLA to meet regulatory requirements
+          </div>
+          <div class="excess-note warning" *ngIf="excess < 0">
+            <mat-icon>warning</mat-icon>
+            Institution has an HQLA shortfall and must take corrective action
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Report Footer -->
+  <div class="report-footer">
+    <mat-divider></mat-divider>
+    <div class="footer-content">
+      <div class="footer-section">
+        <strong>Regulatory Reference:</strong> 12 CFR Part 249 - Liquidity Coverage Ratio: Liquidity Risk Measurement, Standards, and Monitoring
+      </div>
+      <div class="footer-section">
+        <strong>Submission Frequency:</strong> Daily (for Category I/II) | Monthly (for Category III/IV)
+      </div>
+      <div class="footer-section">
+        <strong>Contact:</strong> TD Bank Treasury Department | liquidity.reporting&#64;td.com
+      </div>
+      <div class="footer-section">
+        <em>Generated by LEAP - Liquidity Explain & Analytics Platform</em>
+      </div>
+    </div>
+  </div>
+</div>

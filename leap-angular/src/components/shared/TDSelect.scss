@@ -1,0 +1,229 @@
+@import '@styles/variables.scss';
+
+.td-select-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-bottom: 0;
+  position: relative;
+}
+
+.td-select-label {
+  font-family: $font-family;
+  font-size: 14px;
+  font-weight: 500;
+  color: $color-text-primary;
+  line-height: 1.5;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.td-select {
+  width: 100%;
+
+  .ant-select-selector {
+    font-family: $font-family;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.5;
+    color: #1A1A1A;
+    height: 54px !important;
+    border-color: #8B8B8B !important;
+    border-top-left-radius: 4px !important;
+    border-top-right-radius: 4px !important;
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    border-width: 1px !important;
+    border-style: solid !important;
+    padding: 8px 40px 8px 12px !important; // Match TDInput padding: 8px 12px, but add right padding for arrow
+    transition: all 0.2s ease;
+    display: flex !important;
+    align-items: center !important;
+
+    &:hover {
+      border-color: #8B8B8B !important; // Keep original color on hover
+    }
+  }
+
+  &.ant-select-focused .ant-select-selector {
+    border-color: #8B8B8B !important; // Keep original border color
+    border-width: 1px 1px 3px 1px !important; // Only bottom border is thicker
+    border-bottom-color: #008A00 !important; // Only bottom border turns green
+    box-shadow: none !important;
+  }
+
+  .ant-select-selection-placeholder {
+    color: #9E9E9E !important; // Gray placeholder text
+    font-weight: 400;
+    font-size: 16px !important; // 16px font size
+    line-height: 1.5;
+    margin-top: 12px !important; // Move down 12px (increased from 8px)
+    margin-left: 3px !important; // Move right 3px to align with Region
+  }
+
+  .ant-select-selection-item {
+    line-height: 1.5;
+    display: flex;
+    align-items: center;
+    font-weight: 500 !important; // Selected text is bold
+    font-size: 16px !important; // 16px font size
+    margin-left: 3px !important; // Move right 3px
+    margin-top: 12px !important; // Move down 12px (increased from 8px)
+  }
+
+  // Custom dropdown arrow - vertically centered and darker color
+  .ant-select-arrow {
+    color: #6B6B6B !important; // Darker color
+    font-size: 0;
+    width: 16px;
+    height: 16px;
+    margin-top: 0 !important; // Remove margin-top to center vertically
+    top: 50% !important; // Center vertically
+    transform: translateY(calc(-50% + 4px)) !important; // Center vertically and move down 4px (7px - 3px)
+    transition: transform 0.2s ease, color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    right: 12px !important;
+
+    // Hide default icon
+    .anticon {
+      display: none;
+    }
+
+    // Create elegant chevron icon using CSS - larger size
+    &::after {
+      content: '';
+      display: block;
+      width: 8px; // Increased from 6px
+      height: 8px; // Increased from 6px
+      border-right: 1.5px solid currentColor;
+      border-bottom: 1.5px solid currentColor;
+      transform: rotate(45deg) scale(0.9);
+      transition: transform 0.2s ease, color 0.2s ease;
+    }
+  }
+
+  &:hover .ant-select-arrow {
+    color: #00843D;
+  }
+
+  // Ensure closed state arrow position is maintained
+  &:not(.ant-select-open) .ant-select-arrow {
+    transform: translateY(calc(-50% + 4px)) !important; // Move down 4px for closed state (down arrow) (7px - 3px)
+  }
+
+  &.ant-select-open .ant-select-arrow {
+    transform: translateY(calc(-50% + 8px)) !important; // Move down 8px for open state (up arrow) (10px - 2px)
+    color: #00843D;
+
+    &::after {
+      transform: rotate(225deg) scale(0.9);
+    }
+  }
+
+  &.ant-select-disabled {
+    .ant-select-selector {
+      background-color: #F5F5F5;
+      color: #9E9E9E;
+      cursor: not-allowed;
+      border-color: #8B8B8B !important;
+      border-width: 1px !important;
+    }
+
+    .ant-select-arrow {
+      color: #9E9E9E;
+    }
+  }
+}
+
+// Floating label effect
+.td-select-wrapper {
+  > div {
+    position: relative;
+  }
+
+  .td-select-floating-label {
+    position: absolute;
+    left: 12px;
+    top: 18px;
+    font-family: $font-family;
+    font-size: 16px;
+    font-weight: 400;
+    color: #1C1C1C;
+    pointer-events: none;
+    transition: all 0.2s ease;
+    background-color: white;
+    padding: 0 4px;
+    z-index: 1;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .td-select-floating-label-active {
+    top: 6px !important; // Keep original position
+    font-size: 12px !important;
+    color: #1C1C1C !important;
+  }
+}
+
+// Error state
+.td-select-error {
+  .td-select .ant-select-selector {
+    border-color: #8B8B8B !important;
+    border-width: 1px 1px 3px 1px !important;
+    border-bottom-color: #AD1100 !important;
+  }
+
+  .td-select.ant-select-focused .ant-select-selector {
+    border-color: #8B8B8B !important;
+    border-width: 1px 1px 3px 1px !important;
+    border-bottom-color: #AD1100 !important;
+  }
+}
+
+.td-select-error-text {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-top: 4px;
+  font-family: $font-family;
+  font-size: 12px;
+  color: #AD1100;
+  font-weight: 600;
+  line-height: 1.3;
+
+  .td-select-error-icon {
+    width: 14px;
+    height: 14px;
+    color: #AD1100;
+    margin-top: 1px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .td-select-error-message {
+    margin-left: 2px;
+  }
+}
+
+.td-select-helper-text {
+  font-family: $font-family;
+  font-size: 12px;
+  color: #757575;
+  line-height: 1.3;
+  margin-top: 4px;
+}
+
+// Dropdown options - make text bold
+.ant-select-dropdown {
+  .ant-select-item {
+    font-weight: 600 !important; // Bold text in dropdown
+
+    &.ant-select-item-option-selected {
+      font-weight: 600 !important;
+    }
+  }
+}

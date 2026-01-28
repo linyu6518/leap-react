@@ -1,0 +1,402 @@
+@import 'variables';
+
+.nsfr-detail-container {
+  max-width: 1600px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.page-header {
+  margin-bottom: $spacing-sm;
+  display: flex;
+  align-items: center;
+
+  .page-title {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    color: $color-text-primary;
+    font-size: $font-size-h3;
+    font-weight: 400;
+    font-family: 'Graphik', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+    mat-icon:first-child {
+      color: #133F28;
+      font-size: 28px;
+      width: 28px;
+      height: 28px;
+    }
+
+    .title-breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: $font-size-h3;
+      font-weight: 400;
+
+      .breadcrumb-link {
+        color: #96A496;
+        text-decoration: none;
+        transition: color $duration-fast;
+        cursor: pointer;
+        font-size: $font-size-h3;
+        font-weight: 400;
+
+        &:hover {
+          color: #133F28;
+        }
+      }
+
+      .breadcrumb-separator {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+        color: #96A496;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .breadcrumb-current {
+        color: $color-text-primary;
+        font-size: $font-size-h3;
+        font-weight: 400;
+      }
+    }
+  }
+}
+
+.status-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: $spacing-sm;
+  margin-bottom: $spacing-sm;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.status-card {
+  padding: $spacing-md;
+  box-shadow: $shadow-sm;
+
+  .status-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: #08781E;
+  }
+
+  .status-label {
+    font-size: $font-size-caption;
+    color: #3A473A;
+    font-weight: 600;
+    font-family: 'Graphik', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+
+  .status-corner {
+    font-size: 36px;
+    width: 36px;
+    height: 36px;
+    opacity: 0.8;
+    font-weight: 300;
+    color: #08781E;
+  }
+
+  .status-update {
+    font-size: $font-size-small;
+    color: #9E9E9E;
+    font-weight: 500;
+    margin-bottom: 28px;
+    font-family: 'Graphik', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+
+  .status-value-row {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+
+  .status-value {
+    font-size: 48px;
+    font-weight: 300;
+    color: #08781E;
+    line-height: 1.1;
+    font-family: 'Graphik', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+
+  .status-trend {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    font-size: $font-size-small;
+    color: #FF6767;
+    font-weight: 400;
+    font-family: 'Graphik', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+    .trend-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+    }
+
+    &.positive {
+      color: #6CC100;
+    }
+  }
+}
+
+.action-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-sm;
+  margin-top: 0;
+  padding: $spacing-sm 0;
+  background: #f5f5f5;
+  border-radius: 3px;
+  min-height: 48px;
+  gap: $spacing-lg;
+
+  .action-info {
+    display: flex;
+    align-items: center;
+    gap: $spacing-lg;
+    font-size: 14px;
+    color: $color-text-secondary;
+    line-height: 1.5;
+    margin-left: 0;
+    margin-top: 15px;
+    padding-left: 16px;
+
+    .info-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .info-icon {
+      font-size: 8px;
+      width: 8px;
+      height: 8px;
+
+      &.sign-offs-icon {
+        color: #08781E;
+      }
+
+      &.adjustments-icon {
+        color: #FFC107;
+      }
+    }
+
+    .info-text {
+      display: flex;
+      align-items: center;
+    }
+
+    .info-number {
+      font-weight: 600;
+      margin-right: 4px;
+
+      &.sign-offs {
+        color: #08781E;
+      }
+
+      &.adjustments {
+        color: #FFC107;
+      }
+    }
+  }
+
+  .publish-button {
+    background-color: #1976D2 !important;
+    color: white !important;
+    min-width: 100px;
+    height: 36px;
+    margin-right: 0;
+    margin-top: -5px;
+    margin-left: auto;
+    padding: 0 $spacing-lg !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+}
+
+.nsfr-detail-container {
+  .action-bar {
+    padding-left: 0;
+    padding-right: 0;
+    width: 100%;
+    max-width: 1600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+.grid-section {
+  background: #ffffff;
+  border-radius: 3px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  padding: 0 $spacing-lg $spacing-lg;
+  margin-top: -15px;
+  margin-bottom: $spacing-md;
+  width: 100%;
+
+  .grid-container {
+    background: $color-bg-card;
+    border-radius: 0 0 3px 3px;
+    padding: 0;
+    box-shadow: $shadow-sm;
+    border: 1px solid #E7E7E7;
+    width: calc(100% + #{$spacing-lg * 2});
+    margin-left: -$spacing-lg;
+    margin-right: -$spacing-lg;
+    margin-bottom: -$spacing-lg;
+    overflow: hidden;
+    box-sizing: border-box;
+
+    ::ng-deep {
+      .ag-theme-material {
+        --ag-header-background-color: #FFFFFF;
+        --ag-header-foreground-color: #666666;
+        --ag-header-column-separator-display: none;
+        --ag-pinned-column-border-display: block;
+        --ag-pinned-column-border-color: #E7E7E7;
+        --ag-row-hover-color: #F4F9F4;
+        --ag-selected-row-background-color: #F0F4F0;
+        --ag-font-size: 13px;
+        --ag-font-family: 'Graphik', sans-serif;
+        --ag-border-color: #F0F0F0;
+        width: 100% !important;
+        box-sizing: border-box !important;
+      }
+
+      .ag-root-wrapper {
+        width: 100% !important;
+        box-sizing: border-box !important;
+      }
+
+      .ag-body-viewport {
+        width: 100% !important;
+        box-sizing: border-box !important;
+      }
+
+      .ag-center-cols-container {
+        width: 100% !important;
+        box-sizing: border-box !important;
+      }
+
+      .ag-body-horizontal-scroll {
+        width: 100% !important;
+        box-sizing: border-box !important;
+      }
+
+      .ag-header {
+        width: 100% !important;
+        box-sizing: border-box !important;
+      }
+
+      .ag-header-viewport {
+        width: 100% !important;
+        box-sizing: border-box !important;
+      }
+    }
+  }
+}
+
+::ng-deep {
+  .ag-theme-material {
+    .ag-header {
+      background-color: #f8f8f8;
+      border-bottom: 2px solid #e0e0e0;
+    }
+
+    .ag-header-cell {
+      font-weight: 600;
+      font-size: 13px;
+      color: $color-text-primary;
+    }
+
+    .ag-header-group-cell {
+      font-weight: 600;
+      font-size: 13px;
+
+      &.segment-header-with-border {
+        border-left: 1px solid #E7E7E7 !important;
+      }
+    }
+
+    .segment-column-with-border {
+      border-left: 1px solid #E7E7E7 !important;
+    }
+
+    .ag-cell {
+      font-size: 13px;
+    }
+
+    .lcr-title-header {
+      text-align: left !important;
+      vertical-align: middle !important;
+      
+      .ag-header-cell-text {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        justify-content: center !important;
+        height: 100% !important;
+        line-height: 1.4 !important;
+        font-size: 0 !important;
+        padding-left: 16px !important;
+        
+        &::before {
+          content: 'Enterprise NSFR';
+          font-size: 18px !important;
+          font-weight: 600 !important;
+          color: $color-text-primary !important;
+          display: block !important;
+          margin-bottom: 4px !important;
+          line-height: 1.2 !important;
+        }
+        
+        &::after {
+          content: 'Amount (in Millions CAD)';
+          font-size: 14px !important;
+          font-weight: 400 !important;
+          color: $color-text-secondary !important;
+          display: block !important;
+          line-height: 1.2 !important;
+        }
+      }
+    }
+
+    .header-row-cell {
+      font-weight: 500 !important;
+      color: #133F28 !important;
+      background-color: #f8f8f8 !important;
+    }
+
+    .summary-row {
+      background-color: #e3f2fd !important;
+      font-weight: 600 !important;
+    }
+
+    .variance-up {
+      color: #08781E !important;
+    }
+
+    .variance-down {
+      color: #d32f2f !important;
+    }
+
+    .ag-pinned-left-cols-container {
+      z-index: 10 !important;
+      border-right: 1px solid #E7E7E7 !important;
+    }
+
+    .ag-pinned-left-header {
+      border-right: 1px solid #E7E7E7 !important;
+    }
+  }
+}

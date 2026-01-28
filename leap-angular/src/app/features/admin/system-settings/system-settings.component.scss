@@ -1,0 +1,83 @@
+.settings-container {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.page-header {
+  margin-bottom: 24px;
+
+  h2 {
+    font-size: 28px;
+    font-weight: 600;
+    color: #1A1A1A;
+    margin: 0 0 8px;
+  }
+
+  .subtitle {
+    color: #757575;
+    font-size: 14px;
+    margin: 0;
+  }
+}
+
+.actions-bar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+
+  button {
+    mat-icon {
+      margin-right: 8px;
+    }
+  }
+}
+
+.tab-content {
+  padding: 24px;
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 600px;
+
+    h3 {
+      font-size: 20px;
+      font-weight: 600;
+      color: #1A1A1A;
+      margin: 16px 0 16px 0;
+
+      &:first-child {
+        margin-top: 0;
+      }
+    }
+
+    mat-form-field {
+      width: 100%;
+    }
+
+    .toggle-group {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin: 8px 0;
+
+      mat-slide-toggle {
+        ::ng-deep .mdc-label {
+          font-size: 14px;
+          color: #424242;
+        }
+      }
+    }
+
+    button[mat-raised-button] {
+      width: fit-content;
+      margin-top: 8px;
+
+      mat-icon {
+        margin-right: 8px;
+      }
+    }
+  }
+}

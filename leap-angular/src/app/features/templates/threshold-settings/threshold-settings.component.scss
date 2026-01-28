@@ -1,0 +1,142 @@
+.threshold-container {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.page-header {
+  margin-bottom: 24px;
+
+  h2 {
+    font-size: 28px;
+    font-weight: 600;
+    color: #1A1A1A;
+    margin: 0 0 8px;
+  }
+
+  .subtitle {
+    color: #757575;
+    font-size: 14px;
+    margin: 0;
+  }
+}
+
+.actions-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  gap: 16px;
+
+  mat-form-field {
+    width: 300px;
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 12px;
+
+    button {
+      mat-icon {
+        margin-right: 8px;
+      }
+    }
+  }
+}
+
+.thresholds-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 24px;
+}
+
+.threshold-card {
+  mat-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+
+    mat-card-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1A1A1A;
+      margin: 0;
+    }
+  }
+
+  .threshold-info {
+    .threshold-level {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px;
+      border-radius: 4px;
+      margin-bottom: 8px;
+
+      .label {
+        font-weight: 500;
+        font-size: 14px;
+      }
+
+      .value {
+        font-weight: 700;
+        font-size: 16px;
+      }
+
+      &.warning {
+        background: #FFF3E0;
+
+        .label {
+          color: #E65100;
+        }
+
+        .value {
+          color: #F57C00;
+        }
+      }
+
+      &.critical {
+        background: #FFEBEE;
+
+        .label {
+          color: #C62828;
+        }
+
+        .value {
+          color: #E53935;
+        }
+      }
+    }
+
+    .description {
+      margin-top: 12px;
+      color: #757575;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+  }
+
+  .edit-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    mat-form-field {
+      width: 100%;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      margin-top: 8px;
+
+      button {
+        mat-icon {
+          margin-right: 8px;
+          font-size: 18px;
+        }
+      }
+    }
+  }
+}

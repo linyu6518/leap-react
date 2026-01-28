@@ -1,0 +1,73 @@
+/* Global Styles - TD Green Theme */
+
+/* AG Grid Styles - MUST be imported first */
+@import 'ag-grid-community/styles/ag-grid.css';
+@import 'ag-grid-community/styles/ag-theme-material.css';
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: 'Graphik', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-weight: 300;
+  font-size: 16px;
+  color: #1A1A1A;
+  background-color: #F5F5F5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Material Theme Overrides */
+.mat-toolbar.mat-primary {
+  background: #00843D;
+}
+
+.mat-drawer {
+  background: #005A29;
+  color: white;
+}
+
+/* AG Grid Theme */
+.ag-theme-material {
+  font-family: 'Graphik', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-weight: 300;
+}
+
+/* Apply Graphik font to all elements */
+* {
+  font-family: 'Graphik', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Material components should also use Graphik */
+.mat-typography,
+.mat-body,
+.mat-body-1,
+.mat-body-2,
+.mat-button,
+.mat-raised-button,
+.mat-icon-button,
+.mat-stroked-button,
+.mat-flat-button,
+.mat-fab,
+.mat-mini-fab,
+.mat-form-field,
+.mat-input-element,
+.mat-select,
+.mat-option {
+  font-family: 'Graphik', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+  font-weight: 300;
+}
+
+.ag-header {
+  background-color: #FAFAFA;
+}
+
+.variance-alert {
+  background-color: #FFF9E6 !important;
+  font-weight: 600;
+}

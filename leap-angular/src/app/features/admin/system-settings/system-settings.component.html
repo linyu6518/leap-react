@@ -1,0 +1,208 @@
+<div class="settings-container">
+  <div class="page-header">
+    <h2>System Settings</h2>
+    <p class="subtitle">Configure system-wide settings and preferences</p>
+  </div>
+
+  <div class="actions-bar">
+    <button mat-raised-button (click)="exportSettings()">
+      <mat-icon>download</mat-icon>
+      Export Settings
+    </button>
+    <button mat-raised-button color="warn" (click)="resetToDefaults()">
+      <mat-icon>restore</mat-icon>
+      Reset to Defaults
+    </button>
+  </div>
+
+  <mat-card>
+    <mat-tab-group [(selectedIndex)]="selectedTab">
+      <!-- General Tab -->
+      <mat-tab label="General">
+        <div class="tab-content">
+          <form [formGroup]="generalForm">
+            <h3>General Settings</h3>
+
+            <mat-form-field appearance="outline">
+              <mat-label>System Name</mat-label>
+              <input matInput formControlName="systemName">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Timezone</mat-label>
+              <mat-select formControlName="timezone">
+                <mat-option value="America/New_York">Eastern Time (ET)</mat-option>
+                <mat-option value="America/Chicago">Central Time (CT)</mat-option>
+                <mat-option value="America/Denver">Mountain Time (MT)</mat-option>
+                <mat-option value="America/Los_Angeles">Pacific Time (PT)</mat-option>
+                <mat-option value="UTC">UTC</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Date Format</mat-label>
+              <mat-select formControlName="dateFormat">
+                <mat-option value="MM/DD/YYYY">MM/DD/YYYY</mat-option>
+                <mat-option value="DD/MM/YYYY">DD/MM/YYYY</mat-option>
+                <mat-option value="YYYY-MM-DD">YYYY-MM-DD</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Default Currency</mat-label>
+              <mat-select formControlName="currency">
+                <mat-option value="USD">USD - US Dollar</mat-option>
+                <mat-option value="CAD">CAD - Canadian Dollar</mat-option>
+                <mat-option value="EUR">EUR - Euro</mat-option>
+                <mat-option value="GBP">GBP - British Pound</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Reporting Period</mat-label>
+              <mat-select formControlName="reportingPeriod">
+                <mat-option value="Daily">Daily</mat-option>
+                <mat-option value="Weekly">Weekly</mat-option>
+                <mat-option value="Monthly">Monthly</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <button mat-raised-button color="primary" (click)="saveGeneralSettings()" [disabled]="!generalForm.valid">
+              <mat-icon>save</mat-icon>
+              Save General Settings
+            </button>
+          </form>
+        </div>
+      </mat-tab>
+
+      <!-- Security Tab -->
+      <mat-tab label="Security">
+        <div class="tab-content">
+          <form [formGroup]="securityForm">
+            <h3>Security Settings</h3>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Session Timeout (minutes)</mat-label>
+              <input matInput type="number" formControlName="sessionTimeout" min="5" max="120">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Password Expiry (days)</mat-label>
+              <input matInput type="number" formControlName="passwordExpiry" min="30" max="365">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Max Login Attempts</mat-label>
+              <input matInput type="number" formControlName="maxLoginAttempts" min="1" max="10">
+            </mat-form-field>
+
+            <div class="toggle-group">
+              <mat-slide-toggle formControlName="mfaEnabled" color="primary">
+                Multi-Factor Authentication (MFA)
+              </mat-slide-toggle>
+
+              <mat-slide-toggle formControlName="ipWhitelisting" color="primary">
+                IP Whitelisting
+              </mat-slide-toggle>
+            </div>
+
+            <button mat-raised-button color="primary" (click)="saveSecuritySettings()" [disabled]="!securityForm.valid">
+              <mat-icon>save</mat-icon>
+              Save Security Settings
+            </button>
+          </form>
+        </div>
+      </mat-tab>
+
+      <!-- Notifications Tab -->
+      <mat-tab label="Notifications">
+        <div class="tab-content">
+          <form [formGroup]="notificationForm">
+            <h3>Email Notification Settings</h3>
+
+            <div class="toggle-group">
+              <mat-slide-toggle formControlName="emailEnabled" color="primary">
+                Enable Email Notifications
+              </mat-slide-toggle>
+            </div>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Email Server (SMTP)</mat-label>
+              <input matInput formControlName="emailServer">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>SMTP Port</mat-label>
+              <input matInput type="number" formControlName="emailPort">
+            </mat-form-field>
+
+            <button mat-raised-button (click)="testEmailConnection()">
+              <mat-icon>email</mat-icon>
+              Test Email Connection
+            </button>
+
+            <h3>Notification Triggers</h3>
+
+            <div class="toggle-group">
+              <mat-slide-toggle formControlName="notifyThresholdBreach" color="primary">
+                Threshold Breach Alerts
+              </mat-slide-toggle>
+
+              <mat-slide-toggle formControlName="notifyWorkflowStatus" color="primary">
+                Workflow Status Changes
+              </mat-slide-toggle>
+
+              <mat-slide-toggle formControlName="notifySystemAlerts" color="primary">
+                System Alerts
+              </mat-slide-toggle>
+            </div>
+
+            <button mat-raised-button color="primary" (click)="saveNotificationSettings()" [disabled]="!notificationForm.valid">
+              <mat-icon>save</mat-icon>
+              Save Notification Settings
+            </button>
+          </form>
+        </div>
+      </mat-tab>
+
+      <!-- Data Retention Tab -->
+      <mat-tab label="Data Retention">
+        <div class="tab-content">
+          <form [formGroup]="dataRetentionForm">
+            <h3>Data Retention Policies</h3>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Audit Log Retention (years)</mat-label>
+              <input matInput type="number" formControlName="auditLogRetention" min="1">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Report Data Retention (years)</mat-label>
+              <input matInput type="number" formControlName="reportDataRetention" min="1">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Workflow History Retention (years)</mat-label>
+              <input matInput type="number" formControlName="workflowHistoryRetention" min="1">
+            </mat-form-field>
+
+            <div class="toggle-group">
+              <mat-slide-toggle formControlName="autoArchive" color="primary">
+                Automatic Archiving
+              </mat-slide-toggle>
+
+              <mat-slide-toggle formControlName="compressionEnabled" color="primary">
+                Data Compression
+              </mat-slide-toggle>
+            </div>
+
+            <button mat-raised-button color="primary" (click)="saveDataRetentionSettings()" [disabled]="!dataRetentionForm.valid">
+              <mat-icon>save</mat-icon>
+              Save Data Retention Settings
+            </button>
+          </form>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </mat-card>
+</div>

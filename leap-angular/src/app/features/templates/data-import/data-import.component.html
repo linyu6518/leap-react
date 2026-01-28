@@ -1,0 +1,101 @@
+<div class="import-container">
+  <div class="page-header">
+    <h2>Data Import</h2>
+    <p class="subtitle">Upload and manage data files for liquidity analysis</p>
+  </div>
+
+  <!-- Import Section -->
+  <mat-card class="import-card">
+    <mat-card-header>
+      <mat-card-title>Import New Data</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="import-form">
+        <mat-form-field appearance="outline">
+          <mat-label>Select Template Type</mat-label>
+          <mat-select [(ngModel)]="selectedTemplate">
+            <mat-option *ngFor="let template of templates" [value]="template">
+              {{template}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <div class="file-upload-section">
+          <button mat-raised-button color="accent" (click)="fileInput.click()">
+            <mat-icon>upload_file</mat-icon>
+            Choose File
+          </button>
+          <input #fileInput type="file" accept=".xlsx,.csv" (change)="onFileSelected($event)" hidden>
+          <span class="file-name" *ngIf="selectedFile">{{selectedFile.name}}</span>
+          <span class="file-name placeholder" *ngIf="!selectedFile">No file selected</span>
+        </div>
+
+        <div class="action-buttons">
+          <button mat-raised-button (click)="downloadTemplate()" [disabled]="!selectedTemplate">
+            <mat-icon>download</mat-icon>
+            Download Template
+          </button>
+          <button mat-raised-button color="primary" (click)="uploadFile()"
+                  [disabled]="!selectedFile || !selectedTemplate">
+            <mat-icon>cloud_upload</mat-icon>
+            Upload & Import
+          </button>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Import History -->
+  <mat-card class="history-card">
+    <mat-card-header>
+      <mat-card-title>Import History</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <table mat-table [dataSource]="importHistory" class="history-table">
+        <ng-container matColumnDef="fileName">
+          <th mat-header-cell *matHeaderCellDef>File Name</th>
+          <td mat-cell *matCellDef="let row">{{row.fileName}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="importDate">
+          <th mat-header-cell *matHeaderCellDef>Import Date</th>
+          <td mat-cell *matCellDef="let row">{{row.importDate | date:'short'}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="recordsCount">
+          <th mat-header-cell *matHeaderCellDef>Records</th>
+          <td mat-cell *matCellDef="let row">{{row.recordsCount | number}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef>Status</th>
+          <td mat-cell *matCellDef="let row">
+            <span class="status-badge" [ngClass]="getStatusClass(row.status)">
+              {{row.status | titlecase}}
+            </span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="importedBy">
+          <th mat-header-cell *matHeaderCellDef>Imported By</th>
+          <td mat-cell *matCellDef="let row">{{row.importedBy}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <td mat-cell *matCellDef="let row">
+            <button mat-icon-button (click)="viewDetails(row)" matTooltip="View Details">
+              <mat-icon>visibility</mat-icon>
+            </button>
+            <button mat-icon-button (click)="deleteRecord(row)" matTooltip="Delete">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    </mat-card-content>
+  </mat-card>
+</div>

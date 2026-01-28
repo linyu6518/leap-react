@@ -1,0 +1,78 @@
+<div class="audit-log-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <h2>Audit Log</h2>
+    <p class="subtitle">System-wide activity tracking and compliance monitoring</p>
+  </div>
+
+  <!-- Filter Panel -->
+  <mat-card class="filter-card">
+    <form [formGroup]="filterForm" class="filter-form">
+      <div class="filter-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Start Date</mat-label>
+          <input matInput [matDatepicker]="startPicker" formControlName="startDate">
+          <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+          <mat-datepicker #startPicker></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>End Date</mat-label>
+          <input matInput [matDatepicker]="endPicker" formControlName="endDate">
+          <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+          <mat-datepicker #endPicker></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>User</mat-label>
+          <input matInput formControlName="user" placeholder="Email or username">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Action</mat-label>
+          <mat-select formControlName="action">
+            <mat-option value="">All Actions</mat-option>
+            <mat-option *ngFor="let action of actions" [value]="action">{{ action }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="filter-actions">
+        <button mat-raised-button color="primary" (click)="applyFilters()">
+          <mat-icon>search</mat-icon>
+          Apply Filters
+        </button>
+        <button mat-button (click)="resetFilters()">
+          <mat-icon>clear</mat-icon>
+          Reset
+        </button>
+        <div class="export-buttons">
+          <button mat-stroked-button (click)="exportToExcel()">
+            <mat-icon>download</mat-icon>
+            Export Excel
+          </button>
+          <button mat-stroked-button (click)="exportToCSV()">
+            <mat-icon>download</mat-icon>
+            Export CSV
+          </button>
+        </div>
+      </div>
+    </form>
+  </mat-card>
+
+  <!-- Data Grid -->
+  <div class="grid-container">
+    <ag-grid-angular
+      class="ag-theme-material"
+      [rowData]="rowData"
+      [columnDefs]="columnDefs"
+      [defaultColDef]="defaultColDef"
+      [pagination]="true"
+      [paginationPageSize]="25"
+      [animateRows]="true"
+      (gridReady)="onGridReady($event)"
+      domLayout="autoHeight"
+    >
+    </ag-grid-angular>
+  </div>
+</div>

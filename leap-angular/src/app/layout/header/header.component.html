@@ -1,0 +1,45 @@
+<mat-toolbar class="app-header">
+  <!-- 左侧：搜索框 -->
+  <div class="header-left">
+    <div class="search-box">
+      <mat-icon class="search-icon material-icons-outlined">search</mat-icon>
+      <input type="text" class="search-input" placeholder="Search">
+    </div>
+  </div>
+
+  <!-- 右侧：通知和用户信息 -->
+  <div class="header-right">
+    <button mat-icon-button class="notification-button" matTooltip="Notifications">
+      <mat-icon [matBadge]="3" matBadgeColor="warn" matBadgeSize="small" class="material-icons-outlined">notifications</mat-icon>
+    </button>
+
+    <button mat-button [matMenuTriggerFor]="userMenu" class="user-menu-button">
+      <div class="user-avatar">YL</div>
+    </button>
+
+    <mat-menu #userMenu="matMenu" xPosition="before" class="user-dropdown-menu">
+      <div class="user-header">
+        <div class="user-name-full">{{ currentUser.name }}</div>
+        <div class="user-role">{{ currentUser.role }}</div>
+      </div>
+      <mat-divider></mat-divider>
+      <button mat-menu-item (click)="switchToChecker()">
+        <mat-icon class="material-icons-outlined">swap_horiz</mat-icon>
+        <span>Switch to Checker</span>
+      </button>
+      <button mat-menu-item>
+        <mat-icon class="material-icons-outlined">person</mat-icon>
+        <span>Profile</span>
+      </button>
+      <button mat-menu-item>
+        <mat-icon class="material-icons-outlined">settings</mat-icon>
+        <span>Settings</span>
+      </button>
+      <mat-divider></mat-divider>
+      <button mat-menu-item (click)="logout()">
+        <mat-icon class="material-icons-outlined">logout</mat-icon>
+        <span>Logout</span>
+      </button>
+    </mat-menu>
+  </div>
+</mat-toolbar>

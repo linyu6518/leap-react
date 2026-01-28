@@ -1,0 +1,72 @@
+<div class="commentary-drawer" [class.open]="isOpen">
+  <div class="drawer-overlay" (click)="onClose()"></div>
+
+  <div class="drawer-content" [@slideIn]>
+    <!-- Header -->
+    <div class="drawer-header">
+      <h3>Commentary - {{ productName }}</h3>
+      <button mat-icon-button (click)="onClose()" class="close-button">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <!-- History Comments (Read-only) -->
+    <div class="drawer-body">
+      <div class="history-section" *ngIf="historyComments.length > 0">
+        <h4 class="section-title">History</h4>
+        <div class="comment-list">
+          <div class="comment-item" *ngFor="let comment of historyComments">
+            <div class="comment-header">
+              <div class="comment-user">
+                <mat-icon class="user-icon">person</mat-icon>
+                <span class="user-name">{{ comment.user }}</span>
+              </div>
+              <span class="comment-time">{{ comment.timestamp | date: 'MMM d, y HH:mm' }}</span>
+            </div>
+            <div class="comment-content">{{ comment.content }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- New Comment Form -->
+      <div class="new-comment-section">
+        <h4 class="section-title">Add New Commentary</h4>
+        <form [formGroup]="commentForm">
+          <mat-form-field appearance="outline" class="comment-field">
+            <mat-label>Commentary</mat-label>
+            <textarea
+              matInput
+              formControlName="content"
+              rows="6"
+              placeholder="Enter your commentary here..."
+            ></textarea>
+            <mat-hint>Minimum 10 characters required</mat-hint>
+            <mat-error *ngIf="commentForm.get('content')?.hasError('required')">
+              Commentary is required
+            </mat-error>
+            <mat-error *ngIf="commentForm.get('content')?.hasError('minlength')">
+              Minimum 10 characters required
+            </mat-error>
+          </mat-form-field>
+        </form>
+      </div>
+    </div>
+
+    <!-- Footer Actions -->
+    <div class="drawer-footer">
+      <button mat-stroked-button (click)="onCancel()" class="cancel-button">
+        Cancel
+      </button>
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="onSave()"
+        [disabled]="!commentForm.valid"
+        class="save-button"
+      >
+        <mat-icon>save</mat-icon>
+        Save
+      </button>
+    </div>
+  </div>
+</div>
