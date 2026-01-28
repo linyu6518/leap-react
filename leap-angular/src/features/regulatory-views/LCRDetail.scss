@@ -77,9 +77,9 @@
     }
   }
   
-  // Reduce distance between QueryPanel and cards by 30px
+  // Remove margin-bottom from QueryPanel
   .query-panel {
-    margin-bottom: calc(#{$spacing-lg} - 30px) !important; // Reduced by 30px
+    margin-bottom: 0 !important;
   }
   
   // Status cards row (same as Dashboard)
