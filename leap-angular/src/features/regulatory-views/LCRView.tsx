@@ -1,7 +1,9 @@
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Card, DatePicker, Button, Form } from 'antd'
 import { FileTextOutlined, CalendarOutlined } from '@ant-design/icons'
 import { TDSelect, Option } from '@components/shared'
+import { saveLCRViewParams, loadLCRViewParams } from '@utils/queryParamsStorage'
 import './LCRView.scss'
 
 function LCRView() {
@@ -9,7 +11,28 @@ function LCRView() {
   const [form] = Form.useForm()
   const formValues = Form.useWatch([], form)
 
+  // Load saved params on mount
+  useEffect(() => {
+    const savedParams = loadLCRViewParams()
+    if (savedParams.enterprise || savedParams.segment || savedParams.prior || savedParams.current) {
+      form.setFieldsValue({
+        enterprise: savedParams.enterprise || undefined,
+        segment: savedParams.segment || undefined,
+        prior: savedParams.prior || undefined,
+        current: savedParams.current || undefined,
+      })
+    }
+  }, [form])
+
   const handleView = (values: any) => {
+    // Save to sessionStorage when user submits
+    saveLCRViewParams({
+      enterprise: values.enterprise,
+      segment: values.segment,
+      prior: values.prior,
+      current: values.current,
+    })
+    
     navigate('/regulatory/lcr/detail', {
       state: {
         enterprise: values.enterprise,
@@ -67,6 +90,7 @@ function LCRView() {
             layout="vertical"
             className="compact-form"
             onFinish={handleView}
+            initialValues={loadLCRViewParams()}
           >
             {/* 1. Enterprise */}
             <Form.Item

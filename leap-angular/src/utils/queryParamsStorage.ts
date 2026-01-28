@@ -80,3 +80,47 @@ export function loadLCRQueryParams(): Partial<QueryParams> {
   }
   return {}
 }
+
+// Save LCR View form params (enterprise, segment, prior, current)
+export function saveLCRViewParams(params: {
+  enterprise?: string | null
+  segment?: string | null
+  prior?: any // dayjs object or string
+  current?: any // dayjs object or string
+}): void {
+  try {
+    const serialized: StoredQueryParams = {
+      region: params.enterprise || null,
+      segment: params.segment || null,
+      prior: params.prior ? (typeof params.prior === 'string' ? params.prior : params.prior.toISOString()) : null,
+      current: params.current ? (typeof params.current === 'string' ? params.current : params.current.toISOString()) : null,
+    }
+    sessionStorage.setItem(STORAGE_KEY_LCR, JSON.stringify(serialized))
+  } catch (error) {
+    console.error('Failed to save LCR View params:', error)
+  }
+}
+
+// Load LCR View form params
+export function loadLCRViewParams(): {
+  enterprise?: string
+  segment?: string
+  prior?: any // dayjs object
+  current?: any // dayjs object
+} {
+  try {
+    const stored = sessionStorage.getItem(STORAGE_KEY_LCR)
+    if (stored) {
+      const parsed = JSON.parse(stored) as StoredQueryParams
+      return {
+        enterprise: parsed.region || undefined,
+        segment: parsed.segment || undefined,
+        prior: parsed.prior ? dayjs(parsed.prior) : undefined,
+        current: parsed.current ? dayjs(parsed.current) : undefined,
+      }
+    }
+  } catch (error) {
+    console.error('Failed to load LCR View params:', error)
+  }
+  return {}
+}
