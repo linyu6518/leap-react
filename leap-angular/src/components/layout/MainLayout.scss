@@ -26,7 +26,8 @@
   // Remove transition to prevent flashing on route change
   // transition: padding $duration-base $easing-out;
   // Ensure content fits within viewport for 1080P screens
-  max-height: calc(100vh - #{$header-height});
+  // Add 30px to accommodate page headers and prevent title from being obscured
+  max-height: calc(100vh - #{$header-height} + 30px);
   display: flex;
   flex-direction: column;
   // Prevent flash by ensuring consistent background
