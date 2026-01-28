@@ -17,19 +17,15 @@
 }
 
 .main-content-wrapper {
-  flex: 1;
   background-color: $color-bg-page;
   padding: $spacing-lg 12px 12px 12px; // Top, right, bottom, left - bottom matches card gap (12px)
   overflow-y: auto;
   overflow-x: hidden;
   min-width: 0;
+  // Fixed height instead of flex: 1, allowing scroll
+  height: calc(100vh - #{$header-height});
   // Remove transition to prevent flashing on route change
   // transition: padding $duration-base $easing-out;
-  // Ensure content fits within viewport for 1080P screens
-  // Add 30px to accommodate page headers and prevent title from being obscured
-  max-height: calc(100vh - #{$header-height} + 30px);
-  display: flex;
-  flex-direction: column;
   // Prevent flash by ensuring consistent background
   will-change: contents;
 }
