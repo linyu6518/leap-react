@@ -1,7 +1,7 @@
 @import '@styles/variables.scss';
 
 .navigation-tree {
-  padding: $spacing-sm 0 80px 0; // 底部留出空间给 footer
+  padding: calc(#{$spacing-sm} - 20px) 0 80px 0; // 向上移动20px，底部留出空间给 footer
   display: flex;
   flex-direction: column;
   min-height: 0;
