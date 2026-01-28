@@ -1,7 +1,9 @@
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Card, DatePicker, Button, Form } from 'antd'
 import { FolderOutlined, CalendarOutlined } from '@ant-design/icons'
 import { TDSelect, Option } from '@components/shared'
+import { saveDepositsQueryParams, loadDepositsQueryParams } from '@utils/queryParamsStorage'
 import './Products.scss'
 
 function Products() {
@@ -9,7 +11,28 @@ function Products() {
   const [form] = Form.useForm()
   const formValues = Form.useWatch([], form)
 
+  // Load saved params on mount
+  useEffect(() => {
+    const savedParams = loadDepositsQueryParams()
+    if (savedParams.region || savedParams.segment || savedParams.prior || savedParams.current) {
+      form.setFieldsValue({
+        region: savedParams.region || undefined,
+        segment: savedParams.segment || undefined,
+        prior: savedParams.prior || undefined,
+        current: savedParams.current || undefined,
+      })
+    }
+  }, [form])
+
   const handleView = (values: any) => {
+    // Save to sessionStorage when user submits
+    saveDepositsQueryParams({
+      region: values.region,
+      segment: values.segment,
+      prior: values.prior,
+      current: values.current,
+    })
+    
     navigate('/product/deposits', {
       state: {
         region: values.region,
@@ -43,6 +66,7 @@ function Products() {
             layout="vertical"
             className="compact-form"
             onFinish={handleView}
+            initialValues={loadDepositsQueryParams()}
           >
             {/* 1. Region */}
             <Form.Item

@@ -103,14 +103,33 @@ function Deposits() {
   useEffect(() => {
     if (location.state) {
       const state = location.state as any
-      setQueryParams({
+      const params = {
         region: state.region || undefined,
         segment: state.segment || undefined,
         prior: state.prior ? dayjs(state.prior) : undefined,
         current: state.current ? dayjs(state.current) : undefined,
-      })
+      }
+      setQueryParams(params)
+      // Save to sessionStorage immediately when params come from location.state
+      saveDepositsQueryParams(params)
     }
   }, [location.state])
+
+  // Ensure queryParams are loaded from sessionStorage on mount if location.state is empty
+  useEffect(() => {
+    // If no location.state and queryParams are empty, try loading from sessionStorage
+    if (!location.state) {
+      const savedParams = loadDepositsQueryParams()
+      if (savedParams.region || savedParams.segment || savedParams.prior || savedParams.current) {
+        // Check if current queryParams are different from saved ones
+        const currentHasValues = queryParams.region || queryParams.segment || queryParams.prior || queryParams.current
+        if (!currentHasValues) {
+          // Update queryParams from sessionStorage
+          setQueryParams(savedParams)
+        }
+      }
+    }
+  }, []) // Only run once on mount
 
   useEffect(() => {
     // Mark initial mount as complete after first render
