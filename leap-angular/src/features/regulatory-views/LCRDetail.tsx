@@ -56,12 +56,15 @@ function LCRDetail() {
     // First check location.state, then sessionStorage
     const state = location.state as any
     if (state && (state.enterprise || state.region || state.segment || state.prior || state.current)) {
-      return {
+      const params = {
         region: state?.enterprise || state?.region || null,
         segment: state?.segment || null,
         prior: state?.prior ? dayjs(state.prior) : null,
         current: state?.current ? dayjs(state.current) : null,
       }
+      // Save to sessionStorage immediately when params come from location.state
+      saveLCRQueryParams(params)
+      return params
     }
     // Load from sessionStorage if no location.state
     return loadLCRQueryParams()
