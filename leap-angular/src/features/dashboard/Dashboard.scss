@@ -17,7 +17,7 @@
   justify-content: space-between;
   gap: $spacing-md;
   flex-wrap: wrap;
-  margin-top: -15px; // Move up 15px
+  margin-top: 0; // Reset negative margin to ensure title is visible
   flex-shrink: 0; // Don't shrink
 
   .page-title {
