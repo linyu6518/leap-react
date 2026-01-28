@@ -3,6 +3,7 @@
 .dashboard-container {
   width: 100%;
   margin: 0;
+  margin-top: -30px; // Move up 30px to avoid being obscured by header
   height: 100%;
   display: flex;
   flex-direction: column;
