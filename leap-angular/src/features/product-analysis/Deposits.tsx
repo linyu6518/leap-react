@@ -76,6 +76,7 @@ function Deposits() {
   const [commentaryOpen, setCommentaryOpen] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState<any>(null)
   const [historyComments, setHistoryComments] = useState<any[]>([])
+  const [isInitialMount, setIsInitialMount] = useState(true)
   
   // Initialize queryParams from location.state if available
   const initialQueryParams = useMemo(() => {
@@ -110,6 +111,10 @@ function Deposits() {
   }, [location.state])
 
   useEffect(() => {
+    // Mark initial mount as complete after first render
+    if (isInitialMount) {
+      setIsInitialMount(false)
+    }
     loadData()
   }, [queryParams])
 

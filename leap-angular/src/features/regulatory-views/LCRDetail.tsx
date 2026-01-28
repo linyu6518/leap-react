@@ -50,6 +50,7 @@ function LCRDetail() {
   const [lcrData, setLcrData] = useState<any>(null)
   const [lastUpdateDate, setLastUpdateDate] = useState('')
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set(['hqla', 'nco', 'nco-deposits']))
+  const [isInitialMount, setIsInitialMount] = useState(true)
   const [queryParams, setQueryParams] = useState<Partial<QueryParams>>(() => {
     const state = location.state as any
     return {
@@ -61,6 +62,10 @@ function LCRDetail() {
   })
 
   useEffect(() => {
+    // Mark initial mount as complete after first render
+    if (isInitialMount) {
+      setIsInitialMount(false)
+    }
     updateLastUpdateDate()
     loadData()
   }, [queryParams])

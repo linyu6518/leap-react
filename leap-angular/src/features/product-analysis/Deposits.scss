@@ -6,6 +6,9 @@
   height: 100%;
   display: flex;
   flex-direction: column;
+  // Prevent flash on initial render
+  opacity: 1;
+  animation: none;
 
   .page-header {
     margin-bottom: 12px;

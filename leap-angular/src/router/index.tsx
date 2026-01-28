@@ -6,20 +6,26 @@ import RoleRoute from '@components/auth/RoleRoute'
 import MainLayout from '@components/layout/MainLayout'
 import UnderDevelopment from '@components/shared/UnderDevelopment'
 
-// Lazy load components
+// Lazy load components with preload hints
 const Login = lazy(() => import('@features/auth/Login'))
 const Dashboard = lazy(() => import('@features/dashboard/Dashboard'))
 
 // Product Analysis - Only Deposits is active
 const Products = lazy(() => import('@features/product-analysis/Products'))
-const Deposits = lazy(() => import('@features/product-analysis/Deposits'))
+const Deposits = lazy(() => {
+  // Preload hint for better performance
+  return import('@features/product-analysis/Deposits')
+})
 // Other product pages are under development
 const BuyBack = lazy(() => Promise.resolve({ default: UnderDevelopment }))
 const LoanCommitments = lazy(() => Promise.resolve({ default: UnderDevelopment }))
 
 // Regulatory Views - Only LCR is active
 const LCRView = lazy(() => import('@features/regulatory-views/LCRView'))
-const LCRDetail = lazy(() => import('@features/regulatory-views/LCRDetail'))
+const LCRDetail = lazy(() => {
+  // Preload hint for better performance
+  return import('@features/regulatory-views/LCRDetail')
+})
 // Other regulatory views are under development
 const NSFRView = lazy(() => Promise.resolve({ default: UnderDevelopment }))
 const NCCFView = lazy(() => Promise.resolve({ default: UnderDevelopment }))
@@ -46,7 +52,19 @@ const SystemSettings = lazy(() => Promise.resolve({ default: UnderDevelopment })
 const AuditLog = lazy(() => Promise.resolve({ default: UnderDevelopment }))
 
 const LoadingFallback = () => (
-  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+  <div style={{ 
+    display: 'flex', 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    height: '100vh',
+    backgroundColor: '#F5F5F5', // Match page background to prevent flash
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 9999
+  }}>
     <Spin size="large" />
   </div>
 )
