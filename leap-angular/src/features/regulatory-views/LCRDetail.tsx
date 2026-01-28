@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { Card, Button } from 'antd'
 import { AgGridReact } from 'ag-grid-react'
 import type { ColDef, ColGroupDef, CellClassParams, ICellRendererParams, ValueFormatterParams } from 'ag-grid-community'
-import { FileTextOutlined, ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons'
+import { FileTextOutlined, ArrowUpOutlined, ArrowDownOutlined, InfoCircleOutlined } from '@ant-design/icons'
 import dayjs from 'dayjs'
 import { mockDataService } from '@services/mockDataService'
 import QueryPanel, { QueryParams } from '@components/shared/QueryPanel'
@@ -70,14 +70,46 @@ function LCRDetail() {
     return loadLCRQueryParams()
   })
 
+  // Check if all required fields are filled
+  const isFormComplete = useMemo(() => {
+    return !!(
+      queryParams.region &&
+      queryParams.segment &&
+      queryParams.prior &&
+      queryParams.current
+    )
+  }, [queryParams])
+
+  // Update queryParams when location.state changes
+  useEffect(() => {
+    if (location.state) {
+      const state = location.state as any
+      const params = {
+        region: state?.enterprise || state?.region || null,
+        segment: state?.segment || null,
+        prior: state?.prior ? dayjs(state.prior) : null,
+        current: state?.current ? dayjs(state.current) : null,
+      }
+      setQueryParams(params)
+      // Save to sessionStorage immediately when params come from location.state
+      saveLCRQueryParams(params)
+    }
+  }, [location.state])
+
   useEffect(() => {
     // Mark initial mount as complete after first render
     if (isInitialMount) {
       setIsInitialMount(false)
     }
     updateLastUpdateDate()
-    loadData()
-  }, [queryParams])
+    // Only load data if form is complete
+    if (isFormComplete) {
+      loadData()
+    } else {
+      // Clear data if form is not complete
+      setLcrData(null)
+    }
+  }, [queryParams, isFormComplete])
 
   const updateLastUpdateDate = () => {
     const now = new Date()
@@ -1135,7 +1167,14 @@ function LCRDetail() {
       
       <QueryPanel initialValues={queryParams} onQuery={handleQuery} />
       
-      {lcrData && (
+      {!isFormComplete ? (
+        <div className="lcr-empty-state">
+          <InfoCircleOutlined className="empty-state-icon" />
+          <div className="empty-state-text">
+            Please select Region, Segment, and Date to view analytics
+          </div>
+        </div>
+      ) : lcrData ? (
         <>
           <div className="status-row">
             <Card className="status-card approved">
@@ -1221,7 +1260,7 @@ function LCRDetail() {
             />
           </div>
         </>
-      )}
+      ) : null}
     </div>
   )
 }

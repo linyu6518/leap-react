@@ -82,6 +82,32 @@
     margin-bottom: 0 !important;
   }
   
+  // Empty state prompt
+  .lcr-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 120px 20px;
+    min-height: 500px;
+    background: transparent;
+
+    .empty-state-icon {
+      font-size: 32px;
+      color: #999;
+      margin-bottom: 8px;
+    }
+
+    .empty-state-text {
+      font-size: 14px;
+      color: #999;
+      font-weight: 400;
+      font-family: 'Graphik', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      text-align: center;
+    }
+  }
+  
   // Status cards row (same as Dashboard)
   .status-row {
     display: grid;
