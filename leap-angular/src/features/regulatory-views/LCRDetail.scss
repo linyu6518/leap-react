@@ -8,7 +8,7 @@
   flex-direction: column;
   
   .page-header-wrapper {
-    padding: 0 20px;
+    padding: 0; // Match Deposits page - no extra padding
   }
   
   .page-header {

@@ -1117,13 +1117,12 @@ function LCRDetail() {
         </div>
       </div>
       
-      <div style={{ padding: '0 20px' }}>
-        <QueryPanel initialValues={queryParams} onQuery={handleQuery} />
+      <QueryPanel initialValues={queryParams} onQuery={handleQuery} />
       
-        {lcrData && (
-          <div style={{ marginTop: '24px' }}>
-            <div className="status-row">
-              <Card className="status-card approved">
+      {lcrData && (
+        <>
+          <div className="status-row" style={{ marginTop: '24px' }}>
+            <Card className="status-card approved">
                 <div className="status-top">
                   <div className="status-label">LCR Ratio</div>
                 </div>
@@ -1166,9 +1165,9 @@ function LCRDetail() {
                   </div>
                 </div>
               </Card>
-            </div>
+          </div>
 
-            <div style={{ marginBottom: '25px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ marginBottom: '25px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div className="lcr-status-bar">
                 <span className="status-item">
                   <span className="status-dot status-dot-green"></span>
@@ -1194,20 +1193,19 @@ function LCRDetail() {
               >
                 Submit
               </Button>
-            </div>
-
-            <div className="ag-theme-material" style={{ marginTop: '-2px' }}>
-              <AgGridReact
-                columnDefs={lcrColumnDefs}
-                rowData={getLCRRowData}
-                defaultColDef={defaultColDef}
-                animateRows={true}
-                domLayout="autoHeight"
-              />
-            </div>
           </div>
-        )}
-      </div>
+
+          <div className="ag-theme-material" style={{ marginTop: '-2px' }}>
+            <AgGridReact
+              columnDefs={lcrColumnDefs}
+              rowData={getLCRRowData}
+              defaultColDef={defaultColDef}
+              animateRows={true}
+              domLayout="autoHeight"
+            />
+          </div>
+        </>
+      )}
     </div>
   )
 }
