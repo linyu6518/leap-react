@@ -10,37 +10,43 @@ function LCRView() {
   const navigate = useNavigate()
   const [form] = Form.useForm()
   const formValues = Form.useWatch([], form)
-  const [initialValuesLoaded, setInitialValuesLoaded] = useState(false)
 
-  // Load saved params on mount and whenever component becomes visible
+  // Load saved params on mount - this runs every time component mounts
   useEffect(() => {
-    // Try loading from LCRView params first, then fall back to LCR query params
-    let savedParams = loadLCRViewParams()
-    
-    // If no LCRView params, try loading from LCR query params (in case user modified in Detail page)
-    if (!savedParams.enterprise && !savedParams.segment && !savedParams.prior && !savedParams.current) {
-      const queryParams = loadLCRQueryParams()
-      if (queryParams.region || queryParams.segment || queryParams.prior || queryParams.current) {
-        savedParams = {
-          enterprise: queryParams.region,
-          segment: queryParams.segment,
-          prior: queryParams.prior,
-          current: queryParams.current,
+    const loadParams = () => {
+      // Try loading from LCRView params first, then fall back to LCR query params
+      let savedParams = loadLCRViewParams()
+      
+      // If no LCRView params, try loading from LCR query params (in case user modified in Detail page)
+      if (!savedParams.enterprise && !savedParams.segment && !savedParams.prior && !savedParams.current) {
+        const queryParams = loadLCRQueryParams()
+        if (queryParams.region || queryParams.segment || queryParams.prior || queryParams.current) {
+          savedParams = {
+            enterprise: queryParams.region,
+            segment: queryParams.segment,
+            prior: queryParams.prior,
+            current: queryParams.current,
+          }
         }
+      }
+      
+      // Always set form values if we have any saved params
+      if (savedParams.enterprise || savedParams.segment || savedParams.prior || savedParams.current) {
+        form.setFieldsValue({
+          enterprise: savedParams.enterprise || undefined,
+          segment: savedParams.segment || undefined,
+          prior: savedParams.prior || undefined,
+          current: savedParams.current || undefined,
+        })
       }
     }
     
-    if (savedParams.enterprise || savedParams.segment || savedParams.prior || savedParams.current) {
-      // Set form values
-      form.setFieldsValue({
-        enterprise: savedParams.enterprise || undefined,
-        segment: savedParams.segment || undefined,
-        prior: savedParams.prior || undefined,
-        current: savedParams.current || undefined,
-      })
-    }
-    setInitialValuesLoaded(true)
-  }, [form])
+    // Try immediately, then retry after a short delay to ensure form is ready
+    loadParams()
+    const timer = setTimeout(loadParams, 200)
+    
+    return () => clearTimeout(timer)
+  }, [form]) // Run when form is available
 
   const handleView = (values: any) => {
     // Save to sessionStorage when user submits
@@ -108,19 +114,6 @@ function LCRView() {
             layout="vertical"
             className="compact-form"
             onFinish={handleView}
-            initialValues={(() => {
-              const saved = loadLCRViewParams()
-              if (!saved.enterprise && !saved.segment && !saved.prior && !saved.current) {
-                const queryParams = loadLCRQueryParams()
-                return {
-                  enterprise: queryParams.region,
-                  segment: queryParams.segment,
-                  prior: queryParams.prior,
-                  current: queryParams.current,
-                }
-              }
-              return saved
-            })()}
           >
             {/* 1. Enterprise */}
             <Form.Item
