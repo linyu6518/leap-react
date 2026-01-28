@@ -96,6 +96,23 @@ function LCRDetail() {
     }
   }, [location.state])
 
+  // Ensure queryParams are loaded from sessionStorage on mount if location.state is empty
+  useEffect(() => {
+    // If no location.state and queryParams are empty, try loading from sessionStorage
+    if (!location.state) {
+      const savedParams = loadLCRQueryParams()
+      if (savedParams.region || savedParams.segment || savedParams.prior || savedParams.current) {
+        // Check if current queryParams are different from saved ones
+        const currentHasValues = queryParams.region || queryParams.segment || queryParams.prior || queryParams.current
+        if (!currentHasValues) {
+          // Update queryParams from sessionStorage
+          setQueryParams(savedParams)
+        }
+      }
+    }
+  }, []) // Only run once on mount
+
+  // Load data when component mounts or queryParams change
   useEffect(() => {
     // Mark initial mount as complete after first render
     if (isInitialMount) {
