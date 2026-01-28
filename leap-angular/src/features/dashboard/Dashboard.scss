@@ -374,9 +374,10 @@
   border-radius: 0 !important; // Remove rounded corners
   width: 100%;
   min-width: 0; // Allow card to shrink below min-content
-  flex: 0 1 auto; // Can shrink if needed
-  min-height: 200px; // Minimum height for activities card
-  max-height: 45vh; // Limit height for 1080P screens
+  flex: 1; // Match other cards flex behavior
+  min-height: 240px; // Match chart cards minimum height
+  display: flex;
+  flex-direction: column;
   overflow-y: auto; // Allow scrolling if content is too long
 
   .card-title {
@@ -479,9 +480,10 @@
   width: 100%;
   min-width: 0; // Allow card to shrink below min-content
   flex: 1; // Take remaining space to align with LCR/NSFR Trend card bottom
-  min-height: 200px; // Minimum height for notifications card
+  min-height: 240px; // Match chart cards minimum height
+  display: flex;
+  flex-direction: column;
   overflow-y: auto; // Allow scrolling if content is too long
-  max-height: calc(55vh - 12px); // Limit height for 1080P screens
 
   .card-title {
     font-weight: 600;
