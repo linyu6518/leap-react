@@ -8,21 +8,17 @@
   flex-direction: column;
   min-height: 0; // Allow flex shrinking
   overflow-y: auto; // Allow vertical scrolling
-  position: relative; // Ensure proper positioning context
 }
 
 .page-header {
-  margin-bottom: 12px; // Reduced from 16px
+  margin-bottom: 12px; // Match other pages
+  margin-top: -15px; // Match other pages - Move up 15px
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: $spacing-md;
   flex-wrap: wrap;
-  margin-top: 0; // Reset negative margin to ensure title is visible
   flex-shrink: 0; // Don't shrink
-  position: relative; // Ensure it's in the document flow
-  z-index: 1; // Above background but below header
-  min-height: 24px; // Ensure minimum height for visibility
 
   .page-title {
     display: flex;
@@ -33,8 +29,6 @@
     font-weight: 400;
     line-height: 1.2;
     font-family: 'Graphik', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    visibility: visible; // Ensure visibility
-    opacity: 1; // Ensure opacity
 
     .anticon {
       color: $color-primary;
