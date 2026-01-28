@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Card, DatePicker, Button, Form } from 'antd'
 import { FileTextOutlined, CalendarOutlined } from '@ant-design/icons'
@@ -24,10 +24,10 @@ function LCRView() {
         console.log('LCRView: Loaded LCR query params:', queryParams)
         if (queryParams.region || queryParams.segment || queryParams.prior || queryParams.current) {
           savedParams = {
-            enterprise: queryParams.region,
-            segment: queryParams.segment,
-            prior: queryParams.prior,
-            current: queryParams.current,
+            enterprise: queryParams.region || undefined,
+            segment: queryParams.segment || undefined,
+            prior: queryParams.prior || undefined,
+            current: queryParams.current || undefined,
           }
         }
       }
