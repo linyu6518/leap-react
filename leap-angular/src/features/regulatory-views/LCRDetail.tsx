@@ -1137,7 +1137,7 @@ function LCRDetail() {
       
       {lcrData && (
         <>
-          <div className="status-row" style={{ marginTop: '24px' }}>
+          <div className="status-row">
             <Card className="status-card approved">
                 <div className="status-top">
                   <div className="status-label">LCR Ratio</div>
