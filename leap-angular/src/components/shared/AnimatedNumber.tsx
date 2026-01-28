@@ -40,6 +40,13 @@ function AnimatedNumber({ value, duration = 1000, decimals = 0 }: AnimatedNumber
     // Always animate from current display value (or 0 if first time) to target value
     const startValue = displayValueRef.current
 
+    // Calculate dynamic duration based on value size for smoother animation
+    // Larger values get slightly longer duration, but cap it for very large numbers
+    const valueRange = Math.abs(endValue - startValue)
+    const dynamicDuration = valueRange > 1000 
+      ? Math.min(duration * 1.2, 2000) // Max 2 seconds for very large numbers
+      : duration
+
     // Animate from startValue to endValue
     let startTime: number | null = null
 
@@ -49,11 +56,12 @@ function AnimatedNumber({ value, duration = 1000, decimals = 0 }: AnimatedNumber
       }
 
       const elapsed = currentTime - startTime
-      const progress = Math.min(elapsed / duration, 1)
+      const progress = Math.min(elapsed / dynamicDuration, 1)
 
-      // Easing function for smooth animation
-      const easeOutQuart = 1 - Math.pow(1 - progress, 4)
-      const currentValue = startValue + (endValue - startValue) * easeOutQuart
+      // Use easeOutCubic for smooth, natural rolling animation
+      // This provides a good balance between smoothness and speed
+      const easeOutCubic = 1 - Math.pow(1 - progress, 3)
+      const currentValue = startValue + (endValue - startValue) * easeOutCubic
 
       setDisplayValue(currentValue)
       displayValueRef.current = currentValue
