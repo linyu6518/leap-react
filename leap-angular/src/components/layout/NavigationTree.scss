@@ -180,19 +180,14 @@
       &::before {
         content: '';
         position: absolute;
-        // Level 2 vertical line absolute: 24px (nav-children margin) + 23px (line left) = 47px
-        // Level 3 nav-children absolute: 24px (Level 2 nav-children margin) + 16px (Level 3 nav-children margin) = 40px
-        // Level 3 nav-item-content absolute: 40px + 60px (padding-left) = 100px
-        // Level 2 line relative to nav-item-content: 47px - 100px = -53px
-        // But we want it relative to nav-item-content, so we need to account for the structure
-        // Actually, simpler: Level 2 line is at 23px from Level 2 nav-children start
-        // Level 3 nav-children starts 16px from Level 2 nav-children start
-        // Level 3 nav-item-content starts 60px from Level 3 nav-children start
-        // So Level 2 line relative to Level 3 nav-item-content: 23px - 16px - 60px = -53px
-        left: -53px; // Start from Level 2 vertical line
-        // Dot is at calc(24px + 24px) = 48px relative to nav-item-content
-        // Line should end at dot center: 48px - 1.5px = 46.5px
-        width: calc(46.5px - (-53px)); // From line to dot center
+        // Level 2 vertical line is at: 24px (Level 2 nav-children margin) + 23px (line left) = 47px from sidebar start
+        // Level 3 nav-children margin: 16px from Level 2 nav-children start
+        // Level 3 nav-item-content padding-left: calc(24px + 36px) = 60px from Level 3 nav-children start
+        // So Level 2 line relative to Level 3 nav-item-content: 24px + 23px - 16px - 60px = -29px
+        // Dot is at: calc(24px + 24px) = 48px relative to nav-item-content
+        // Line should start at vertical line (-29px) and end at dot center (48px - 1.5px = 46.5px)
+        left: -29px; // Start exactly at Level 2 vertical line, not beyond it
+        width: calc(46.5px - (-29px)); // From vertical line to dot center
         top: 50%;
         height: 1px;
         background-color: rgba(255, 255, 255, 0.08);
