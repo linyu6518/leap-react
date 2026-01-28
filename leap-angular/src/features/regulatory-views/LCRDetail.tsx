@@ -8,6 +8,7 @@ import dayjs from 'dayjs'
 import { mockDataService } from '@services/mockDataService'
 import QueryPanel, { QueryParams } from '@components/shared/QueryPanel'
 import AnimatedNumber from '@components/shared/AnimatedNumber'
+import { saveLCRQueryParams, loadLCRQueryParams } from '@utils/queryParamsStorage'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-material.css'
 import './LCRDetail.scss'
@@ -52,13 +53,18 @@ function LCRDetail() {
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set(['hqla', 'nco', 'nco-deposits']))
   const [isInitialMount, setIsInitialMount] = useState(true)
   const [queryParams, setQueryParams] = useState<Partial<QueryParams>>(() => {
+    // First check location.state, then sessionStorage
     const state = location.state as any
-    return {
-      region: state?.enterprise || state?.region || null,
-      segment: state?.segment || null,
-      prior: state?.prior ? dayjs(state.prior) : null,
-      current: state?.current ? dayjs(state.current) : null,
+    if (state && (state.enterprise || state.region || state.segment || state.prior || state.current)) {
+      return {
+        region: state?.enterprise || state?.region || null,
+        segment: state?.segment || null,
+        prior: state?.prior ? dayjs(state.prior) : null,
+        current: state?.current ? dayjs(state.current) : null,
+      }
     }
+    // Load from sessionStorage if no location.state
+    return loadLCRQueryParams()
   })
 
   useEffect(() => {
@@ -89,6 +95,8 @@ function LCRDetail() {
 
   const handleQuery = (params: QueryParams) => {
     setQueryParams(params)
+    // Save to sessionStorage when user submits query
+    saveLCRQueryParams(params)
   }
 
   const toggleNodeExpansion = (nodeId: string) => {

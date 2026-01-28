@@ -31,7 +31,8 @@
       "@router/*": ["./src/router/*"],
       "@styles/*": ["./src/styles/*"],
       "@config/*": ["./src/config/*"],
-      "@assets/*": ["./src/assets/*"]
+      "@assets/*": ["./src/assets/*"],
+      "@utils/*": ["./src/utils/*"]
     }
   },
   "include": [
@@ -42,6 +43,7 @@
     "src/router/**/*",
     "src/styles/**/*",
     "src/config/**/*",
+    "src/utils/**/*",
     "src/App.tsx",
     "src/main.tsx",
     "src/App.css",

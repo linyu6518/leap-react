@@ -9,6 +9,7 @@ import CommentaryDrawer from '@components/shared/CommentaryDrawer'
 import { useAppDispatch, useAppSelector } from '@store/hooks'
 import { loadProductsAsync } from '@store/slices/productSlice'
 import dayjs from 'dayjs'
+import { saveDepositsQueryParams, loadDepositsQueryParams } from '@utils/queryParamsStorage'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-material.css'
 import './Deposits.scss'
@@ -78,7 +79,7 @@ function Deposits() {
   const [historyComments, setHistoryComments] = useState<any[]>([])
   const [isInitialMount, setIsInitialMount] = useState(true)
   
-  // Initialize queryParams from location.state if available
+  // Initialize queryParams from location.state if available, otherwise from sessionStorage
   const initialQueryParams = useMemo(() => {
     if (location.state) {
       const state = location.state as any
@@ -89,7 +90,8 @@ function Deposits() {
         current: state.current ? dayjs(state.current) : undefined,
       }
     }
-    return {}
+    // Load from sessionStorage if no location.state
+    return loadDepositsQueryParams()
   }, [location.state])
   
   const [queryParams, setQueryParams] = useState<Partial<QueryParams>>(initialQueryParams)
@@ -129,6 +131,8 @@ function Deposits() {
 
   const handleQuery = (params: QueryParams) => {
     setQueryParams(params)
+    // Save to sessionStorage when user submits query
+    saveDepositsQueryParams(params)
   }
 
   // Check if all required fields are filled
