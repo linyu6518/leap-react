@@ -51,19 +51,14 @@ const UserManagement = lazy(() => Promise.resolve({ default: UnderDevelopment })
 const SystemSettings = lazy(() => Promise.resolve({ default: UnderDevelopment }))
 const AuditLog = lazy(() => Promise.resolve({ default: UnderDevelopment }))
 
-const LoadingFallback = () => (
+// Loading fallback for login page only
+const LoginLoadingFallback = () => (
   <div style={{ 
     display: 'flex', 
     justifyContent: 'center', 
     alignItems: 'center', 
     height: '100vh',
-    backgroundColor: '#F5F5F5', // Match page background to prevent flash
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    zIndex: 9999
+    backgroundColor: '#F5F5F5',
   }}>
     <Spin size="large" />
   </div>
@@ -71,20 +66,26 @@ const LoadingFallback = () => (
 
 function AppRouter() {
   return (
-    <Suspense fallback={<LoadingFallback />}>
-      <Routes>
-        {/* Public routes */}
-        <Route path="/login" element={<Login />} />
+    <Routes>
+      {/* Public routes */}
+      <Route 
+        path="/login" 
+        element={
+          <Suspense fallback={<LoginLoadingFallback />}>
+            <Login />
+          </Suspense>
+        } 
+      />
 
-        {/* Protected routes with layout */}
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute>
-              <MainLayout />
-            </ProtectedRoute>
-          }
-        >
+      {/* Protected routes with layout */}
+      <Route
+        path="/"
+        element={
+          <ProtectedRoute>
+            <MainLayout />
+          </ProtectedRoute>
+        }
+      >
           <Route index element={<Navigate to="/dashboard" replace />} />
           <Route path="dashboard" element={<Dashboard />} />
 
@@ -150,8 +151,7 @@ function AppRouter() {
           {/* Catch all */}
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Route>
-      </Routes>
-    </Suspense>
+    </Routes>
   )
 }
 
