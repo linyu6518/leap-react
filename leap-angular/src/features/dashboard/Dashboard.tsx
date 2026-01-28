@@ -55,6 +55,13 @@ function Dashboard() {
     initVarianceChart()
     initThresholdChart()
     loadDashboardStats()
+    
+    // Ensure page scrolls to top when Dashboard loads
+    // This prevents the title from being hidden behind the sticky header
+    const mainContentWrapper = document.querySelector('.main-content-wrapper')
+    if (mainContentWrapper) {
+      mainContentWrapper.scrollTop = 0
+    }
   }, [])
 
   useEffect(() => {

@@ -19,6 +19,8 @@
   gap: $spacing-md;
   flex-wrap: wrap;
   flex-shrink: 0; // Don't shrink
+  // Ensure title is visible and not hidden by sticky header
+  min-height: 24px; // Minimum height to ensure visibility
 
   .page-title {
     display: flex;
