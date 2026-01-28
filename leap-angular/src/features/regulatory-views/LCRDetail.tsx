@@ -98,19 +98,17 @@ function LCRDetail() {
 
   // Ensure queryParams are loaded from sessionStorage on mount if location.state is empty
   useEffect(() => {
-    // If no location.state and queryParams are empty, try loading from sessionStorage
+    // If no location.state, always try loading from sessionStorage
+    // This ensures that when user navigates back, params are loaded
     if (!location.state) {
       const savedParams = loadLCRQueryParams()
       if (savedParams.region || savedParams.segment || savedParams.prior || savedParams.current) {
-        // Check if current queryParams are different from saved ones
-        const currentHasValues = queryParams.region || queryParams.segment || queryParams.prior || queryParams.current
-        if (!currentHasValues) {
-          // Update queryParams from sessionStorage
-          setQueryParams(savedParams)
-        }
+        // Always update queryParams from sessionStorage to ensure they're loaded
+        // This handles the case when component remounts after navigation
+        setQueryParams(savedParams)
       }
     }
-  }, []) // Only run once on mount
+  }, [location.state]) // Run when location.state changes
 
   // Load data when component mounts or queryParams change
   useEffect(() => {
