@@ -1,20 +1,37 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Card, DatePicker, Button, Form } from 'antd'
 import { FileTextOutlined, CalendarOutlined } from '@ant-design/icons'
 import { TDSelect, Option } from '@components/shared'
-import { saveLCRViewParams, loadLCRViewParams } from '@utils/queryParamsStorage'
+import { saveLCRViewParams, loadLCRViewParams, loadLCRQueryParams } from '@utils/queryParamsStorage'
 import './LCRView.scss'
 
 function LCRView() {
   const navigate = useNavigate()
   const [form] = Form.useForm()
   const formValues = Form.useWatch([], form)
+  const [initialValuesLoaded, setInitialValuesLoaded] = useState(false)
 
-  // Load saved params on mount
+  // Load saved params on mount and whenever component becomes visible
   useEffect(() => {
-    const savedParams = loadLCRViewParams()
+    // Try loading from LCRView params first, then fall back to LCR query params
+    let savedParams = loadLCRViewParams()
+    
+    // If no LCRView params, try loading from LCR query params (in case user modified in Detail page)
+    if (!savedParams.enterprise && !savedParams.segment && !savedParams.prior && !savedParams.current) {
+      const queryParams = loadLCRQueryParams()
+      if (queryParams.region || queryParams.segment || queryParams.prior || queryParams.current) {
+        savedParams = {
+          enterprise: queryParams.region,
+          segment: queryParams.segment,
+          prior: queryParams.prior,
+          current: queryParams.current,
+        }
+      }
+    }
+    
     if (savedParams.enterprise || savedParams.segment || savedParams.prior || savedParams.current) {
+      // Set form values
       form.setFieldsValue({
         enterprise: savedParams.enterprise || undefined,
         segment: savedParams.segment || undefined,
@@ -22,6 +39,7 @@ function LCRView() {
         current: savedParams.current || undefined,
       })
     }
+    setInitialValuesLoaded(true)
   }, [form])
 
   const handleView = (values: any) => {
@@ -90,7 +108,19 @@ function LCRView() {
             layout="vertical"
             className="compact-form"
             onFinish={handleView}
-            initialValues={loadLCRViewParams()}
+            initialValues={(() => {
+              const saved = loadLCRViewParams()
+              if (!saved.enterprise && !saved.segment && !saved.prior && !saved.current) {
+                const queryParams = loadLCRQueryParams()
+                return {
+                  enterprise: queryParams.region,
+                  segment: queryParams.segment,
+                  prior: queryParams.prior,
+                  current: queryParams.current,
+                }
+              }
+              return saved
+            })()}
           >
             {/* 1. Enterprise */}
             <Form.Item
