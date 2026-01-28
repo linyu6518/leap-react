@@ -25,6 +25,7 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: true,
+    publicDir: 'public',
   },
   css: {
     preprocessorOptions: {
