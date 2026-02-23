@@ -2,7 +2,7 @@
 
 ## 📦 Package Contents
 
-**File**: `leap-angular-v1.0.0.tar.gz` (208 KB)
+**File**: `leap-react-v1.0.0.tar.gz` (208 KB)
 
 This package contains the complete LEAP (Liquidity Explain & Analytics Platform) Angular application source code, ready for deployment.
 
@@ -16,8 +16,8 @@ This package contains the complete LEAP (Liquidity Explain & Analytics Platform)
 
 ### Step 1: Extract Package
 ```bash
-tar -xzf leap-angular-v1.0.0.tar.gz
-cd leap-angular
+tar -xzf leap-react-v1.0.0.tar.gz
+cd leap-react
 ```
 
 ### Step 2: Install Dependencies

@@ -1,0 +1,185 @@
+@use '../../../../styles/variables' as *;
+
+.login-page { min-height: 100vh; display: flex; flex-direction: column; background: #f5f5f5; }
+.login-container { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px 24px; }
+.login-card {
+  background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  padding: 40px; max-width: 480px; width: 100%;
+}
+.login-card-header {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 32px;
+  .app-icon-wrapper { width: 48px; height: 48px; flex-shrink: 0; }
+  .app-icon { width: 100%; height: 100%; object-fit: contain; }
+  .app-title-section { flex: 1; min-width: 0; }
+  .app-title { font-size: 28px; font-weight: 600; color: #424242; margin: 0 0 1px 0; line-height: 1.2; }
+  .app-subtitle { font-size: 14px; font-weight: 400; color: #757575; margin: 0; line-height: 1.3; }
+}
+
+/* Login inputs: icon + floating label (match React TDInput) */
+.login-form .login-form-item {
+  margin-bottom: 20px;
+
+  .td-input-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    position: relative;
+  }
+
+  .td-input-inner {
+    position: relative;
+  }
+
+  .td-input-floating-label {
+    position: absolute;
+    left: 40px; /* 与输入文字起始对齐：12px(padding) + 20px(icon) + 8px(margin) */
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: $font-family;
+    font-size: 16px;
+    font-weight: 400;
+    color: #1C1C1C;
+    pointer-events: none;
+    transition: all 0.2s ease;
+    background-color: white;
+    padding: 0 4px;
+    z-index: 1;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .td-input-floating-label-active {
+    top: 8px !important;
+    transform: none !important;
+    font-size: 12px !important;
+    color: #1C1C1C !important;
+  }
+
+  /* 前缀图标：内联 SVG 或 .ant-input-prefix，与 React 一致 */
+  .ant-input-prefix,
+  .td-input-leading {
+    display: flex;
+    align-items: center;
+    color: #8C8C8C;
+    margin-right: 8px;
+    .anticon,
+    span[nz-icon],
+    .td-input-icon {
+      font-size: 20px;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    .td-input-icon {
+      width: 20px;
+      height: 20px;
+      color: inherit;
+    }
+  }
+
+  /* Input group: 54px height, black text, border like React */
+  .ant-input-affix-wrapper {
+    min-height: 54px !important;
+    height: 54px !important;
+    padding: 8px 12px !important;
+    border-color: #8C8C8C !important;
+    border-top-left-radius: 4px !important;
+    border-top-right-radius: 4px !important;
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    border-width: 1px !important;
+    transition: all 0.2s ease;
+    font-family: $font-family !important;
+    font-size: 16px !important;
+    font-weight: 500 !important;
+    color: #1A1A1A !important;
+    &:hover:not(.ant-input-affix-wrapper-disabled) {
+      border-color: #008A00 !important;
+    }
+    &:focus,
+    &.ant-input-affix-wrapper-focused {
+      border-color: #008A00 !important;
+      border-width: 1px 1px 3px 1px !important;
+      border-bottom-color: #008A00 !important;
+      box-shadow: none !important;
+    }
+  }
+
+  .ant-input {
+    font-family: $font-family !important;
+    font-size: 16px !important;
+    font-weight: 500 !important;
+    color: #1A1A1A !important;
+    background: transparent !important;
+    text-align: left !important;
+    padding-left: 0 !important;
+    padding-top: 15px !important; /* 输入文字下移，与上方浮动标签拉开间距 */
+    margin-left: -1px !important;
+    &::placeholder {
+      color: #1C1C1C;
+      opacity: 1;
+    }
+  }
+
+  .td-input-wrapper.td-input-has-error .ant-input-affix-wrapper {
+    border-color: #8C8C8C !important;
+    border-width: 1px 1px 3px 1px !important;
+    border-bottom-color: #AD1100 !important;
+    &:focus, &.ant-input-affix-wrapper-focused {
+      border-bottom-color: #AD1100 !important;
+    }
+  }
+}
+
+.login-form {
+  text-align: left;
+  .error-message {
+    margin-bottom: 20px;
+    background-color: #F8E7E8 !important;
+    border: none !important;
+    border-radius: 4px;
+    padding: 10px 14px !important;
+  }
+  .login-buttons { display: flex; gap: 12px; margin-top: 8px; margin-bottom: 24px; }
+  .login-button {
+    flex: 1;
+    height: 40px !important;
+    background: #058901 !important;
+    color: white !important;
+    border-radius: 0 !important;
+    font-weight: 500;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+
+    &:hover,
+    &:focus,
+    &:active,
+    &:focus-visible {
+      background: #047001 !important;
+      border: none !important;
+      outline: none !important;
+      box-shadow: none !important;
+    }
+
+    &.ant-btn-loading {
+      background: #058901 !important;
+      border: none !important;
+      outline: none !important;
+      box-shadow: none !important;
+    }
+  }
+
+  /* 去掉 ng-zorro 主按钮的蓝色 focus 环（仅登录页） */
+  :host ::ng-deep .login-button.ant-btn-primary,
+  :host ::ng-deep .login-button.ant-btn-primary:focus,
+  :host ::ng-deep .login-button.ant-btn-primary:active,
+  :host ::ng-deep .login-button.ant-btn-primary:hover {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+  }
+  .cancel-button { flex: 1; height: 40px !important; background: white !important; color: #00843D !important; border: 2px solid #00843D !important; border-radius: 0 !important; font-weight: 500; }
+  .cancel-button:hover { background: rgba(0, 132, 61, 0.05) !important; color: #00843D !important; border-color: #00843D !important; }
+}
+.leap-description { margin-top: 24px; padding-top: 24px; border-top: 1px solid #e0e0e0; text-align: left; }
+.description-text { font-size: 13px; color: #757575; line-height: 1.5; margin: 0; text-align: left; }

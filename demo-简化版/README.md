@@ -157,7 +157,7 @@ open "/Users/lin/Liquidity Explain & Analytics Platform (LEAP)/demo-简化版/in
 
 ### 如果你满意这个演示：
 1. 可以基于此HTML设计完善完整的Angular应用
-2. 或者直接使用 `/leap-angular/` 目录的Angular版本（需修复SCSS配置）
+2. 或者直接使用 `/leap-react/` 目录的Angular版本（需修复SCSS配置）
 
 ### 如果需要完整功能：
 1. 参考 `BACKEND_DEPLOYMENT_PLAN.md` 实现后端API

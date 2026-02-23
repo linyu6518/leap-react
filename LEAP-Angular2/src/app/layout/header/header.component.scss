@@ -1,0 +1,196 @@
+@use '../../../styles/variables' as *;
+
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  height: $header-height;
+  background: #fff;
+  border-bottom: 1px solid $color-border;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  padding: 0 12px !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  color: $color-text-primary;
+  min-height: $header-height !important;
+  max-height: $header-height !important;
+  box-sizing: border-box !important;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  width: 400px !important;
+  margin-left: 0;
+  margin-top: 0;
+  position: relative;
+  z-index: 2;
+
+  .search-input-wrapper {
+    width: 100%;
+  }
+
+  /* 40px 总高：上下各 10px padding + 中间 20px line-height，不设 height 避免白色遮罩 */
+  .ant-input-affix-wrapper {
+    display: flex !important;
+    align-items: center !important;
+    padding: 10px 12px !important;
+    box-sizing: border-box !important;
+    border-color: #8C8C8C !important;
+    border-radius: 4px 4px 0 0 !important;
+    border-width: 1px !important;
+    transition: all 0.2s ease;
+    position: relative;
+    z-index: 1;
+
+    &:hover:not(.ant-input-affix-wrapper-disabled) {
+      border-color: #008A00 !important;
+    }
+    &:focus,
+    &.ant-input-affix-wrapper-focused {
+      border-color: #008A00 !important;
+      border-width: 1px 1px 3px 1px !important;
+      border-bottom-color: #008A00 !important;
+      box-shadow: none !important;
+    }
+  }
+
+  .ant-input,
+  input.search-input {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    height: auto !important;
+    min-height: 0 !important;
+    line-height: 20px !important;
+    font-size: 16px !important;
+    font-weight: 500 !important;
+    color: $color-text-primary !important;
+    padding: 0 8px 0 0 !important;
+
+    &::placeholder {
+      font-size: 16px !important;
+      font-weight: 400 !important;
+      color: #1C1C1C !important;
+      opacity: 1 !important;
+    }
+  }
+
+  .ant-input-prefix {
+    color: #008A00 !important;
+    display: flex !important;
+    align-items: center !important;
+    margin-right: 10px !important;
+
+    .anticon {
+      color: #008A00 !important;
+      font-size: 18px !important;
+      width: 18px !important;
+      height: 18px !important;
+    }
+  }
+
+  .search-clear {
+    background-color: #F5F5F5 !important;
+    border: none;
+    border-radius: 50%;
+    width: 22px !important;
+    height: 22px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    margin-left: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    .anticon {
+      color: #6B6B6B !important;
+      font-size: 14px !important;
+    }
+
+    &:hover {
+      background-color: #E0E0E0 !important;
+      .anticon { color: #6B6B6B !important; }
+    }
+  }
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  flex-shrink: 0;
+  height: 100%;
+}
+
+.notification-button {
+  color: $color-text-primary;
+  margin-right: 20px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 18px;
+  padding: 6px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  .anticon, [nz-icon] {
+    font-size: 18px !important;
+  }
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+}
+
+.user-menu-button {
+  min-width: auto !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  transition: all 0.2s ease;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  &:hover {
+    background-color: rgba(170, 80, 222, 0.08);
+  }
+}
+
+.user-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background-color: #aa50de;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(170, 80, 222, 0.3);
+  margin-left: -10px;
+}
+
+@media (max-width: 768px) {
+  .search-box {
+    display: none;
+  }
+}

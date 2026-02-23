@@ -5,7 +5,7 @@
 由于项目结构是：
 ```
 LEAP React/
-  └── leap-angular/  (实际项目目录)
+  └── leap-react/  (实际项目目录)
       ├── src/
       ├── package.json
       └── vercel.json
@@ -19,16 +19,16 @@ LEAP React/
 2. 选择你的项目
 3. 进入 **Settings** → **General**
 4. 找到 **Root Directory** 设置
-5. 设置为：`leap-angular`
+5. 设置为：`leap-react`
 6. 点击 **Save**
 
 ### 或者使用根目录的 vercel.json
 
 如果不想设置 Root Directory，我已经在项目根目录创建了 `vercel.json`，它会：
-- 自动进入 `leap-angular` 目录
+- 自动进入 `leap-react` 目录
 - 安装依赖
 - 构建项目
-- 从 `leap-angular/dist` 输出
+- 从 `leap-react/dist` 输出
 
 ### 验证部署
 

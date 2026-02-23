@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "buildCommand": "cd leap-angular && npm install && npm run build",
-  "outputDirectory": "leap-angular/dist",
-  "installCommand": "cd leap-angular && npm install",
+  "buildCommand": "cd leap-react && npm install && npm run build",
+  "outputDirectory": "leap-react/dist",
+  "installCommand": "cd leap-react && npm install",
   "rewrites": [
     {
       "source": "/(.*)",

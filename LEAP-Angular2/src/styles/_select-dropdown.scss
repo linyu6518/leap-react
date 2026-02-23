@@ -1,0 +1,302 @@
+// LEAP 设计系统：Select / DatePicker 下拉组件样式
+// 供全局或页面通过 mixin 调用，保证与 UI_SPEC 2.3 / 2.4 一致
+// 使用方式见 UI_SPEC.md 第 2.3、2.4 节「调用方式」
+
+@use 'variables' as *;
+
+// ---------- 设计令牌（下拉专用，便于后期覆盖） ----------
+$leap-select-height: 54px;
+$leap-select-border-color: #8b8b8b;
+$leap-select-focus-underline: #008a00;
+$leap-select-arrow-default: #6b6b6b;
+$leap-select-arrow-active: #00843d;
+$leap-select-placeholder-color: #9e9e9e;
+$leap-dropdown-panel-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+$leap-dropdown-panel-radius: 4px;
+$leap-dropdown-panel-border: 1px solid rgba(0, 0, 0, 0.06);
+$leap-select-arrow-open-offset: 2px; // 打开时箭头下移 4px → translateY(-50% + 2px)
+
+// ---------- Mixin：Select 触发器（nz-select 容器 + 箭头） ----------
+// 用法：在页面 :host ::ng-deep 内 @include leap-select-trigger('.你的类名');
+@mixin leap-select-trigger($selector: '.leap-select') {
+  #{$selector} {
+    width: 100%;
+  }
+
+  #{$selector} .ant-select-selector {
+    padding: 8px 40px 8px 12px !important;
+  }
+
+  #{$selector} .ant-select-selector {
+    height: $leap-select-height !important;
+    min-height: $leap-select-height !important;
+    border-color: $leap-select-border-color !important;
+    border-top-left-radius: 4px !important;
+    border-top-right-radius: 4px !important;
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    border-width: 1px !important;
+    font-family: $font-family !important;
+    outline: none !important;
+
+    &:hover {
+      border-color: $leap-select-border-color !important;
+    }
+  }
+
+  /* 编辑/聚焦：整框绿色 */
+  #{$selector}.ant-select-focused .ant-select-selector,
+  #{$selector}.ant-select-open .ant-select-selector {
+    border-color: $leap-select-focus-underline !important;
+    border-width: 1px 1px 3px 1px !important;
+    box-shadow: none !important;
+    outline: none !important;
+  }
+
+  /* 失焦：整体变灰，绿边不保留 */
+  #{$selector}:not(.ant-select-focused):not(.ant-select-open) .ant-select-selector {
+    border-color: $leap-select-border-color !important;
+    border-width: 1px !important;
+  }
+
+  #{$selector} .ant-select-selection-placeholder {
+    color: $leap-select-placeholder-color !important;
+    font-weight: 400 !important;
+    font-size: 16px !important;
+    margin-top: 12px !important;
+    margin-left: 3px !important;
+    line-height: 1.5 !important;
+  }
+
+  #{$selector} .ant-select-selection-item {
+    color: $color-text-primary !important;
+    font-weight: 500 !important;
+    font-size: 16px !important;
+    line-height: 1.5 !important;
+    margin-top: 12px !important;
+    margin-left: 3px !important;
+  }
+
+  /* 箭头：CSS 三角，与 React 一致；打开时旋转并下移、主色 */
+  #{$selector} .ant-select-arrow {
+    color: $leap-select-arrow-default !important;
+    font-size: 0 !important;
+    width: 16px !important;
+    height: 16px !important;
+    margin-top: 0 !important;
+    top: 50% !important;
+    transform: translateY(calc(-50% - 2px)) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    right: 12px !important;
+
+    .anticon {
+      display: none !important;
+    }
+
+    &::after {
+      content: '';
+      display: block;
+      width: 8px;
+      height: 8px;
+      border-right: 1.5px solid currentColor;
+      border-bottom: 1.5px solid currentColor;
+      transform: rotate(45deg) scale(0.9);
+      transition: transform 0.2s ease, color 0.2s ease;
+    }
+  }
+
+  #{$selector}:hover .ant-select-arrow {
+    color: $leap-select-arrow-active !important;
+  }
+
+  #{$selector}.ant-select-open .ant-select-arrow {
+    transform: translateY(calc(-50% + #{$leap-select-arrow-open-offset})) !important;
+    color: $leap-select-arrow-active !important;
+
+    &::after {
+      transform: rotate(225deg) scale(0.9);
+    }
+  }
+}
+
+// ---------- Mixin：DatePicker 触发器（与 Select 同高、同边框与焦点） ----------
+@mixin leap-datepicker-trigger($selector: '.leap-datepicker') {
+  #{$selector} {
+    width: 100%;
+  }
+
+  #{$selector} .ant-picker {
+    height: $leap-select-height !important;
+    min-height: $leap-select-height !important;
+    border-color: $leap-select-border-color !important;
+    border-top-left-radius: 4px !important;
+    border-top-right-radius: 4px !important;
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    border-width: 1px !important;
+    font-family: $font-family !important;
+    outline: none !important;
+
+    &:hover {
+      border-color: $leap-select-border-color !important;
+    }
+  }
+
+  /* 编辑/聚焦：整框绿色 */
+  #{$selector} .ant-picker-focused {
+    border-color: $leap-select-focus-underline !important;
+    border-width: 1px 1px 3px 1px !important;
+    box-shadow: none !important;
+    outline: none !important;
+  }
+
+  /* 失焦：整体变灰，绿边不保留 */
+  #{$selector} .ant-picker:not(.ant-picker-focused) {
+    border-color: $leap-select-border-color !important;
+    border-width: 1px !important;
+  }
+
+  #{$selector} .ant-picker-input input::placeholder {
+    color: #1a1a1a !important;
+    font-weight: 400 !important;
+    font-size: 16px !important;
+  }
+
+  #{$selector} .ant-picker-input {
+    height: 100% !important;
+    padding: 0 !important;
+  }
+
+  #{$selector} .ant-picker-input input {
+    color: #1a1a1a !important;
+    font-weight: 500 !important;
+    font-size: 16px !important;
+    line-height: $leap-select-height !important;
+    height: $leap-select-height !important;
+    font-family: $font-family !important;
+  }
+
+  #{$selector} .ant-picker-suffix,
+  #{$selector} .ant-picker-suffix .anticon {
+    color: $leap-select-focus-underline !important;
+  }
+  #{$selector} .ant-picker-suffix .anticon {
+    font-size: 16px !important;
+  }
+}
+
+// ---------- Mixin：Select 下拉面板（全局 .ant-select-dropdown） ----------
+@mixin leap-select-dropdown-panel() {
+  .ant-select-dropdown {
+    background: #fff !important;
+    background-color: #fff !important;
+    box-shadow: $leap-dropdown-panel-shadow !important;
+    border-radius: $leap-dropdown-panel-radius !important;
+    border: $leap-dropdown-panel-border !important;
+    font-family: $font-family !important;
+
+    .ant-select-item {
+      font-family: $font-family !important;
+      font-size: 16px !important;
+      font-weight: 500 !important;
+      color: $color-text-primary !important;
+
+      &.ant-select-item-option-selected {
+        background: rgba(0, 132, 61, 0.1) !important;
+        color: #00843D !important;
+        font-weight: 500 !important;
+      }
+
+      &.ant-select-item-option-active:not(.ant-select-item-option-selected) {
+        background: $color-bg-hover !important;
+      }
+    }
+  }
+}
+
+// ---------- Mixin：DatePicker 下拉面板（全局 .ant-picker-dropdown） ----------
+@mixin leap-datepicker-dropdown-panel() {
+  .ant-picker-dropdown {
+    .ant-picker-panel-container {
+      box-shadow: $leap-dropdown-panel-shadow !important;
+      border-radius: $leap-dropdown-panel-radius !important;
+    }
+
+    .ant-picker-panel {
+      border: none !important;
+      background: #fff !important;
+    }
+
+    .ant-picker-header .ant-picker-header-view,
+    .ant-picker-header .ant-picker-header-view > span,
+    .ant-picker-header .ant-picker-header-view > span:hover {
+      color: $leap-select-focus-underline !important;
+    }
+
+    .ant-picker-prev-icon,
+    .ant-picker-next-icon {
+      color: #666 !important;
+      font-size: 12px !important;
+    }
+    .ant-picker-prev-icon:hover,
+    .ant-picker-next-icon:hover {
+      color: $leap-select-focus-underline !important;
+    }
+
+    .ant-picker-body {
+      padding: 8px 12px !important;
+    }
+
+    .ant-picker-content th {
+      color: #666 !important;
+      font-weight: 500 !important;
+      font-size: 12px !important;
+      padding: 8px 0 !important;
+    }
+
+    .ant-picker-cell-inner {
+      border-radius: 0 !important;
+      transition: all 0.2s !important;
+    }
+    .ant-picker-cell-inner:hover {
+      background: rgba(0, 138, 0, 0.1) !important;
+    }
+    .ant-picker-cell-selected .ant-picker-cell-inner {
+      background: $leap-select-focus-underline !important;
+      color: #fff !important;
+      font-weight: 500 !important;
+      border: none !important;
+      border-radius: 0 !important;
+    }
+    .ant-picker-cell-today .ant-picker-cell-inner {
+      border: 1px solid $leap-select-focus-underline !important;
+      border-radius: 0 !important;
+      font-weight: 500 !important;
+    }
+
+    .ant-picker-footer {
+      border-top: 1px solid #f0f0f0 !important;
+      padding: 12px 20px !important;
+      background: #fff !important;
+    }
+    .ant-picker-footer .ant-picker-today-btn {
+      display: none !important;
+    }
+    .ant-picker-footer .ant-btn-link {
+      color: $leap-select-focus-underline !important;
+      border: none !important;
+      background: transparent !important;
+      font-weight: 500 !important;
+      font-size: 14px !important;
+    }
+    .ant-picker-footer .ant-btn-primary {
+      background: $leap-select-focus-underline !important;
+      border-color: $leap-select-focus-underline !important;
+      color: #fff !important;
+      font-weight: 500 !important;
+      font-size: 14px !important;
+    }
+  }
+}

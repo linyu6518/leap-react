@@ -1,0 +1,117 @@
+<div class="lcr-container">
+  <div class="page-header">
+    <div class="page-title">
+      <span nz-icon nzType="file-text" class="page-icon"></span>
+      <div class="title-breadcrumb">
+        <a routerLink="/regulatory/lcr" class="breadcrumb-link">Regulatory</a>
+        <span class="breadcrumb-separator">-</span>
+        <a routerLink="/regulatory/lcr" class="breadcrumb-link">Metrics</a>
+        <span class="breadcrumb-separator">-</span>
+        <span class="breadcrumb-current">LCR</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="lcr-page-content">
+    <nz-card class="selection-card">
+      <div class="header">
+        <h2>Report Config</h2>
+        <p class="subtitle">
+          Configure the enterprise, segment and time parameters to analyze LCR metrics.
+        </p>
+      </div>
+
+      <form
+        nz-form
+        [formGroup]="form"
+        nzLayout="vertical"
+        class="compact-form"
+        (ngSubmit)="view()"
+      >
+        <nz-form-item>
+          <nz-form-control nzErrorTip="Enterprise is required">
+            <div
+              class="lcr-select-wrapper"
+              [class.floating-label-active]="enterpriseOpen() || form.get('enterprise')?.value"
+            >
+              <nz-select
+                formControlName="enterprise"
+                [nzPlaceHolder]="(enterpriseOpen() || form.get('enterprise')?.value) ? 'Select an enterprise' : ''"
+                nzSize="large"
+                class="lcr-select"
+                (nzOpenChange)="enterpriseOpen.set($event)"
+              >
+                <nz-option nzValue="Enterprise" nzLabel="Enterprise"></nz-option>
+                <nz-option nzValue="CAD Retail" nzLabel="CAD Retail"></nz-option>
+                <nz-option nzValue="US Retail" nzLabel="US Retail"></nz-option>
+                <nz-option nzValue="Wholesale" nzLabel="Wholesale"></nz-option>
+              </nz-select>
+              <span class="floating-label">Enterprise</span>
+            </div>
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-control nzErrorTip="Segment is required">
+            <div
+              class="lcr-select-wrapper"
+              [class.floating-label-active]="segmentOpen() || form.get('segment')?.value"
+            >
+              <nz-select
+                formControlName="segment"
+                [nzPlaceHolder]="(segmentOpen() || form.get('segment')?.value) ? 'Select a segment' : ''"
+                nzSize="large"
+                class="lcr-select"
+                (nzOpenChange)="segmentOpen.set($event)"
+              >
+                <nz-option nzValue="Enterprise" nzLabel="Enterprise"></nz-option>
+                <nz-option nzValue="CAD Retail" nzLabel="CAD Retail"></nz-option>
+                <nz-option nzValue="US Retail" nzLabel="US Retail"></nz-option>
+                <nz-option nzValue="Wholesale" nzLabel="Wholesale"></nz-option>
+              </nz-select>
+              <span class="floating-label">Segment</span>
+            </div>
+          </nz-form-control>
+        </nz-form-item>
+
+        <div class="date-row">
+          <nz-form-item>
+            <nz-form-control nzErrorTip="Prior date is required">
+              <nz-date-picker
+                formControlName="prior"
+                nzSize="large"
+                nzPlaceHolder="Prior *"
+                class="lcr-datepicker"
+                style="width: 100%;"
+              ></nz-date-picker>
+            </nz-form-control>
+          </nz-form-item>
+          <nz-form-item>
+            <nz-form-control nzErrorTip="Current date is required">
+              <nz-date-picker
+                formControlName="current"
+                nzSize="large"
+                nzPlaceHolder="Current *"
+                class="lcr-datepicker"
+                style="width: 100%;"
+              ></nz-date-picker>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+
+        <div class="form-divider"></div>
+        <div class="form-actions">
+          <button
+            nz-button
+            nzType="primary"
+            type="submit"
+            class="view-button"
+            [disabled]="!canSubmit()"
+          >
+            View Analytics
+          </button>
+        </div>
+      </form>
+    </nz-card>
+  </div>
+</div>

@@ -1,0 +1,68 @@
+// LEAP UI Spec - Design Tokens (aligned with UI_SPEC.md)
+
+// Brand
+$color-primary: #00843D;
+$color-primary-dark: #133F28;
+$color-primary-light: #E8F5E9;
+$sidebar-bg: #005A29;
+
+// Status
+$color-draft: #9E9E9E;
+$color-pending: #1976D2;
+$color-approved: #4CAF50;
+$color-rejected: #E53935;
+$color-escalated: #FF6F00;
+$color-warning: #FFC107;
+$color-error: #E53935;
+$color-info: #1976D2;
+$color-success: #4CAF50;
+
+// Neutrals
+$color-text-primary: #1A1A1A;
+$color-text-secondary: #4A4A4A;
+$color-text-hint: #757575;
+$color-text-tertiary: #757575;
+$color-text-white: #FFFFFF;
+$color-border: #E0E0E0;
+$color-border-medium: #BDBDBD;
+$color-background: #F5F5F5;
+$color-bg-page: #F5F5F5;
+$color-bg-card: #FFFFFF;
+$color-bg-hover: #FAFAFA;
+
+// Typography
+$font-family: 'Graphik', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+$font-weight-light: 300;
+$font-weight-regular: 400;
+$font-weight-medium: 500;
+$font-weight-bold: 700;
+$font-size-h1: 28px;
+$font-size-h2: 24px;
+$font-size-h3: 20px;
+$font-size-h4: 18px;
+$font-size-body: 16px;
+$font-size-caption: 14px;
+$font-size-small: 12px;
+
+// Spacing
+$spacing-xs: 8px;
+$spacing-sm: 16px;
+$spacing-md: 24px;
+$spacing-lg: 32px;
+$spacing-xl: 48px;
+
+// Layout
+$header-height: 64px;
+$sidebar-width: 270px;
+$sidebar-collapsed-width: 80px;
+
+// Radius
+$border-radius-sm: 4px;
+$border-radius-md: 8px;
+
+// Shadows
+$shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+
+// Error alert
+$color-error-bg: #F8E7E8;
+$color-error-icon: #AD1100;

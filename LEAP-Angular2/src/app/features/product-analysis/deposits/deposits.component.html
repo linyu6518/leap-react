@@ -1,0 +1,128 @@
+<div class="deposits-container">
+  <div class="page-header">
+    <div class="page-title">
+      <span nz-icon nzType="folder" class="page-icon"></span>
+      <div class="title-breadcrumb">
+        <a routerLink="/product" class="breadcrumb-link">Products</a>
+        <span class="breadcrumb-separator">-</span>
+        <span class="breadcrumb-current">Deposit</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="query-panel">
+    <form nz-form [formGroup]="form" (ngSubmit)="onQuery()" class="query-form">
+      <div class="query-row">
+        <nz-form-item class="filter-field">
+          <nz-form-control nzErrorTip="Region is required">
+            <div
+              class="deposits-select-wrapper"
+              [class.floating-label-active]="regionOpen() || form.get('region')?.value"
+            >
+              <nz-select
+                formControlName="region"
+                [nzPlaceHolder]="(regionOpen() || form.get('region')?.value) ? 'Select a region' : ''"
+                nzSize="large"
+                class="deposits-select"
+                (nzOpenChange)="regionOpen.set($event)"
+              >
+                <nz-option nzValue="US" nzLabel="US"></nz-option>
+                <nz-option nzValue="CAD" nzLabel="CAD"></nz-option>
+                <nz-option nzValue="Europe" nzLabel="Europe"></nz-option>
+                <nz-option nzValue="Enterprise" nzLabel="Enterprise"></nz-option>
+              </nz-select>
+              <span class="floating-label">Region</span>
+            </div>
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item class="filter-field">
+          <nz-form-control nzErrorTip="Segment is required">
+            <div
+              class="deposits-select-wrapper"
+              [class.floating-label-active]="segmentOpen() || form.get('segment')?.value"
+            >
+              <nz-select
+                formControlName="segment"
+                [nzPlaceHolder]="(segmentOpen() || form.get('segment')?.value) ? 'Select a segment' : ''"
+                nzSize="large"
+                class="deposits-select"
+                (nzOpenChange)="segmentOpen.set($event)"
+              >
+                <nz-option nzValue="Enterprise" nzLabel="Enterprise"></nz-option>
+                <nz-option nzValue="CAD Retail" nzLabel="CAD Retail"></nz-option>
+                <nz-option nzValue="US Retail" nzLabel="US Retail"></nz-option>
+                <nz-option nzValue="Wholesale" nzLabel="Wholesale"></nz-option>
+              </nz-select>
+              <span class="floating-label">Segment</span>
+            </div>
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item class="date-field">
+          <nz-form-control nzErrorTip="Prior date is required">
+            <nz-date-picker
+              formControlName="prior"
+              nzSize="large"
+              nzPlaceHolder="Prior *"
+              class="deposits-datepicker"
+              style="width: 100%;"
+            ></nz-date-picker>
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item class="date-field">
+          <nz-form-control nzErrorTip="Current date is required">
+            <nz-date-picker
+              formControlName="current"
+              nzSize="large"
+              nzPlaceHolder="Current *"
+              class="deposits-datepicker"
+              style="width: 100%;"
+            ></nz-date-picker>
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item class="button-field">
+          <button
+            nz-button
+            nzType="primary"
+            type="submit"
+            class="query-button"
+            [disabled]="!isFormComplete()"
+          >
+            View Analytics
+          </button>
+        </nz-form-item>
+      </div>
+    </form>
+  </div>
+
+  <nz-card class="deposits-card">
+    @if (!isFormComplete()) {
+      <div class="deposits-empty-state">
+        <span nz-icon nzType="info-circle" class="empty-state-icon"></span>
+        <div class="empty-state-text">
+          Please select Region, Segment, and Date to view analytics
+        </div>
+      </div>
+    } @else {
+      <nz-tabset [nzSelectedIndex]="activeTabIndex()" (nzSelectedIndexChange)="onTabChange($event)">
+        @for (tab of tabs; track tab) {
+          <nz-tab [nzTitle]="tab"></nz-tab>
+        }
+      </nz-tabset>
+      <div class="deposits-grid-wrapper">
+        <ag-grid-angular
+          class="ag-theme-material"
+          [rowData]="rowData()"
+          [columnDefs]="columnDefs()"
+          [defaultColDef]="defaultColDef"
+          [context]="gridContext"
+          [animateRows]="true"
+          rowSelection="single"
+          [suppressNoRowsOverlay]="false"
+          domLayout="autoHeight"
+          [getRowId]="getRowId"
+          (rowClicked)="onRowClicked($event)"
+        />
+      </div>
+    }
+  </nz-card>
+</div>

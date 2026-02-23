@@ -13,7 +13,7 @@ LEAP Angular项目 - 使用说明
    - Windows: 使用7-Zip或WinRAR解压
 
 2. 进入项目目录
-   cd leap-angular
+   cd leap-react
 
 3. 安装依赖 (首次运行必须!)
    npm install

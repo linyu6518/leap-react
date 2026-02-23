@@ -1,0 +1,270 @@
+@use './styles/variables' as *;
+@use './styles/select-dropdown' as leap-dropdown;
+
+@import 'ng-zorro-antd/ng-zorro-antd.min.css';
+@import 'ag-grid-community/styles/ag-grid.css';
+@import 'ag-grid-community/styles/ag-theme-material.css';
+
+:root {
+  --leap-primary: #{$color-primary};
+  --leap-sidebar-bg: #133F28;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  font-family: $font-family;
+  font-weight: $font-weight-light;
+  font-size: $font-size-body;
+  color: $color-text-primary;
+  background: $color-background;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* UI Spec: Main layout */
+.main-layout {
+  display: flex;
+  flex-direction: row;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background: $color-bg-page;
+}
+
+.content-area {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  height: 100vh;
+  overflow: hidden;
+  min-width: 0;
+  position: relative;
+  z-index: 20;
+  background: $color-bg-page;
+}
+
+.main-content-wrapper {
+  background: $color-bg-page;
+  padding: 7px 12px 12px 12px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-width: 0;
+  height: calc(100vh - #{$header-height});
+}
+
+/* ng-zorro: global font */
+.ant-btn, .ant-input, .ant-select, nz-input, nz-select, nz-date-picker,
+.ant-form-item-label > label, .ant-form-item-extra, .ant-form-item-explain,
+.ant-table, .ant-card, .ant-menu, .ant-dropdown, .ant-tooltip, .ant-modal,
+.ant-drawer, .ant-message, .ant-notification, .ant-alert,
+nz-alert {
+  font-family: $font-family !important;
+}
+
+/* UI Spec: Buttons - border-radius 0, font-weight 500 */
+.ant-btn, .ant-btn-primary, .ant-btn-default {
+  border-radius: 0 !important;
+  font-weight: 500 !important;
+}
+
+/* UI Spec: Input - 编辑时整框绿色，失焦变灰（绿边不保留） */
+.main-content-wrapper .ant-input,
+.main-content-wrapper .ant-input-affix-wrapper {
+  min-height: 54px !important;
+  border-radius: 4px 4px 0 0 !important;
+  border-color: #8C8C8C !important;
+  border-width: 1px !important;
+}
+.main-content-wrapper .ant-input:focus,
+.main-content-wrapper .ant-input-affix-wrapper-focused {
+  border-color: #008A00 !important;
+  box-shadow: none !important;
+  border-bottom-width: 3px !important;
+}
+
+/* UI Spec 2.4: DatePicker - 编辑时整框绿色，失焦变灰（绿边不保留） */
+.main-content-wrapper .ant-picker {
+  min-height: 54px !important;
+  height: 54px !important;
+  border-radius: 4px 4px 0 0 !important;
+  border-color: #8b8b8b !important;
+  border-width: 1px !important;
+  outline: none !important;
+}
+.main-content-wrapper .ant-picker-focused {
+  border-color: #008a00 !important;
+  border-width: 1px 1px 3px 1px !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+.main-content-wrapper .ant-picker .ant-picker-input input {
+  font-family: $font-family !important;
+}
+.main-content-wrapper .ant-picker .ant-picker-suffix .anticon {
+  color: #008a00 !important;
+}
+
+/* 顶栏搜索框：不强制高度，避免产生遮挡层；图标与文字间距 */
+.app-header .search-box {
+  position: relative;
+  z-index: 2;
+}
+.app-header .search-box .ant-input-prefix {
+  margin-right: 10px !important;
+}
+.app-header .search-box .ant-input {
+  padding-left: 0 !important;
+}
+.app-header .search-box .ant-input-prefix,
+.app-header .search-box .ant-input-prefix .anticon {
+  color: #008A00 !important;
+  font-size: 18px !important;
+}
+.app-header .search-box .ant-input-prefix .anticon {
+  width: 18px !important;
+  height: 18px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+.app-header .search-box .ant-input-prefix .anticon svg {
+  width: 18px !important;
+  height: 18px !important;
+}
+.app-header {
+  z-index: 1000;
+  isolation: isolate;
+}
+
+/* 顶栏用户下拉菜单：白色背景（overlay 在 body 下，需全局样式） */
+.ant-dropdown {
+  background: #fff !important;
+  background-color: #fff !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+  border-radius: 4px !important;
+  border: 1px solid rgba(0, 0, 0, 0.06) !important;
+}
+.ant-dropdown-wrap,
+ul.ant-dropdown-menu,
+.ant-dropdown .ant-dropdown-menu {
+  background: #fff !important;
+  background-color: #fff !important;
+}
+.ant-dropdown-menu-item {
+  background: #fff !important;
+}
+
+/* UI Spec 2.3 / 2.4: Select & DatePicker 下拉面板（设计系统 _select-dropdown.scss） */
+@include leap-dropdown.leap-select-dropdown-panel();
+@include leap-dropdown.leap-datepicker-dropdown-panel();
+
+/* UI Spec: Form */
+.ant-form-item { margin-bottom: 20px; }
+.ant-form-item-label > label { color: $color-text-primary; font-size: $font-size-caption; }
+.ant-form-item-required::before { color: $color-rejected !important; }
+
+/* Form error style - match React: red bottom border, red icon + red message */
+.ant-form-item-has-error .ant-input,
+.ant-form-item-has-error .ant-input-affix-wrapper {
+  border-color: #8B8B8B !important;
+  border-width: 1px 1px 3px 1px !important;
+  border-bottom-color: #AD1100 !important;
+  &:hover:not(:disabled):not([readonly]) {
+    border-color: #8B8B8B !important;
+    border-bottom-color: #AD1100 !important;
+  }
+  &:focus, &.ant-input-focused, .ant-input-affix-wrapper-focused {
+    border-color: #8B8B8B !important;
+    border-width: 1px 1px 3px 1px !important;
+    border-bottom-color: #AD1100 !important;
+    box-shadow: none !important;
+  }
+}
+.ant-form-item-has-error .ant-picker {
+  border-color: #8B8B8B !important;
+  border-width: 1px 1px 3px 1px !important;
+  border-bottom-color: #AD1100 !important;
+  &:hover {
+    border-color: #8B8B8B !important;
+    border-bottom-color: #AD1100 !important;
+  }
+  &.ant-picker-focused {
+    border-color: #8B8B8B !important;
+    border-width: 1px 1px 3px 1px !important;
+    border-bottom-color: #AD1100 !important;
+    box-shadow: none !important;
+  }
+}
+.ant-form-item-has-error .ant-select .ant-select-selector {
+  border-color: #8B8B8B !important;
+  border-width: 1px 1px 3px 1px !important;
+  border-bottom-color: #AD1100 !important;
+  &:hover { border-color: #8B8B8B !important; border-bottom-color: #AD1100 !important; }
+}
+.ant-form-item-explain-error {
+  font-family: $font-family;
+  font-size: 12px;
+  color: #AD1100 !important;
+  font-weight: 600;
+  line-height: 1.5;
+  margin-top: 4px;
+  margin-left: 2px;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  > * { color: #AD1100 !important; }
+  &::before {
+    content: '';
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    margin-top: 1px;
+    background-image: url("data:image/svg+xml,%3Csvg width='14' height='14' viewBox='0 0 14 14' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='7' cy='7' r='7' fill='%23AD1100'/%3E%3Cpath d='M7 3.5V7.5' stroke='white' stroke-width='1.3' stroke-linecap='round'/%3E%3Ccircle cx='7' cy='10' r='0.7' fill='white'/%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+  .anticon { display: none; }
+}
+
+/* UI Spec: Card radius 0 */
+.ant-card { border-radius: 0 !important; }
+
+/* UI Spec: Error alert */
+.ant-alert-error, nz-alert[ng-reflect-nz-type="error"] {
+  background-color: $color-error-bg !important;
+  border: none !important;
+  border-radius: $border-radius-sm !important;
+  padding: 10px 14px !important;
+  display: flex !important;
+  gap: 0 !important;
+}
+.ant-alert-error .ant-alert-message { color: $color-text-primary !important; font-size: 13px; font-weight: 600; }
+.ant-alert-error .ant-alert-description { color: $color-text-primary !important; font-size: $font-size-small; font-weight: 400 !important; }
+.ant-alert-error .ant-alert-icon {
+  color: $color-error-icon !important;
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: center !important;
+  margin-top: 2px !important;
+  width: 14px !important;
+  height: 14px !important;
+  flex-shrink: 0 !important;
+}
+.ant-alert-error .ant-alert-icon svg { display: block; width: 100%; height: 100%; }
+.ant-alert-error .ant-alert-content { flex: 1; min-width: 0; margin-left: 2px; }
+
+/* Layout sider - match React #133F28 */
+.ant-layout-sider { background: #133F28 !important; }
+.ant-menu-dark { background: #133F28 !important; }
+.ant-menu-dark .ant-menu-item-selected { background-color: rgba(0, 132, 61, 0.3) !important; border-left: 4px solid $color-primary; font-weight: 400 !important; }
+.ant-menu-dark .ant-menu-item:hover { background-color: rgba(255, 255, 255, 0.1) !important; }
+
+/* AG Grid */
+.ag-theme-material { font-family: $font-family; font-weight: $font-weight-light; }
+.ag-header { background-color: $color-bg-hover; }
+.variance-alert { background-color: #fff9e6 !important; font-weight: 600; }

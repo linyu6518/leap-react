@@ -311,7 +311,7 @@ services:
 
   # Angular前端（可选，也可单独部署）
   frontend:
-    build: ./leap-angular
+    build: ./leap-react
     ports:
       - "4200:80"
     depends_on:
@@ -339,7 +339,7 @@ volumes:
 
 **运行方式：**
 ```bash
-cd leap-angular
+cd leap-react
 npm install
 npm start
 # 访问 http://localhost:4200
@@ -370,7 +370,7 @@ npm install express cors dotenv bcryptjs jsonwebtoken sqlite3 sequelize
 npm run dev  # Port 3000
 
 # 4. 启动前端（新终端）
-cd ../leap-angular
+cd ../leap-react
 npm start    # Port 4200
 
 # 5. 前端连接后端
@@ -491,7 +491,7 @@ sleep 2
 
 # 启动前端
 echo "🎨 启动前端应用..."
-cd ../leap-angular
+cd ../leap-react
 npm start &
 
 echo "✅ 应用启动完成！"

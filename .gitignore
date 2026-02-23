@@ -45,9 +45,14 @@ Thumbs.db
 *.tar.gz
 *.zip
 
+# Angular
+.angular/
+
 # Cursor/Claude
 .cursor/
 .claude/
 
 # Debug
 debug.log
+.vercel
+.env*.local

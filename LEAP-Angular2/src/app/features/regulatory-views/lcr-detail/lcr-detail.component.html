@@ -1,0 +1,172 @@
+<div class="lcr-detail-container">
+  <div class="page-header-wrapper">
+    <div class="page-header">
+      <div class="page-title">
+        <span nz-icon nzType="file-text" class="page-icon"></span>
+        <div class="title-breadcrumb">
+          <a routerLink="/regulatory/lcr" class="breadcrumb-link">Regulatory</a>
+          <span class="breadcrumb-separator">-</span>
+          <a routerLink="/regulatory/lcr" class="breadcrumb-link">Metrics</a>
+          <span class="breadcrumb-separator">-</span>
+          <span class="breadcrumb-current">LCR</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="query-panel">
+    <form nz-form [formGroup]="form" (ngSubmit)="onQuery()" class="query-form">
+      <div class="query-row">
+        <nz-form-item class="filter-field">
+          <nz-form-control nzErrorTip="Region is required">
+            <div
+              class="lcr-query-select-wrapper"
+              [class.floating-label-active]="regionOpen() || form.get('region')?.value"
+            >
+              <nz-select
+                formControlName="region"
+                [nzPlaceHolder]="(regionOpen() || form.get('region')?.value) ? 'Select a region' : ''"
+                nzSize="large"
+                class="lcr-query-select"
+                (nzOpenChange)="regionOpen.set($event)"
+              >
+                <nz-option nzValue="US" nzLabel="US"></nz-option>
+                <nz-option nzValue="CAD" nzLabel="CAD"></nz-option>
+                <nz-option nzValue="Europe" nzLabel="Europe"></nz-option>
+                <nz-option nzValue="Enterprise" nzLabel="Enterprise"></nz-option>
+              </nz-select>
+              <span class="floating-label">Region</span>
+            </div>
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item class="filter-field">
+          <nz-form-control nzErrorTip="Segment is required">
+            <div
+              class="lcr-query-select-wrapper"
+              [class.floating-label-active]="segmentOpen() || form.get('segment')?.value"
+            >
+              <nz-select
+                formControlName="segment"
+                [nzPlaceHolder]="(segmentOpen() || form.get('segment')?.value) ? 'Select a segment' : ''"
+                nzSize="large"
+                class="lcr-query-select"
+                (nzOpenChange)="segmentOpen.set($event)"
+              >
+                <nz-option nzValue="Enterprise" nzLabel="Enterprise"></nz-option>
+                <nz-option nzValue="CAD Retail" nzLabel="CAD Retail"></nz-option>
+                <nz-option nzValue="US Retail" nzLabel="US Retail"></nz-option>
+                <nz-option nzValue="Wholesale" nzLabel="Wholesale"></nz-option>
+              </nz-select>
+              <span class="floating-label">Segment</span>
+            </div>
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item class="date-field">
+          <nz-form-control nzErrorTip="Prior date is required">
+            <nz-date-picker
+              formControlName="prior"
+              nzSize="large"
+              nzPlaceHolder="Prior *"
+              class="lcr-query-datepicker"
+              style="width: 100%;"
+            ></nz-date-picker>
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item class="date-field">
+          <nz-form-control nzErrorTip="Current date is required">
+            <nz-date-picker
+              formControlName="current"
+              nzSize="large"
+              nzPlaceHolder="Current *"
+              class="lcr-query-datepicker"
+              style="width: 100%;"
+            ></nz-date-picker>
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item class="button-field">
+          <button
+            nz-button
+            nzType="primary"
+            type="submit"
+            class="query-button"
+            [disabled]="!isFormComplete()"
+          >
+            View Analytics
+          </button>
+        </nz-form-item>
+      </div>
+    </form>
+  </div>
+
+  @if (!isFormComplete()) {
+    <div class="lcr-empty-state">
+      <span nz-icon nzType="info-circle" class="empty-state-icon"></span>
+      <div class="empty-state-text">
+        Please select Region, Segment, and Date to view analytics
+      </div>
+    </div>
+  } @else {
+    <div class="status-row">
+      <nz-card class="status-card approved">
+        <div class="status-top">
+          <div class="status-label">LCR Ratio</div>
+        </div>
+        <div class="status-update">Last update: {{ lastUpdateDate }}</div>
+        <div class="status-value-row">
+          <div class="status-value"><app-animated-number [value]="lcrRatio" [duration]="1500"></app-animated-number><span class="status-unit">%</span></div>
+          <div class="status-trend" [class.positive]="lcrRatio >= 100">↑ 0.2%</div>
+        </div>
+      </nz-card>
+      <nz-card class="status-card approved">
+        <div class="status-top">
+          <div class="status-label">Total HQLA</div>
+        </div>
+        <div class="status-update">Last update: {{ lastUpdateDate }}</div>
+        <div class="status-value-row">
+          <div class="status-value"><span class="status-currency">$</span><app-animated-number [value]="totalHqla" [duration]="1500" [decimals]="1"></app-animated-number> <span class="status-unit">M</span></div>
+          <div class="status-trend">↓</div>
+        </div>
+      </nz-card>
+      <nz-card class="status-card approved">
+        <div class="status-top">
+          <div class="status-label">Total NCO</div>
+        </div>
+        <div class="status-update">Last update: {{ lastUpdateDate }}</div>
+        <div class="status-value-row">
+          <div class="status-value"><span class="status-currency">$</span><app-animated-number [value]="totalNco" [duration]="1500" [decimals]="1"></app-animated-number> <span class="status-unit">M</span></div>
+          <div class="status-trend">↓</div>
+        </div>
+      </nz-card>
+    </div>
+
+    <div class="lcr-status-bar-row">
+      <div class="lcr-status-bar">
+        <span class="status-item">
+          <span class="status-dot status-dot-green"></span>
+          <span class="status-number status-number-green">12</span>
+          <span class="status-text">sign-offs</span>
+        </span>
+        <span class="status-separator">|</span>
+        <span class="status-item">
+          <span class="status-dot status-dot-orange"></span>
+          <span class="status-number status-number-orange">3</span>
+          <span class="status-text">adjustments</span>
+        </span>
+      </div>
+      <button nz-button class="lcr-submit-button">Submit</button>
+    </div>
+
+    <div class="lcr-grid-wrapper">
+      <ag-grid-angular
+        class="ag-theme-material"
+        [rowData]="rowData()"
+        [columnDefs]="columnDefs()"
+        [defaultColDef]="defaultColDef"
+        [context]="gridContext"
+        [animateRows]="true"
+        domLayout="autoHeight"
+        [getRowId]="getRowId"
+      />
+    </div>
+  }
+</div>

@@ -1,0 +1,111 @@
+<div class="products-container">
+  <div class="page-header">
+    <div class="page-title">
+      <span nz-icon nzType="folder"></span>
+      <span>Products</span>
+    </div>
+  </div>
+
+  <div class="products-page-content">
+    <nz-card class="selection-card">
+      <div class="header">
+        <h2>Report Config</h2>
+        <p class="subtitle">
+          Configure the region and time parameters to analyze liquidity metrics across products.
+        </p>
+      </div>
+
+      <form
+        nz-form
+        [formGroup]="form"
+        nzLayout="vertical"
+        class="compact-form"
+        (ngSubmit)="view()"
+      >
+        <nz-form-item>
+          <nz-form-control nzErrorTip="Region is required">
+            <div
+              class="products-select-wrapper"
+              [class.floating-label-active]="regionOpen() || form.get('region')?.value"
+            >
+              <nz-select
+                formControlName="region"
+                [nzPlaceHolder]="(regionOpen() || form.get('region')?.value) ? 'Select a region' : ''"
+                nzSize="large"
+                class="products-select"
+                (nzOpenChange)="regionOpen.set($event)"
+              >
+                <nz-option nzValue="US" nzLabel="US"></nz-option>
+                <nz-option nzValue="CAD" nzLabel="CAD"></nz-option>
+                <nz-option nzValue="Europe" nzLabel="Europe"></nz-option>
+                <nz-option nzValue="Enterprise" nzLabel="Enterprise"></nz-option>
+              </nz-select>
+              <span class="floating-label">Region</span>
+            </div>
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-control nzErrorTip="Segment is required">
+            <div
+              class="products-select-wrapper"
+              [class.floating-label-active]="segmentOpen() || form.get('segment')?.value"
+            >
+              <nz-select
+                formControlName="segment"
+                [nzPlaceHolder]="(segmentOpen() || form.get('segment')?.value) ? 'Select a segment' : ''"
+                nzSize="large"
+                class="products-select"
+                (nzOpenChange)="segmentOpen.set($event)"
+              >
+                <nz-option nzValue="Enterprise" nzLabel="Enterprise"></nz-option>
+                <nz-option nzValue="CAD Retail" nzLabel="CAD Retail"></nz-option>
+                <nz-option nzValue="US Retail" nzLabel="US Retail"></nz-option>
+                <nz-option nzValue="Wholesale" nzLabel="Wholesale"></nz-option>
+              </nz-select>
+              <span class="floating-label">Segment</span>
+            </div>
+          </nz-form-control>
+        </nz-form-item>
+
+        <div class="date-row">
+          <nz-form-item>
+            <nz-form-control nzErrorTip="Prior date is required">
+              <nz-date-picker
+                formControlName="prior"
+                nzSize="large"
+                nzPlaceHolder="Prior *"
+                class="products-datepicker"
+                style="width: 100%;"
+              ></nz-date-picker>
+            </nz-form-control>
+          </nz-form-item>
+          <nz-form-item>
+            <nz-form-control nzErrorTip="Current date is required">
+              <nz-date-picker
+                formControlName="current"
+                nzSize="large"
+                nzPlaceHolder="Current *"
+                class="products-datepicker"
+                style="width: 100%;"
+              ></nz-date-picker>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+
+        <div class="form-divider"></div>
+        <div class="form-actions">
+          <button
+            nz-button
+            nzType="primary"
+            type="submit"
+            class="view-button"
+            [disabled]="!canSubmit()"
+          >
+            View Analytics
+          </button>
+        </div>
+      </form>
+    </nz-card>
+  </div>
+</div>

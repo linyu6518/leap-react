@@ -1,0 +1,46 @@
+import { Routes } from '@angular/router'
+import { authGuard } from './core/guards/auth.guard'
+import { roleGuard } from './core/guards/role.guard'
+
+export const routes: Routes = [
+  { path: 'login', loadComponent: () => import('./features/auth/login/login.component').then(m => m.LoginComponent) },
+  {
+    path: '',
+    canActivate: [authGuard],
+    loadComponent: () => import('./layout/main-layout/main-layout.component').then(m => m.MainLayoutComponent),
+    children: [
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      { path: 'dashboard', loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent) },
+      { path: 'product', loadComponent: () => import('./features/product-analysis/products/products.component').then(m => m.ProductsComponent) },
+      { path: 'product/deposits', loadComponent: () => import('./features/product-analysis/deposits/deposits.component').then(m => m.DepositsComponent) },
+      { path: 'product/commitments', loadComponent: () => import('./features/shared/under-development/under-development.component').then(m => m.UnderDevelopmentComponent) },
+      { path: 'product/loans', loadComponent: () => import('./features/shared/under-development/under-development.component').then(m => m.UnderDevelopmentComponent) },
+      { path: 'product/derivatives', loadComponent: () => import('./features/shared/under-development/under-development.component').then(m => m.UnderDevelopmentComponent) },
+      { path: 'product/unsecured', loadComponent: () => import('./features/shared/under-development/under-development.component').then(m => m.UnderDevelopmentComponent) },
+      { path: 'product/interaffiliate-funding', loadComponent: () => import('./features/shared/under-development/under-development.component').then(m => m.UnderDevelopmentComponent) },
+      { path: 'product/secured-funding', loadComponent: () => import('./features/shared/under-development/under-development.component').then(m => m.UnderDevelopmentComponent) },
+      { path: 'product/other-risks', loadComponent: () => import('./features/shared/under-development/under-development.component').then(m => m.UnderDevelopmentComponent) },
+      { path: 'product/prime-services', loadComponent: () => import('./features/shared/under-development/under-development.component').then(m => m.UnderDevelopmentComponent) },
+      { path: 'product/hqla', loadComponent: () => import('./features/shared/under-development/under-development.component').then(m => m.UnderDevelopmentComponent) },
+      { path: 'regulatory/lcr', loadComponent: () => import('./features/regulatory-views/lcr-view/lcr-view.component').then(m => m.LcrViewComponent) },
+      { path: 'regulatory/lcr/detail', loadComponent: () => import('./features/regulatory-views/lcr-detail/lcr-detail.component').then(m => m.LcrDetailComponent) },
+      { path: 'regulatory/nsfr', loadComponent: () => import('./features/shared/under-development/under-development.component').then(m => m.UnderDevelopmentComponent) },
+      { path: 'regulatory/nccf', loadComponent: () => import('./features/shared/under-development/under-development.component').then(m => m.UnderDevelopmentComponent) },
+      { path: 'regulatory/ilst', loadComponent: () => import('./features/shared/under-development/under-development.component').then(m => m.UnderDevelopmentComponent) },
+      { path: 'reports/fr2052a', loadComponent: () => import('./features/shared/under-development/under-development.component').then(m => m.UnderDevelopmentComponent) },
+      { path: 'reports/stwf', loadComponent: () => import('./features/shared/under-development/under-development.component').then(m => m.UnderDevelopmentComponent) },
+      { path: 'reports/appendix-vi', loadComponent: () => import('./features/shared/under-development/under-development.component').then(m => m.UnderDevelopmentComponent) },
+      { path: 'reports/osfi-lcr', loadComponent: () => import('./features/shared/under-development/under-development.component').then(m => m.UnderDevelopmentComponent) },
+      { path: 'templates/import', loadComponent: () => import('./features/shared/under-development/under-development.component').then(m => m.UnderDevelopmentComponent) },
+      { path: 'templates/mapping', loadComponent: () => import('./features/shared/under-development/under-development.component').then(m => m.UnderDevelopmentComponent) },
+      { path: 'templates/thresholds', loadComponent: () => import('./features/shared/under-development/under-development.component').then(m => m.UnderDevelopmentComponent) },
+      { path: 'maker/review', loadComponent: () => import('./features/shared/under-development/under-development.component').then(m => m.UnderDevelopmentComponent), canActivate: [roleGuard(['maker'])] },
+      { path: 'checker/approve', loadComponent: () => import('./features/shared/under-development/under-development.component').then(m => m.UnderDevelopmentComponent), canActivate: [roleGuard(['checker'])] },
+      { path: 'admin/users', loadComponent: () => import('./features/shared/under-development/under-development.component').then(m => m.UnderDevelopmentComponent), canActivate: [roleGuard(['admin'])] },
+      { path: 'admin/settings', loadComponent: () => import('./features/shared/under-development/under-development.component').then(m => m.UnderDevelopmentComponent), canActivate: [roleGuard(['admin'])] },
+      { path: 'admin/audit-log', loadComponent: () => import('./features/shared/under-development/under-development.component').then(m => m.UnderDevelopmentComponent), canActivate: [roleGuard(['admin'])] },
+      { path: '**', redirectTo: 'dashboard' },
+    ],
+  },
+  { path: '**', redirectTo: 'dashboard' },
+]
