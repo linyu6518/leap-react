@@ -1,0 +1,22 @@
+LEAP-Angular2 源码包 - 使用说明
+================================
+
+【环境要求】
+- Node.js 18 或更高版本
+- npm（随 Node.js 安装）
+
+【快速启动】
+1. 解压本压缩包到任意目录
+2. 在终端中进入项目目录，执行：
+   npm install
+3. 安装完成后执行：
+   npm start
+4. 浏览器访问：http://localhost:4200/
+
+【生产构建】
+如需打包为可部署的静态文件，执行：
+   npm run build
+构建产物在 dist/leap-angular2 目录下。
+
+【更多说明】
+详见 README.md
