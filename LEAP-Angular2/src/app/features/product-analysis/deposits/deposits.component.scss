@@ -350,6 +350,20 @@
       color: #000000;
     }
   }
+
+  // Column separator: use border-right so it's not overridden by AG Grid's box-shadow.
+  .ag-pinned-left-header,
+  .ag-pinned-left-cols-container {
+    position: relative;
+    z-index: 2;
+    border-right: 1px solid #d9d9d9 !important;
+  }
+
+  // Allow outline to render past the right edge of pinned columns (not clipped).
+  .ag-pinned-left-cols-viewport,
+  .ag-pinned-left-header-viewport {
+    overflow: visible !important;
+  }
 }
 
 @media (max-width: 1400px) {

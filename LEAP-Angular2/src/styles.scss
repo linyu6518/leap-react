@@ -268,3 +268,14 @@ ul.ant-dropdown-menu,
 .ag-theme-material { font-family: $font-family; font-weight: $font-weight-light; }
 .ag-header { background-color: $color-bg-hover; }
 .variance-alert { background-color: #fff9e6 !important; font-weight: 600; }
+
+/*
+ * Fix: AG Grid cell focus ring (border) gets clipped by overflow:hidden on
+ * .ag-pinned-left-cols-container, causing the right side to disappear.
+ * outline is NOT clipped by overflow:hidden, so we switch to outline here.
+ */
+.ag-theme-material .ag-cell-focus:not(.ag-cell-inline-editing) {
+  border-color: transparent !important;
+  outline: 1px solid #00843D !important;
+  outline-offset: -2px;
+}
