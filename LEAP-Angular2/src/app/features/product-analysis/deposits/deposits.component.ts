@@ -16,6 +16,8 @@ import { ActionCellRendererComponent } from './cell-renderers/action-cell.render
 import { DepositsHeaderRendererComponent } from './cell-renderers/deposits-header.renderer'
 import { Fr2052aActionCellRendererComponent } from './cell-renderers/fr2052a-action-cell.renderer'
 import { WithdrawalRiskHeaderRendererComponent } from './cell-renderers/withdrawal-risk-header.renderer'
+import { CommentPanelComponent } from './comment-panel/comment-panel.component'
+import { EscalationPanelComponent } from './escalation-panel/escalation-panel.component'
 import type { UsLcrRow } from './us-lcr-data'
 import { US_LCR_DATA_MAP } from './us-lcr-data'
 
@@ -26,6 +28,7 @@ interface StoredParams {
   segment: string | null
   prior: string | null
   current: string | null
+  tabIndex: number | null
 }
 
 function loadParams(): Partial<StoredParams> {
@@ -41,6 +44,7 @@ function saveParams(p: {
   segment?: string | null
   prior?: Date | string | null
   current?: Date | string | null
+  tabIndex?: number | null
 }) {
   try {
     sessionStorage.setItem(
@@ -50,6 +54,7 @@ function saveParams(p: {
         segment: p.segment ?? null,
         prior: p.prior instanceof Date ? p.prior.toISOString().slice(0, 10) : p.prior ?? null,
         current: p.current instanceof Date ? p.current.toISOString().slice(0, 10) : p.current ?? null,
+        tabIndex: p.tabIndex ?? null,
       })
     )
   } catch (_) {}
@@ -100,6 +105,8 @@ export interface FR2052AData {
     DepositsHeaderRendererComponent,
     Fr2052aActionCellRendererComponent,
     WithdrawalRiskHeaderRendererComponent,
+    CommentPanelComponent,
+    EscalationPanelComponent,
   ],
   templateUrl: './deposits.component.html',
   styleUrls: ['./deposits.component.scss'],
@@ -131,7 +138,20 @@ export class DepositsComponent implements OnInit {
     filter: false,
     floatingFilter: false,
   }
-  gridContext = { toggleNode: (id: string) => this.toggleNode(id) }
+
+  commentPanelOpen = signal(false)
+  selectedRowForComment = signal<unknown>(null)
+
+  escalationPanelOpen = signal(false)
+  selectedRowForEscalation = signal<unknown>(null)
+  escalationNoticeVisible = signal(false)
+  private escalationNoticeTimer: ReturnType<typeof setTimeout> | null = null
+
+  gridContext = {
+    toggleNode: (id: string) => this.toggleNode(id),
+    onCommentClick: (data: unknown) => this.openCommentPanel(data),
+    onEscalateClick: (data: unknown) => this.openEscalationPanel(data),
+  }
 
   constructor(private fb: FormBuilder, private router: Router) {
     const nav = this.router.getCurrentNavigation()
@@ -140,6 +160,8 @@ export class DepositsComponent implements OnInit {
     const saved = fromState ? state : loadParams()
     const prior = saved.prior ? new Date(saved.prior) : null
     const current = saved.current ? new Date(saved.current) : null
+    const tabIndex = typeof saved.tabIndex === 'number' ? saved.tabIndex : 0
+    this.activeTabIndex.set(tabIndex)
     this.form = this.fb.group({
       region: [saved.region ?? null, Validators.required],
       segment: [saved.segment ?? null, Validators.required],
@@ -165,12 +187,26 @@ export class DepositsComponent implements OnInit {
 
   onQuery(): void {
     const v = this.form.value
-    saveParams({ region: v.region, segment: v.segment, prior: v.prior, current: v.current })
+    saveParams({
+      region: v.region,
+      segment: v.segment,
+      prior: v.prior,
+      current: v.current,
+      tabIndex: this.activeTabIndex(),
+    })
     this.rowData.set(this.getRowDataForCurrentTab())
   }
 
   onTabChange(index: number): void {
     this.activeTabIndex.set(index)
+    const v = this.form.value
+    saveParams({
+      region: v.region,
+      segment: v.segment,
+      prior: v.prior,
+      current: v.current,
+      tabIndex: index,
+    })
     this.rowData.set(this.getRowDataForCurrentTab())
   }
 
@@ -206,9 +242,46 @@ export class DepositsComponent implements OnInit {
   onRowClicked(event: { data?: SummaryRowData; event?: Event | null }): void {
     const target = event.event?.target as HTMLElement | undefined
     if (target?.closest('[col-id="name"]')) return
-    if (event.data) {
-      // Commentary drawer could be opened here
+  }
+
+  openCommentPanel(data: unknown): void {
+    this.selectedRowForComment.set(data)
+    this.commentPanelOpen.set(true)
+  }
+
+  closeCommentPanel(): void {
+    this.commentPanelOpen.set(false)
+  }
+
+  openEscalationPanel(data: unknown): void {
+    this.selectedRowForEscalation.set(data)
+    this.escalationPanelOpen.set(true)
+  }
+
+  closeEscalationPanel(): void {
+    this.escalationPanelOpen.set(false)
+  }
+
+  onEscalationConfirmed(_: { contacts: string[]; comment: string }): void {
+    this.closeEscalationPanel()
+    this.showEscalationNotice()
+  }
+
+  dismissEscalationNotice(): void {
+    this.escalationNoticeVisible.set(false)
+    if (this.escalationNoticeTimer) {
+      clearTimeout(this.escalationNoticeTimer)
+      this.escalationNoticeTimer = null
     }
+  }
+
+  private showEscalationNotice(): void {
+    this.escalationNoticeVisible.set(true)
+    if (this.escalationNoticeTimer) clearTimeout(this.escalationNoticeTimer)
+    this.escalationNoticeTimer = setTimeout(() => {
+      this.escalationNoticeVisible.set(false)
+      this.escalationNoticeTimer = null
+    }, 4500)
   }
 
   getColumnDefs(): (ColDef | ColGroupDef)[] {
@@ -320,13 +393,13 @@ export class DepositsComponent implements OnInit {
       },
       {
         headerName: 'Action',
-        flex: 0.5,
-        minWidth: 80,
-        maxWidth: 100,
+        flex: 0.7,
+        minWidth: 132,
+        maxWidth: 148,
         cellStyle: (params: CellClassParams) => {
           const d = params.data as FR2052AData
           if (d?.isGrandTotal) return grandTotalStyle
-          return { display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '8px' }
+          return { display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '8px 12px' }
         },
         cellRenderer: Fr2052aActionCellRendererComponent,
       },

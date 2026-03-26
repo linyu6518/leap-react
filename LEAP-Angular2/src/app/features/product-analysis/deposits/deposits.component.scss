@@ -211,6 +211,72 @@
   width: 100%;
 }
 
+.escalation-toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1200;
+  width: min(339px, calc(100vw - 40px));
+  min-height: 72px;
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  padding: 16px 56px 16px 28px;
+  border: 1px solid #B7DFB8;
+  background: #F5FBF2;
+  box-shadow: 0 8px 24px rgba(17, 24, 39, 0.08);
+}
+
+.toast-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+.toast-copy {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-right: 8px;
+}
+
+.toast-title {
+  font-size: 15px;
+  line-height: 1.2;
+  font-weight: 600;
+  color: #111111;
+}
+
+.toast-body {
+  font-size: 15px;
+  line-height: 1.35;
+  font-weight: 400;
+  color: #2B2B2B;
+}
+
+.toast-close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: #6E6E6E;
+  cursor: pointer;
+  padding: 0;
+}
+
+.toast-close:hover {
+  color: #3F3F3F;
+}
+
 :host ::ng-deep .ant-tabs {
     background: transparent !important;
     margin-top: 5px;
