@@ -17,8 +17,12 @@ export interface LcrTreeNode {
   children?: LcrTreeNode[]
 }
 
+export type LcrSegmentKey = 'enterprise' | 'cadRetail' | 'wholesale' | 'usRetail'
+
 export interface LcrRowData extends LcrTreeNode {
   isExpanded: boolean
+  /** Maps segment key → original (pre-adjustment) current value */
+  adjustedFrom?: Partial<Record<LcrSegmentKey, number>>
 }
 
 const seg = (c: number, p?: number, v?: number): LcrSegmentValue => ({

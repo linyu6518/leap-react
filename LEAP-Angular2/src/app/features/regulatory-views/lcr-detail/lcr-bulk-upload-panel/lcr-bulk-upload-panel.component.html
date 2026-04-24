@@ -1,0 +1,148 @@
+<div class="panel-overlay" [class.visible]="visible" (click)="onOverlayClick($event)">
+  <div class="bulk-upload-panel" [class.open]="visible" (click)="$event.stopPropagation()">
+    <div class="panel-header">
+      <div class="panel-title-area">
+        <h2 class="panel-title">OSFI LCR - Bulk upload</h2>
+      </div>
+      <button class="close-btn" type="button" (click)="close()" aria-label="Close">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M1 1L13 13M13 1L1 13" stroke="#777" stroke-width="2.5" stroke-linecap="round" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="panel-body">
+      <div class="form-grid">
+        <div class="form-field">
+          <nz-date-picker
+            [(ngModel)]="reportingDate"
+            nzFormat="yyyy-MM-dd"
+            nzSize="large"
+            nzPlaceHolder="Reporting Date *"
+            class="lcr-query-datepicker"
+            style="width: 100%"
+          ></nz-date-picker>
+          @if (submitAttempted && !reportingDate) {
+            <span class="field-hint-error">Reporting date is required.</span>
+          }
+        </div>
+
+        <div class="form-field">
+          <div
+            class="field-wrap"
+            [class.floating-label-active]="calcIdFocus || (calcId && calcId.length > 0)"
+          >
+            <input
+              class="adj-input"
+              type="text"
+              [(ngModel)]="calcId"
+              (focus)="calcIdFocus = true"
+              (blur)="calcIdFocus = false"
+            />
+            <span class="floating-label">Calc Id</span>
+          </div>
+          @if (submitAttempted && !calcId.trim()) {
+            <span class="field-hint-error">Calc Id is required.</span>
+          }
+        </div>
+
+        <div class="form-field upload-field">
+          <div class="upload-field-label">File upload</div>
+          <p class="upload-field-hint">Supported file types: XLSX, CSV.</p>
+          <div
+            class="upload-dropzone"
+            [class.upload-dropzone--active]="dropzoneActive"
+            (dragenter)="onDragEnter($event)"
+            (dragover)="onDragOver($event)"
+            (dragleave)="onDragLeave($event)"
+            (drop)="onDrop($event)"
+          >
+            <input
+              #fileInput
+              type="file"
+              accept=".xlsx,.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv"
+              class="sr-only"
+              (change)="onFileSelected($event)"
+            />
+            @if (dropzoneActive) {
+              <div class="upload-dropzone-drop-state">
+                <span class="upload-dropzone-drop-text">Drop file here</span>
+              </div>
+            } @else {
+              <div class="upload-dropzone-inner">
+                <div class="upload-dropzone-row">
+                  <span
+                    class="upload-dropzone-text"
+                    [class.upload-dropzone-text--placeholder]="!selectedFile"
+                  >Choose XLSX file</span>
+                  <button type="button" class="btn-browse-outline" (click)="fileInput.click()">Browse</button>
+                </div>
+                @if (selectedFile) {
+                  <div class="upload-file-chip">
+                    <span class="upload-file-chip-check" aria-hidden="true">
+                      <svg class="upload-file-chip-check-svg" viewBox="0 0 16 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                          d="M1.5 6.2L5.2 10l9.3-8.5"
+                          stroke="#008a00"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                    </span>
+                    <span class="upload-file-chip-badge" aria-hidden="true">
+                      <svg class="upload-file-chip-badge-svg" viewBox="0 0 24 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                          d="M3 1.5h10.5L19.5 7v19a2 2 0 01-2 2H3a2 2 0 01-2-2V3.5a2 2 0 012-2z"
+                          fill="#fafafa"
+                          stroke="#d9d9d9"
+                          stroke-width="1"
+                        />
+                        <path d="M13.5 1.5V7H19" stroke="#d9d9d9" stroke-width="1" fill="none" />
+                      </svg>
+                      <span class="upload-file-chip-badge-ext">{{ fileExtensionLabel(selectedFile) }}</span>
+                    </span>
+                    <div class="upload-file-chip-meta">
+                      <span class="upload-file-chip-name">{{ selectedFile.name }}</span>
+                      <span class="upload-file-chip-size"> ({{ fileSizeLabel(selectedFile) }})</span>
+                    </div>
+                    <button
+                      type="button"
+                      class="upload-file-chip-remove"
+                      aria-label="Remove file"
+                      (click)="clearFile()"
+                    >
+                      <svg width="10" height="10" viewBox="0 0 14 14" fill="none">
+                        <path d="M1 1L13 13M13 1L1 13" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
+                      </svg>
+                    </button>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+          @if (submitAttempted && !selectedFile) {
+            <span class="field-hint-error">Please choose a file.</span>
+          }
+          @if (submitAttempted && selectedFile && !isAcceptableDataFile(selectedFile)) {
+            <span class="field-hint-error">File must be .xlsx or .csv.</span>
+          }
+        </div>
+      </div>
+
+      <ul class="upload-hints">
+        <li>LCR line number should be a valid input line number</li>
+        <li>Original Currency can be CAD, USD, GBP, JPY, EUR &amp; OTH</li>
+        <li>Reporting Amount should be in CAD Equivalent value</li>
+        <li>Comment is mandatory</li>
+      </ul>
+    </div>
+
+    <div class="panel-footer">
+      <div class="footer-actions">
+        <button type="button" class="btn-cancel" (click)="onDownloadTemplate()">Download Template</button>
+        <button type="button" class="btn-confirm btn-confirm-primary" (click)="onSubmit()">Submit</button>
+      </div>
+    </div>
+  </div>
+</div>

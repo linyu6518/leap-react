@@ -58,7 +58,7 @@ interface EscComment {
           </button>
         </div>
 
-        <div class="panel-body">
+        <div class="panel-body" (click)="cancelReply()">
 
           <!-- To: multi-select -->
           <div class="section to-section">
@@ -108,36 +108,15 @@ interface EscComment {
             <div class="details-shell">
               <div class="details-grid">
                 <div class="details-card">
-                  <div class="details-label">
-                    <span class="details-label-icon" aria-hidden="true">
-                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                        <circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.2"/>
-                      </svg>
-                    </span>
-                    <span>Current</span>
-                  </div>
+                  <div class="details-label">Current</div>
                   <div class="details-value">{{ details.current }}</div>
                 </div>
                 <div class="details-card">
-                  <div class="details-label">
-                    <span class="details-label-icon" aria-hidden="true">
-                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                        <path d="M6 1.5V10.5M2.5 5L6 1.5L9.5 5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
-                    </span>
-                    <span>Prev</span>
-                  </div>
+                  <div class="details-label">Prev</div>
                   <div class="details-value">{{ details.prev }}</div>
                 </div>
                 <div class="details-card details-card-accent">
-                  <div class="details-label">
-                    <span class="details-label-icon" aria-hidden="true">
-                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                        <path d="M2 8.5L4.75 5.75L6.75 7.75L10 4.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
-                    </span>
-                    <span>Variance</span>
-                  </div>
+                  <div class="details-label">Variance</div>
                   <div class="details-value">{{ details.variance }}</div>
                 </div>
               </div>
@@ -175,7 +154,7 @@ interface EscComment {
                       </span>
                       <span class="comment-text">{{ comment.text }}</span>
                     </div>
-                    <button class="reply-btn" type="button" (click)="startReply(comment.id, comment.id)">
+                    <button class="reply-btn" type="button" (click)="startReply(comment.id, comment.id); $event.stopPropagation()">
                       <svg width="12" height="12" viewBox="0 0 18 18" fill="none">
                         <path d="M15 2H3C2.44772 2 2 2.44772 2 3V11C2 11.5523 2.44772 12 3 12H5V15.5L9.5 12H15C15.5523 12 16 11.5523 16 11V3C16 2.44772 15.5523 2 15 2Z"
                           stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -213,7 +192,7 @@ interface EscComment {
                                   </span>
                                   <span class="comment-text">{{ reply.text }}</span>
                                 </div>
-                                <button class="reply-btn" type="button" (click)="startReply(reply.id, reply.id)">
+                                <button class="reply-btn" type="button" (click)="startReply(reply.id, reply.id); $event.stopPropagation()">
                                   <svg width="12" height="12" viewBox="0 0 18 18" fill="none">
                                     <path d="M15 2H3C2.44772 2 2 2.44772 2 3V11C2 11.5523 2.44772 12 3 12H5V15.5L9.5 12H15C15.5523 12 16 11.5523 16 11V3C16 2.44772 15.5523 2 15 2Z"
                                       stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -288,7 +267,7 @@ interface EscComment {
 
         <!-- Reply editor template -->
         <ng-template #replyEditor let-parentId="parentId">
-          <div class="reply-editor-wrap">
+          <div class="reply-editor-wrap" (click)="$event.stopPropagation()">
             <div class="comment-input-shell compact" [class.focused]="replyFieldFocused" [class.has-value]="replyDraft.length > 0">
               <div class="comment-input-label">Reply</div>
               <textarea
@@ -300,13 +279,15 @@ interface EscComment {
                 placeholder="Hint text"
                 rows="1"
               ></textarea>
-              <div class="reply-inline-meta">
-                <span class="char-count compact">{{ replyDraft.length }} / {{ maxChars }}</span>
-              </div>
+              <button class="comment-submit-btn" type="button" (click)="submitReply(parentId)" [class.active]="replyDraft.trim().length > 0" aria-label="Submit reply">
+                <svg width="22" height="22" viewBox="0 0 20 20" fill="none">
+                  <circle cx="10" cy="10" r="9" stroke="currentColor" stroke-width="1.4"/>
+                  <path d="M10 13.5L10 6.5M7 9.5L10 6.5L13 9.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
             </div>
-            <div class="footer-actions compact">
-              <button class="btn-cancel" type="button" (click)="cancelReply()">Cancel</button>
-              <button class="btn-confirm" type="button" [disabled]="!replyDraft.trim()" (click)="submitReply(parentId)">Reply</button>
+            <div class="field-meta">
+              <span class="char-count">{{ replyDraft.length }} / {{ maxChars }}</span>
             </div>
           </div>
         </ng-template>
@@ -415,7 +396,8 @@ interface EscComment {
       padding: 18px 20px 16px;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
+      justify-content: flex-start;
+      gap: 10px;
       background: #FFFFFF;
     }
     .details-card + .details-card { border-left: 1px solid #EAEAEA; }
@@ -423,24 +405,10 @@ interface EscComment {
       background: #FAFCF9;
     }
     .details-label {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
       font-size: 12px;
       font-weight: 500;
       color: #6D6D6D;
       line-height: 1.2;
-      letter-spacing: 0.03em;
-      text-transform: uppercase;
-    }
-    .details-label-icon {
-      width: 12px;
-      height: 12px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      color: #8C8C8C;
-      flex-shrink: 0;
     }
     .details-value {
       font-size: 18px;
@@ -561,17 +529,12 @@ interface EscComment {
     }
     .comment-submit-btn.active { color: #008A00; }
     .comment-submit-btn.active:hover { color: #006800; }
-    .reply-inline-meta { position: absolute; right: 12px; top: 8px; display: flex; align-items: center; gap: 8px; }
     .field-meta { display: flex; justify-content: flex-end; align-items: center; margin-top: 6px; margin-bottom: 16px; }
     .char-count { font-size: 12px; color: #1A1A1A; line-height: 1; text-align: right; min-width: 72px; }
-    .char-count.compact { min-width: auto; font-size: 11px; }
 
     /* Footer */
     .panel-footer { flex-shrink: 0; padding: 14px 28px 24px; border-top: none; }
     .footer-actions { display: flex; gap: 12px; }
-    .footer-actions.compact { margin-top: 10px; margin-bottom: 2px; }
-    .footer-actions.compact .btn-cancel,
-    .footer-actions.compact .btn-confirm { height: 32px; font-size: 12px; padding: 0 10px; }
     .btn-cancel {
       flex: 1; height: 40px; background: #fff; color: #008A00;
       border: 2px solid #008A00; border-radius: 0;
@@ -653,6 +616,7 @@ export class EscalationPanelComponent implements OnChanges, AfterViewChecked {
 
   // Reply
   activeReplyId: string | null = null
+  private draftMap = new Map<string, string>()
   activeReplyParentId: string | null = null
   replyDraft = ''
   replyFieldFocused = false
@@ -739,16 +703,21 @@ export class EscalationPanelComponent implements OnChanges, AfterViewChecked {
 
   // Reply
   startReply(targetId: string, parentCommentId: string): void {
+    if (this.activeReplyId && this.activeReplyId !== targetId) {
+      this.draftMap.set(this.activeReplyId, this.replyDraft)
+    }
     this.activeReplyId = targetId
     this.activeReplyParentId = parentCommentId
-    this.replyDraft = ''
+    this.replyDraft = this.draftMap.get(targetId) ?? ''
     this.replyFieldFocused = false
   }
 
   cancelReply(): void {
+    if (this.activeReplyId) {
+      this.draftMap.set(this.activeReplyId, this.replyDraft)
+    }
     this.activeReplyId = null
     this.activeReplyParentId = null
-    this.replyDraft = ''
     this.replyFieldFocused = false
   }
 
@@ -782,6 +751,8 @@ export class EscalationPanelComponent implements OnChanges, AfterViewChecked {
       avatarColor: '#6a1b9a', avatarBg: '#f3e5f5',
       timestamp: 'just now', text: content, replies: [],
     })
+    this.draftMap.delete(parentId)
+    this.replyDraft = ''
     this.cancelReply()
   }
 

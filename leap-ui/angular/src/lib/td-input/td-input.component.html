@@ -1,0 +1,35 @@
+<div class="td-input-wrapper" [class.td-input-error]="error">
+  @if (label) {
+    <label [attr.for]="inputId" class="td-input-label">{{ label }}</label>
+  }
+  <div class="td-input-inner">
+    <input
+      nz-input
+      [id]="inputId"
+      [placeholder]="showFloatingLabel ? '' : placeholder"
+      [disabled]="disabled"
+      [ngModel]="value"
+      (ngModelChange)="value = $event; onChange($event); valueChange.emit($event)"
+      (focus)="onFocus()"
+      (blur)="onBlur()"
+      [attr.aria-invalid]="error ? true : null"
+      [attr.aria-describedby]="error ? inputId + '-error' : (helperText ? inputId + '-helper' : null)"
+    />
+    @if (showFloatingLabel) {
+      <span class="td-input-floating-label" [class.td-input-floating-label-active]="hasValue || focused">
+        {{ placeholder }}
+      </span>
+    }
+  </div>
+  @if (error) {
+    <div [id]="inputId + '-error'" class="td-input-error-text" role="alert">
+      <span class="td-input-error-icon">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6.5" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M7 3.5V7.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="7" cy="10" r="0.5" fill="currentColor"/></svg>
+      </span>
+      <span class="td-input-error-message">{{ error }}</span>
+    </div>
+  }
+  @if (!error && helperText) {
+    <div [id]="inputId + '-helper'" class="td-input-helper-text">{{ helperText }}</div>
+  }
+</div>

@@ -1,0 +1,30 @@
+/* LEAP UI - CSS Custom Properties (use in any framework) */
+:root {
+  --leap-primary: #00843D;
+  --leap-primary-dark: #133F28;
+  --leap-primary-light: #E8F5E9;
+  --leap-draft: #9E9E9E;
+  --leap-pending: #1976D2;
+  --leap-approved: #4CAF50;
+  --leap-rejected: #E53935;
+  --leap-escalated: #FF6F00;
+  --leap-error: #E53935;
+  --leap-success: #4CAF50;
+  --leap-warning: #FFC107;
+  --leap-text-primary: #1A1A1A;
+  --leap-text-secondary: #4A4A4A;
+  --leap-text-hint: #757575;
+  --leap-border: #E0E0E0;
+  --leap-bg: #F5F5F5;
+  --leap-bg-card: #FFFFFF;
+  --leap-font-family: 'Graphik', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --leap-font-size-body: 16px;
+  --leap-font-size-caption: 14px;
+  --leap-font-size-small: 12px;
+  --leap-radius-sm: 4px;
+  --leap-radius-md: 8px;
+  --leap-spacing-xs: 8px;
+  --leap-spacing-sm: 16px;
+  --leap-spacing-md: 24px;
+  --leap-spacing-lg: 32px;
+}

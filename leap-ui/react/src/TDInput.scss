@@ -1,0 +1,61 @@
+@use './variables.scss' as *;
+
+.td-input-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-bottom: 0;
+}
+.td-input-label {
+  font-family: $font-family;
+  font-size: 14px;
+  font-weight: 500;
+  color: $color-text-primary;
+  line-height: 1.5;
+  margin-bottom: 4px;
+  display: block;
+}
+.td-input-wrapper .ant-input,
+.td-input-wrapper .ant-input-affix-wrapper {
+  font-family: $font-family;
+  font-size: 16px;
+  font-weight: 500;
+  height: 54px !important;
+  border-color: #8B8B8B;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-width: 1px;
+  transition: all 0.2s ease;
+  &:hover:not(:disabled) { border-color: #008A00; }
+  &:focus, &.ant-input-focused { border-color: #008A00; border-width: 1px 1px 3px 1px; border-bottom-color: #008A00; box-shadow: none; outline: none; }
+  &:disabled { background-color: $color-background; color: $color-text-hint; cursor: not-allowed; }
+}
+.td-input-floating-label {
+  position: absolute;
+  left: 12px;
+  top: 18px;
+  font-family: $font-family;
+  font-size: 16px;
+  font-weight: 400;
+  color: #1C1C1C;
+  pointer-events: none;
+  transition: all 0.2s ease;
+  background-color: white;
+  padding: 0 4px;
+  z-index: 1;
+  line-height: 1;
+}
+.td-input-floating-label-active { top: 6px !important; font-size: 12px !important; }
+.td-input-leading, .td-input-trailing { display: flex; align-items: center; margin-right: 8px; color: $color-text-hint; }
+.td-input-clear-btn { display: flex; align-items: center; justify-content: center; color: $color-text-hint; cursor: pointer; padding: 4px; }
+.td-input-helper-text { font-family: $font-family; font-size: 12px; color: $color-text-hint; margin-top: 4px; }
+.td-input-wrapper.td-input-error .ant-input,
+.td-input-wrapper.td-input-error .ant-input-affix-wrapper {
+  border-bottom-color: #AD1100 !important; border-width: 1px 1px 3px 1px !important;
+}
+.td-input-error-text { display: flex; align-items: flex-start; gap: 6px; font-size: 12px; margin-top: 4px; }
+.td-input-error-icon { color: #AD1100; width: 14px; height: 14px; flex-shrink: 0; }
+.td-input-error-message { color: #AD1100; font-weight: 600; }
+.td-input-word-count { font-size: 12px; color: $color-text-hint; text-align: right; margin-top: 4px; }

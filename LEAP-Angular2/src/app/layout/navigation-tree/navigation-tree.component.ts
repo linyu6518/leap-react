@@ -30,16 +30,14 @@ interface NavItem {
               @if (item.icon) {
                 <span class="nav-icon" nz-icon [nzType]="item.icon"></span>
               }
-              @if (sidebarOpened()) {
-                <span class="nav-label">{{ item.label }}</span>
-                @if (item.children?.length) {
-                  <span class="expand-icon" [class.expanded]="item.expanded"></span>
-                }
+              <span class="nav-label">{{ item.label }}</span>
+              @if (item.children?.length) {
+                <span class="expand-icon" [class.expanded]="item.expanded"></span>
               }
             </div>
           </div>
 
-          @if (item.children?.length && item.expanded && sidebarOpened()) {
+          @if (item.children?.length && item.expanded) {
             <div class="nav-children">
               @for (child of item.children; track $index) {
                 <div>

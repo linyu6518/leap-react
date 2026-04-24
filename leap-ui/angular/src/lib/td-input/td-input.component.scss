@@ -1,0 +1,55 @@
+@use '../../../../tokens/variables.scss' as *;
+
+.td-input-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-bottom: 0;
+}
+.td-input-label {
+  font-family: $font-family;
+  font-size: 14px;
+  font-weight: 500;
+  color: $color-text-primary;
+  margin-bottom: 4px;
+  display: block;
+}
+.td-input-inner {
+  position: relative;
+  input[nz-input] {
+    font-family: $font-family;
+    font-size: 16px;
+    font-weight: 500;
+    height: 54px;
+    border-color: #8b8b8b;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    width: 100%;
+    &:hover:not(:disabled) { border-color: #008a00; }
+    &:focus { border-color: #008a00; border-width: 1px 1px 3px 1px; border-bottom-color: #008a00; outline: none; box-shadow: none; }
+    &:disabled { background-color: $color-background; color: $color-text-hint; }
+  }
+}
+.td-input-floating-label {
+  position: absolute;
+  left: 12px;
+  top: 18px;
+  font-family: $font-family;
+  font-size: 16px;
+  font-weight: 400;
+  color: #1c1c1c;
+  pointer-events: none;
+  transition: all 0.2s ease;
+  background-color: white;
+  padding: 0 4px;
+  z-index: 1;
+  line-height: 1;
+}
+.td-input-floating-label-active { top: 6px; font-size: 12px; }
+.td-input-helper-text { font-family: $font-family; font-size: 12px; color: $color-text-hint; margin-top: 4px; }
+.td-input-wrapper.td-input-error input[nz-input] { border-bottom-color: #ad1100; border-width: 1px 1px 3px 1px; }
+.td-input-error-text { display: flex; align-items: flex-start; gap: 6px; font-size: 12px; margin-top: 4px; }
+.td-input-error-icon { color: #ad1100; width: 14px; height: 14px; flex-shrink: 0; }
+.td-input-error-message { color: #ad1100; font-weight: 600; }

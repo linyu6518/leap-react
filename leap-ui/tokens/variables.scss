@@ -1,0 +1,61 @@
+// LEAP UI - Design Tokens (TD Brand)
+// Use in both React and Angular: @import 'leap-ui/tokens/variables.scss';
+
+// Brand
+$color-primary: #00843D;
+$color-primary-dark: #133F28;
+$color-primary-light: #E8F5E9;
+
+// Status
+$color-draft: #9E9E9E;
+$color-pending: #1976D2;
+$color-approved: #4CAF50;
+$color-rejected: #E53935;
+$color-escalated: #FF6F00;
+
+// Functional
+$color-warning: #FFC107;
+$color-error: #E53935;
+$color-info: #1976D2;
+$color-success: #4CAF50;
+
+// Neutral
+$color-text-primary: #1A1A1A;
+$color-text-secondary: #4A4A4A;
+$color-text-hint: #757575;
+$color-text-white: #FFFFFF;
+$color-border: #E0E0E0;
+$color-background: #F5F5F5;
+$color-bg-card: #FFFFFF;
+$color-bg-hover: #FAFAFA;
+
+// Typography
+$font-family: 'Graphik', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+$font-weight-regular: 400;
+$font-weight-medium: 500;
+$font-weight-bold: 700;
+$font-size-body: 16px;
+$font-size-caption: 14px;
+$font-size-small: 12px;
+
+// Spacing
+$spacing-xs: 8px;
+$spacing-sm: 16px;
+$spacing-md: 24px;
+$spacing-lg: 32px;
+
+// Radius
+$border-radius-sm: 4px;
+$radius-sm: 4px;
+
+// Status badge
+$status-draft-bg: #F5F5F5;
+$status-draft-text: #616161;
+$status-pending-bg: #E3F2FD;
+$status-pending-text: #1565C0;
+$status-approved-bg: #E8F5E9;
+$status-approved-text: #2E7D32;
+$status-rejected-bg: #FFEBEE;
+$status-rejected-text: #C62828;
+$status-escalated-bg: #FFF3E0;
+$status-escalated-text: #E65100;

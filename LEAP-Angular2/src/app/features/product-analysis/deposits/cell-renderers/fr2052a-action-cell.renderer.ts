@@ -5,6 +5,7 @@ import { ICellRendererParams } from 'ag-grid-community'
 interface ActionContext {
   onCommentClick?: (data: unknown) => void
   onEscalateClick?: (data: unknown) => void
+  onAdjustClick?: (data: unknown) => void
 }
 
 @Component({
@@ -13,10 +14,15 @@ interface ActionContext {
   template: `
     @if (!isGrandTotal) {
       <div class="action-cell">
-        <!-- Escalation icon: orange circle + white arrow -->
-        <button class="icon-btn escalation-btn" title="Escalation" (click)="onEscalate($event)">
+        <!-- Escalation icon: grey when already escalated, orange otherwise -->
+        <button
+          class="icon-btn escalation-btn"
+          [class.escalation-btn--done]="isEscalated"
+          [attr.title]="isEscalated ? 'Already escalated' : 'Escalation'"
+          (click)="onEscalate($event)"
+        >
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="10" cy="10" r="10" fill="#FF8453"/>
+            <circle cx="10" cy="10" r="10" [attr.fill]="isEscalated ? '#C8C8C8' : '#FF8453'"/>
             <path d="M7 13L13 7" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
             <path d="M8 7H13V12" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
@@ -72,6 +78,13 @@ interface ActionContext {
     .escalation-btn:hover svg path {
       stroke: white;
     }
+    .escalation-btn--done {
+      cursor: default;
+      opacity: 0.75;
+    }
+    .escalation-btn--done:hover svg circle {
+      fill: #C8C8C8;
+    }
     .alert-dot {
       position: absolute;
       top: 3px;
@@ -86,13 +99,15 @@ interface ActionContext {
 export class Fr2052aActionCellRendererComponent implements ICellRendererAngularComp {
   isGrandTotal = false
   hasAlert = false
+  isEscalated = false
   private params!: ICellRendererParams
 
   agInit(params: ICellRendererParams): void {
     this.params = params
-    const data = params.data as { isGrandTotal?: boolean; hasAlert?: boolean }
+    const data = params.data as { isGrandTotal?: boolean; hasAlert?: boolean; isEscalated?: boolean }
     this.isGrandTotal = !!data?.isGrandTotal
     this.hasAlert = !!data?.hasAlert
+    this.isEscalated = !!data?.isEscalated
   }
 
   refresh(params: ICellRendererParams): boolean {

@@ -227,6 +227,22 @@
   box-shadow: 0 8px 24px rgba(17, 24, 39, 0.08);
 }
 
+.adjustment-toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1200;
+  width: min(339px, calc(100vw - 40px));
+  min-height: 72px;
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  padding: 16px 56px 16px 28px;
+  border: 1px solid #B7DFB8;
+  background: #F5FBF2;
+  box-shadow: 0 8px 24px rgba(17, 24, 39, 0.08);
+}
+
 .toast-icon {
   display: inline-flex;
   align-items: center;
@@ -396,6 +412,11 @@
       .ag-cell {
         background-color: #eef9f0 !important;
       }
+
+      /* Keep adjustment highlight when row is selected (matches amount cell renderer) */
+      .ag-cell.fr2052a-amount-adjusted {
+        background-color: #fff8e1 !important;
+      }
     }
 
     .ag-cell:last-child {
@@ -409,11 +430,25 @@
     font-family: $font-family;
     box-sizing: border-box;
 
+    /* FR2052A amount: pencil slides in from the right; avoid clipping the off-screen icon */
+    &[col-id='amount1'],
+    &[col-id='amount2'],
+    &[col-id='amount3'] {
+      overflow: visible !important;
+    }
+
     &[col-id*="current"],
     &[col-id*="previous"],
     &[col-id*="variance"] {
       font-weight: 500;
       color: #000000;
+    }
+
+    /* Amber focus ring for adjusted amount cells (global styles use green outline) */
+    &.ag-cell-focus.fr2052a-amount-adjusted:not(.ag-cell-inline-editing) {
+      border-color: transparent !important;
+      outline: 1px solid #c9a01a !important;
+      outline-offset: -2px;
     }
   }
 

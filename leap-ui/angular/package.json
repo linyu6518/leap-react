@@ -1,0 +1,24 @@
+{
+  "name": "@leap/ui-angular",
+  "version": "1.0.0",
+  "description": "LEAP UI component library - Angular (TD brand)",
+  "peerDependencies": {
+    "@angular/common": ">=17.0.0",
+    "@angular/core": ">=17.0.0",
+    "ng-zorro-antd": ">=17.0.0"
+  },
+  "scripts": {
+    "build": "ng-packagr -p ng-package.json"
+  },
+  "devDependencies": {
+    "ng-packagr": ">=17.0.0"
+  },
+  "ngPackage": {
+    "$schema": "node_modules/ng-packagr/ng-package.schema.json",
+    "dest": "dist",
+    "lib": {
+      "entryFile": "src/public-api.ts",
+      "styleIncludePaths": ["../tokens"]
+    }
+  }
+}

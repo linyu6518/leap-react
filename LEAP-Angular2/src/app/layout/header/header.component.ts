@@ -1,14 +1,13 @@
-import { Component, signal, effect } from '@angular/core'
+import { Component, signal, computed, effect } from '@angular/core'
 import { Router } from '@angular/router'
 import { FormsModule } from '@angular/forms'
 import { NzLayoutModule } from 'ng-zorro-antd/layout'
 import { NzBadgeModule } from 'ng-zorro-antd/badge'
-import { NzDropDownModule } from 'ng-zorro-antd/dropdown'
-import { NzMenuModule } from 'ng-zorro-antd/menu'
 import { NzIconModule } from 'ng-zorro-antd/icon'
 import { NzInputModule } from 'ng-zorro-antd/input'
 import { NzButtonModule } from 'ng-zorro-antd/button'
 import { AuthService } from '../../core/services/auth.service'
+import { ViewModeService } from '../../core/services/view-mode.service'
 
 @Component({
   selector: 'app-header',
@@ -17,8 +16,6 @@ import { AuthService } from '../../core/services/auth.service'
     FormsModule,
     NzLayoutModule,
     NzBadgeModule,
-    NzDropDownModule,
-    NzMenuModule,
     NzIconModule,
     NzInputModule,
     NzButtonModule,
@@ -50,26 +47,88 @@ import { AuthService } from '../../core/services/auth.service'
             <span nz-icon nzType="bell"></span>
           </button>
         </nz-badge>
-        <button class="user-menu-button" nz-button nzType="text" nz-dropdown [nzDropdownMenu]="menu" nzPlacement="bottomRight" nzTrigger="click">
-          <span class="user-avatar">{{ currentUser().avatar }}</span>
-        </button>
-        <nz-dropdown-menu #menu="nzDropdownMenu">
-          @if (currentViewMode() === 'maker') {
-            <li nz-menu-item (click)="switchToChecker()">
-              <span nz-icon nzType="swap"></span> Switch to Checker View
-            </li>
-          } @else {
-            <li nz-menu-item (click)="switchToMaker()">
-              <span nz-icon nzType="swap"></span> Switch to Maker View
-            </li>
+
+        <!-- Custom user menu -->
+        <div class="user-menu-wrap">
+          <button
+            class="user-menu-button"
+            type="button"
+            (click)="toggleMenu()"
+            [class.user-menu-button--open]="menuOpen()"
+            aria-label="User menu"
+          >
+            <span class="user-avatar">{{ currentUser().avatar }}</span>
+          </button>
+
+          @if (menuOpen()) {
+            <div class="menu-backdrop" (click)="closeMenu()"></div>
+            <div class="user-dropdown-card" role="menu">
+
+              <!-- User info header -->
+              <div class="dropdown-header">
+                <div class="dropdown-avatar">{{ currentUser().avatar }}</div>
+                <div class="dropdown-user-info">
+                  <div class="dropdown-user-name">{{ currentUser().name }}</div>
+                  <span
+                    class="dropdown-role-badge"
+                    [class.role-badge--checker]="currentViewMode() === 'checker'"
+                  >{{ currentViewMode() === 'checker' ? 'Checker' : 'Maker' }}</span>
+                </div>
+              </div>
+
+              <div class="dropdown-divider"></div>
+
+              <!-- Switch View -->
+              <button class="dropdown-item dropdown-item--switch" type="button" (click)="switchView()">
+                <span class="dropdown-item-icon">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M2 5h10M9 2l3 3-3 3M14 11H4M7 8l-3 3 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+                <span>Switch to {{ currentViewMode() === 'maker' ? 'Checker' : 'Maker' }} View</span>
+                <span class="dropdown-item-badge" [class.badge--checker]="currentViewMode() === 'maker'">
+                  {{ currentViewMode() === 'maker' ? 'Checker' : 'Maker' }}
+                </span>
+              </button>
+
+              <!-- Profile -->
+              <button class="dropdown-item" type="button">
+                <span class="dropdown-item-icon">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <circle cx="8" cy="5.5" r="2.5" stroke="currentColor" stroke-width="1.4"/>
+                    <path d="M2.5 13.5c0-3.038 2.462-5.5 5.5-5.5s5.5 2.462 5.5 5.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                  </svg>
+                </span>
+                <span>Profile</span>
+              </button>
+
+              <!-- Settings -->
+              <button class="dropdown-item" type="button">
+                <span class="dropdown-item-icon">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.4"/>
+                    <path d="M8 1v1.5M8 13.5V15M1 8h1.5M13.5 8H15M3.05 3.05l1.06 1.06M11.89 11.89l1.06 1.06M12.95 3.05l-1.06 1.06M4.11 11.89l-1.06 1.06" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                  </svg>
+                </span>
+                <span>Settings</span>
+              </button>
+
+              <div class="dropdown-divider"></div>
+
+              <!-- Sign out -->
+              <button class="dropdown-item dropdown-item--danger" type="button" (click)="handleLogout()">
+                <span class="dropdown-item-icon">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M6 14H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                    <path d="M11 11l3-3-3-3M14 8H6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+                <span>Sign out</span>
+              </button>
+
+            </div>
           }
-          <li nz-menu-item><span nz-icon nzType="user"></span> Profile</li>
-          <li nz-menu-item><span nz-icon nzType="setting"></span> Settings</li>
-          <li nz-menu-divider></li>
-          <li nz-menu-item (click)="handleLogout()">
-            <span nz-icon nzType="logout"></span> Logout
-          </li>
-        </nz-dropdown-menu>
+        </div>
       </div>
     </header>
   `,
@@ -77,17 +136,16 @@ import { AuthService } from '../../core/services/auth.service'
 })
 export class HeaderComponent {
   searchVal = ''
-  currentViewMode = signal<'maker' | 'checker'>('maker')
+  menuOpen = signal(false)
   currentUser = signal({ name: 'YL', role: 'Maker', avatar: 'YL' })
+  currentViewMode!: ViewModeService['viewMode']
 
   constructor(
     private auth: AuthService,
     private router: Router,
+    private viewModeService: ViewModeService,
   ) {
-    effect(() => {
-      const path = this.router.url
-      this.currentViewMode.set(path.includes('/checker') ? 'checker' : 'maker')
-    })
+    this.currentViewMode = viewModeService.viewMode
     const user = this.auth.getCurrentUser() ?? this.auth.user
     if (user) {
       this.currentUser.set({
@@ -98,26 +156,23 @@ export class HeaderComponent {
     }
   }
 
-  getInitials(name: string): string {
-    return name
-      .split(' ')
-      .map((n) => n.charAt(0))
-      .join('')
-      .toUpperCase()
-      .slice(0, 2)
+  toggleMenu(): void {
+    this.menuOpen.update(v => !v)
+  }
+
+  closeMenu(): void {
+    this.menuOpen.set(false)
+  }
+
+  switchView(): void {
+    this.viewModeService.toggle()
+    this.closeMenu()
   }
 
   handleLogout(): void {
+    this.closeMenu()
     this.auth.logout()
     this.router.navigate(['/login'])
-  }
-
-  switchToMaker(): void {
-    this.router.navigate(['/maker/review'])
-  }
-
-  switchToChecker(): void {
-    this.router.navigate(['/checker/approve'])
   }
 
   clearSearch(): void {

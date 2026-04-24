@@ -1,0 +1,183 @@
+<div class="dashboard-container">
+  <div class="page-header">
+    <div class="page-title">
+      <span nz-icon nzType="appstore"></span>
+      <span>Dashboard</span>
+    </div>
+  </div>
+
+  <div class="dashboard-grid">
+    <div class="grid-main">
+      <div class="status-row">
+        @for (stat of stats; track stat.theme) {
+          <nz-card class="status-card" [class]="stat.theme">
+            <div class="status-top">
+              <div class="status-label">{{ stat.label }}</div>
+              <span class="status-corner">
+                @switch (stat.theme) {
+                  @case ('approved') { <span nz-icon nzType="check-circle"></span> }
+                  @case ('pending') { <span nz-icon nzType="clock-circle"></span> }
+                  @case ('draft') { <span nz-icon nzType="file-text"></span> }
+                }
+              </span>
+            </div>
+            <div class="status-update">Last update: {{ lastUpdateDate }}</div>
+            <div class="status-value-row">
+              <div class="status-value"><app-animated-number [value]="stat.value" [duration]="1500"></app-animated-number></div>
+              <div class="status-trend" [class.positive]="stat.trend.direction === 'up'">
+                {{ stat.trend.direction === 'up' ? '↑' : '↓' }}
+                @if (stat.trend.value) { <span>{{ stat.trend.value }}</span> }
+              </div>
+            </div>
+          </nz-card>
+        }
+      </div>
+
+      <div class="chart-stack">
+        <nz-card class="chart-card variance-card">
+          <div class="card-title">Variance Top 10</div>
+          <div class="card-update">Last update: {{ lastUpdateDate }}</div>
+          <div echarts class="chart" [options]="varianceChartOption"></div>
+        </nz-card>
+
+        <nz-card class="chart-card threshold-card">
+          <div class="card-title">Threshold Exceedance</div>
+          <div class="card-update">Last update: {{ lastUpdateDate }}</div>
+          <div
+            echarts
+            class="chart"
+            [options]="thresholdChartOption"
+            (chartInit)="onThresholdChartInit($event)"
+            (chartMouseOver)="onThresholdChartMouseOver($event)"
+            (chartGlobalOut)="onThresholdChartGlobalOut()"
+          ></div>
+          <div class="threshold-legend">
+            <div
+              class="legend-item normal"
+              [class.active]="selectedLegend === 'Normal'"
+              (click)="toggleLegend('Normal')"
+            >
+              <span class="dot"></span>
+              <span>Normal</span>
+            </div>
+            <div
+              class="legend-item warning"
+              [class.active]="selectedLegend === 'Warning'"
+              (click)="toggleLegend('Warning')"
+            >
+              <span class="dot"></span>
+              <span>Warning</span>
+            </div>
+            <div
+              class="legend-item critical"
+              [class.active]="selectedLegend === 'Critical'"
+              (click)="toggleLegend('Critical')"
+            >
+              <span class="dot"></span>
+              <span>Critical</span>
+            </div>
+          </div>
+        </nz-card>
+      </div>
+
+      <nz-card class="chart-card trend-card">
+        <div class="card-title">LCR/NSFR Trend (Last 12 Months)</div>
+        <div class="card-update">Last update: {{ lastUpdateDate }}</div>
+        <div echarts class="chart" [options]="trendChartOption"></div>
+      </nz-card>
+    </div>
+
+    <div class="sidebar-column">
+      <nz-card class="activities-card">
+        <div class="card-title">Recent Activity</div>
+        <div class="activity-date">Today</div>
+        <div class="activity-item">
+          <div class="activity-avatar">YL</div>
+          <div class="activity-details">
+            <div class="activity-title"><span class="activity-name">Lin</span> signed off Reciprocal</div>
+            <div class="activity-meta">9:50 am • View</div>
+          </div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-avatar purple">YL</div>
+          <div class="activity-details">
+            <div class="activity-title"><span class="activity-name">Lin</span> Submitted LCR Analysis</div>
+            <div class="activity-meta">9:42 am • View</div>
+          </div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-avatar orange">YL</div>
+          <div class="activity-details">
+            <div class="activity-title"><span class="activity-name">Lin</span> Escalated NSFR Report</div>
+            <div class="activity-meta">9:13 am • View</div>
+          </div>
+        </div>
+        <div class="activity-date">Yesterday</div>
+        <div class="activity-item">
+          <div class="activity-avatar green">YL</div>
+          <div class="activity-details">
+            <div class="activity-title"><span class="activity-name">Lin</span> Approved Cashable</div>
+            <div class="activity-meta">1:22 pm • View</div>
+          </div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-avatar green">YL</div>
+          <div class="activity-details">
+            <div class="activity-title"><span class="activity-name">Lin</span> Submitted LCR Analysis</div>
+            <div class="activity-meta">11:25 am • View</div>
+          </div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-avatar purple">YL</div>
+          <div class="activity-details">
+            <div class="activity-title"><span class="activity-name">Lin</span> Escalated NSFR Report</div>
+            <div class="activity-meta">10:54 am • View</div>
+          </div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-avatar muted">YL</div>
+          <div class="activity-details">
+            <div class="activity-title"><span class="activity-name">Lin</span> Published Deposits Review</div>
+            <div class="activity-meta">9:21 am • View</div>
+          </div>
+        </div>
+      </nz-card>
+
+      <nz-card class="notifications-card">
+        <div class="card-title">Notifications</div>
+        <div class="notification-item">
+          <div class="notification-icon warning"><span>!</span></div>
+          <div class="notification-details">
+            <div class="notification-title">Threshold Alert</div>
+            <div class="notification-meta">LCR ratio below minimum threshold</div>
+            <div class="notification-time">2 hours ago</div>
+          </div>
+        </div>
+        <div class="notification-item">
+          <div class="notification-icon info"><span>i</span></div>
+          <div class="notification-details">
+            <div class="notification-title">System Update</div>
+            <div class="notification-meta">New regulatory requirements added</div>
+            <div class="notification-time">5 hours ago</div>
+          </div>
+        </div>
+        <div class="notification-item">
+          <div class="notification-icon success"><span>✓</span></div>
+          <div class="notification-details">
+            <div class="notification-title">Report Generated</div>
+            <div class="notification-meta">Monthly NSFR report is ready</div>
+            <div class="notification-time">1 day ago</div>
+          </div>
+        </div>
+        <div class="notification-item">
+          <div class="notification-icon warning"><span>!</span></div>
+          <div class="notification-details">
+            <div class="notification-title">Data Sync Required</div>
+            <div class="notification-meta">Some data sources need synchronization</div>
+            <div class="notification-time">2 days ago</div>
+          </div>
+        </div>
+      </nz-card>
+    </div>
+  </div>
+</div>

@@ -22,5 +22,5 @@ import { HeaderComponent } from '../header/header.component'
   styles: [`:host { display: block; height: 100%; }`],
 })
 export class MainLayoutComponent {
-  sidebarOpened = true
+  sidebarOpened = false
 }

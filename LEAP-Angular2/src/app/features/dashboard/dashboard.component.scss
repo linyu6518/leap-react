@@ -1,5 +1,7 @@
 @use '../../../styles/variables' as *;
 
+$side-rail-vh: calc(100vh - #{$header-height} - 7px - 12px - 52px);
+
 /* Fill viewport so cards can adapt to screen height (header 64px + main padding 32+12) */
 :host {
   display: block;
@@ -12,6 +14,21 @@
   min-height: 100%;
   display: flex;
   flex-direction: column;
+}
+
+/* 全站 main-content DatePicker 为 54px；Dashboard 内减 1/3 → 36px */
+:host ::ng-deep .dashboard-container .ant-picker {
+  min-height: 36px !important;
+  height: 36px !important;
+}
+
+:host ::ng-deep .dashboard-container .ant-picker .ant-picker-input > input {
+  font-size: 13px;
+  line-height: 22px;
+}
+
+:host ::ng-deep .dashboard-container .ant-picker .ant-picker-suffix .anticon {
+  font-size: 14px;
 }
 
 .page-header {
@@ -51,7 +68,8 @@
   align-items: stretch;
   flex: 1;
   min-height: 0;
-  overflow: hidden;
+  /* visible so Recent Activity / Notifications can sticky to .main-content-wrapper (overflow hidden breaks sticky) */
+  overflow: visible;
 
   @media (max-width: 1200px) {
     grid-template-columns: 1fr;
@@ -66,9 +84,23 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  height: 100%;
   min-height: 0;
-  overflow: hidden;
+
+  @media (min-width: 1201px) {
+    position: sticky;
+    top: 0;
+    align-self: start;
+    height: $side-rail-vh;
+    max-height: $side-rail-vh;
+    overflow: hidden;
+    z-index: 2;
+  }
+
+  @media (max-width: 1200px) {
+    height: auto;
+    max-height: none;
+    overflow: visible;
+  }
 }
 
 .grid-main {
@@ -134,7 +166,7 @@
     .anticon { font-size: 32px; }
   }
 
-  &.approved .status-corner { color: #6cc100; }
+  &.approved .status-corner { color: #76c700; }
   &.pending .status-corner { color: #ff9800; }
   &.draft .status-corner { color: #9e9e9e; }
 
@@ -171,12 +203,12 @@
     align-items: center;
     gap: 1px;
     font-size: $font-size-small;
-    color: #ff6767;
+    color: #ff7070;
     font-weight: 400;
     line-height: 1.2;
     font-family: $font-family;
 
-    &.positive { color: #6cc100; }
+    &.positive { color: #76c700; }
   }
 }
 
@@ -310,9 +342,9 @@
 
         &:hover .dot { transform: scale(1.2); }
         &.active .dot { transform: scale(1.3); }
-        &.normal .dot { background: #6cc100; }
+        &.normal .dot { background: #76c700; }
         &.warning .dot { background: $color-warning; }
-        &.critical .dot { background: #ff6767; }
+        &.critical .dot { background: #ff7070; }
       }
     }
   }
@@ -329,18 +361,26 @@
   }
 }
 
-// Left panel: match React, flex to fill viewport height
 :host ::ng-deep .activities-card {
-  padding: 16px;
+  padding: 48px;
   box-shadow: $shadow-sm;
   border-radius: 0 !important;
   width: 100%;
   min-width: 0;
-  flex: 1;
-  min-height: 180px;
+  flex: 1 1 0;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
+  overflow: hidden;
+
+  .ant-card-body {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+  }
 
   .card-title {
     font-weight: 600;
@@ -348,12 +388,13 @@
     margin-bottom: 4px;
     line-height: 1.3;
     font-size: 17px;
+    flex-shrink: 0;
     font-family: 'Graphik', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   }
 
   .activity-date {
-    color: #757575;
-    font-size: 12px;
+    color: #9e9e9e;
+    font-size: $font-size-small;
     margin: 0 0 8px 0;
     line-height: 1.3;
     font-weight: 500;
@@ -418,7 +459,7 @@
       font-size: 14px;
       color: #1a1a1a;
       font-weight: 400;
-      line-height: 1.4;
+      line-height: 1.3;
       margin-bottom: 4px;
       font-family: 'Graphik', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 
@@ -428,43 +469,56 @@
     }
 
     .activity-meta {
-      font-size: 12px;
-      color: #757575;
-      font-weight: 400;
+      font-size: $font-size-small;
+      color: #9e9e9e;
+      font-weight: 500;
       line-height: 1.3;
       font-family: 'Graphik', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     }
   }
 }
 
-// Left panel: match React, flex to fill viewport height
 :host ::ng-deep .notifications-card {
-  padding: 16px;
+  padding: 48px;
   box-shadow: $shadow-sm;
   border-radius: 0 !important;
   width: 100%;
   min-width: 0;
-  flex: 1;
-  min-height: 180px;
+  flex: 1 1 0;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
+  overflow: hidden;
+
+  .ant-card-body {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+  }
 
   .card-title {
     font-weight: 600;
     color: #3a473a;
-    margin-bottom: 16px;
+    margin-bottom: 4px;
     line-height: 1.3;
     font-size: 17px;
+    flex-shrink: 0;
     font-family: 'Graphik', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   }
 
   .notification-item {
     display: flex;
     gap: 12px;
-    padding: 12px 0;
+    padding: 8px 0;
     align-items: flex-start;
     border-bottom: 1px solid #f0f0f0;
+
+    &:first-of-type {
+      padding-top: 12px;
+    }
 
     &:last-child {
       border-bottom: none;
@@ -507,27 +561,48 @@
       font-size: 14px;
       color: #1a1a1a;
       font-weight: 500;
-      line-height: 1.4;
+      line-height: 1.3;
       margin-bottom: 4px;
       font-family: 'Graphik', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     }
 
     .notification-meta {
-      font-size: 12px;
-      color: #757575;
-      font-weight: 400;
+      font-size: $font-size-small;
+      color: #9e9e9e;
+      font-weight: 500;
       line-height: 1.3;
       margin-bottom: 4px;
       font-family: 'Graphik', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     }
 
     .notification-time {
-      font-size: 12px;
-      color: #757575;
-      font-weight: 400;
+      font-size: $font-size-small;
+      color: #9e9e9e;
+      font-weight: 500;
       line-height: 1.3;
       font-family: 'Graphik', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     }
+  }
+}
+
+:host ::ng-deep .activities-card .sidebar-feed-scroll,
+:host ::ng-deep .notifications-card .sidebar-feed-scroll {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-gutter: stable;
+}
+
+@media (max-width: 1200px) {
+  :host ::ng-deep .activities-card,
+  :host ::ng-deep .notifications-card {
+    flex: 0 0 auto;
+  }
+
+  :host ::ng-deep .activities-card .sidebar-feed-scroll,
+  :host ::ng-deep .notifications-card .sidebar-feed-scroll {
+    max-height: min(400px, 50vh);
   }
 }
 
@@ -535,4 +610,328 @@
   :host ::ng-deep .chart-card .chart {
     height: 260px;
   }
+}
+
+// —— LAMP-style footer blocks (aligned with chart-card / dashboard tone) ——
+
+.lamp-block--footer {
+  /* spacing to trend card: use same 12px as .grid-main gap */
+  margin-top: 0;
+  padding-top: 0;
+}
+
+.lamp-monitoring-row,
+.lamp-exceptions-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 12px;
+
+  @media (max-width: 960px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.lamp-chart-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 2px;
+}
+
+.lamp-toolbar-label {
+  font-size: 11px;
+  color: #9e9e9e;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-family: $font-family;
+}
+
+:host ::ng-deep .lamp-hqla-card {
+  min-height: 0;
+
+  .lamp-chart-toolbar {
+    margin-bottom: 8px;
+  }
+
+  .lamp-hqla-body {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px 20px;
+    width: 100%;
+    min-height: 0;
+
+    @media (max-width: 640px) {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
+
+  .lamp-donut-chart {
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 220px;
+    max-height: 220px;
+    height: 220px;
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+  }
+
+  .lamp-donut-chart > div {
+    width: min(100%, 280px) !important;
+    max-width: 280px;
+    height: 100% !important;
+    flex: 0 0 auto;
+    min-height: 220px;
+    transform: translateX(200px);
+  }
+
+  .lamp-hqla-legend {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    align-self: center;
+    margin-top: 115px;
+    gap: 8px 0;
+    flex: 0 0 auto;
+    max-width: 48%;
+    cursor: default;
+    pointer-events: none;
+
+    @media (max-width: 640px) {
+      max-width: none;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 8px 16px;
+      margin-top: 0;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      cursor: default;
+      gap: 8px;
+      font-size: $font-size-small;
+      font-weight: 300;
+      color: #777;
+      padding: 0;
+      line-height: 1.3;
+
+      &:hover {
+        background: transparent;
+      }
+
+      .dot {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+    }
+
+    .lamp-lev1 .dot { background: #4e9f52; }
+    .lamp-lev2a .dot { background: #6fc96a; }
+    .lamp-lev2brmb .dot { background: #c8e650; }
+    .lamp-lev2b .dot { background: #154a22; }
+  }
+
+  @media (max-width: 640px) {
+    .lamp-donut-chart > div {
+      transform: none;
+    }
+  }
+}
+
+.dash-table-scroll {
+  overflow-x: auto;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+  border: 1px solid #ebebeb;
+  border-radius: 0;
+  background: #fff;
+
+  &--tall {
+    max-height: 260px;
+  }
+}
+
+.dash-data-table {
+  width: 100%;
+  min-width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  font-family: $font-family;
+
+  thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: #fafafa;
+    color: #6b8e6b;
+    font-weight: 600;
+    font-size: 12px;
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 1px solid #e0e0e0;
+    white-space: nowrap;
+    vertical-align: bottom;
+    box-sizing: border-box;
+
+    &.col-num {
+      text-align: right;
+    }
+  }
+
+  tbody td {
+    padding: 10px 14px;
+    border-bottom: 1px solid #f0f0f0;
+    color: #2b2b2b;
+    vertical-align: middle;
+    box-sizing: border-box;
+  }
+
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  tbody tr:hover td {
+    background: #fafcfa;
+  }
+
+  tbody tr:hover td.cell-neg {
+    background: rgba(255, 112, 112, 0.22);
+  }
+
+  tbody tr:hover td.cell-pos {
+    background: rgba(118, 199, 0, 0.18);
+  }
+
+  tbody tr:hover td.cell-dod-neutral {
+    background: #f3f4f6;
+  }
+
+  .col-num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .mono {
+    font-size: 12px;
+    color: #424242;
+  }
+
+  .cell-strong {
+    font-weight: 500;
+    color: #1a1a1a;
+  }
+
+  .cell-neg {
+    color: #ff7070;
+    font-weight: 600;
+    background: rgba(255, 112, 112, 0.14);
+    box-shadow: inset 3px 0 0 #ff7070;
+  }
+
+  .cell-pos {
+    color: #76c700;
+    font-weight: 600;
+    background: rgba(118, 199, 0, 0.12);
+    box-shadow: inset 3px 0 0 #76c700;
+  }
+
+  .cell-dod-neutral {
+    color: #4b5563;
+    font-weight: 500;
+    background: #f3f4f6;
+    box-shadow: inset 3px 0 0 #9ca3af;
+  }
+
+  th.dod-th {
+    cursor: help;
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    text-underline-offset: 3px;
+  }
+
+  &--dense thead th {
+    padding: 8px 10px;
+    font-size: 11px;
+  }
+
+  &--dense tbody td {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+
+  &--dense thead th.col-num {
+    text-align: right;
+  }
+}
+
+.lamp-feed-card {
+  margin-bottom: 12px;
+}
+
+.lamp-feed-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+.lamp-breadcrumb {
+  font-size: 13px;
+  color: #6b8e6b;
+  font-weight: 500;
+  font-family: $font-family;
+
+  .sep {
+    margin: 0 8px;
+    opacity: 0.55;
+  }
+}
+
+.lamp-feed-dates {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.lamp-feed-footer {
+  margin-top: 14px;
+  font-size: 12px;
+  color: #9e9e9e;
+  font-family: $font-family;
+
+  a {
+    color: $color-primary;
+    font-weight: 500;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.lamp-mini-dates {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.lamp-exception-card {
+  min-height: 0;
 }

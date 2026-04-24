@@ -85,11 +85,192 @@
         <div class="card-update">Last update: {{ lastUpdateDate }}</div>
         <div echarts class="chart" [options]="trendChartOption"></div>
       </nz-card>
+
+      <section class="lamp-block lamp-block--footer" aria-label="LAMP-style monitoring">
+        <div class="lamp-monitoring-row">
+          <nz-card class="chart-card lamp-hqla-card">
+            <div class="card-title">HQLA composition</div>
+            <div class="card-update">Same donut style as threshold chart · as-of {{ formatLampDate(lampReportDate) }}</div>
+            <div class="lamp-chart-toolbar">
+              <span class="lamp-toolbar-label">Snapshot date</span>
+              <nz-date-picker [(ngModel)]="lampReportDate" nzSize="small"></nz-date-picker>
+            </div>
+            <div class="lamp-hqla-body">
+              <div class="threshold-legend lamp-hqla-legend">
+                <div class="legend-item lamp-lev1"><span class="dot"></span><span>Level 1</span></div>
+                <div class="legend-item lamp-lev2a"><span class="dot"></span><span>Level 2A</span></div>
+                <div class="legend-item lamp-lev2brmb"><span class="dot"></span><span>2B RMBS</span></div>
+                <div class="legend-item lamp-lev2b"><span class="dot"></span><span>2B Non‑RMBS</span></div>
+              </div>
+              <div echarts class="chart lamp-donut-chart" [options]="lampHqlaChartOption"></div>
+            </div>
+          </nz-card>
+
+          <nz-card class="chart-card lamp-osfi-card">
+            <div class="card-title">OSFI summary</div>
+            <div class="card-update">Parameter, amount (CA$), day-over-day</div>
+            <div class="dash-table-scroll">
+              <table class="dash-data-table">
+                <thead>
+                  <tr>
+                    <th>Parameter</th>
+                    <th class="col-num">Amount</th>
+                    <th class="col-num dod-th" title="Day over day — change vs comparison date">DoD</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (row of lampOsfiRows; track row.parameter) {
+                    <tr>
+                      <td class="cell-strong">{{ row.parameter }}</td>
+                      <td class="col-num">{{ row.amount }}</td>
+                      <td
+                        class="col-num"
+                        [class.cell-neg]="dodTone(row.dod) === 'neg'"
+                        [class.cell-pos]="dodTone(row.dod) === 'pos'"
+                        [class.cell-dod-neutral]="dodTone(row.dod) === 'neutral'"
+                      >{{ row.dod }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </nz-card>
+        </div>
+
+        <nz-card class="chart-card lamp-feed-card">
+          <div class="card-title">Feed statistics</div>
+          <div class="card-update">Source system granularity · reporting vs comparison</div>
+          <div class="lamp-feed-toolbar">
+            <div class="lamp-breadcrumb">Source System <span class="sep">›</span> Product Class</div>
+            <div class="lamp-feed-dates">
+              <span class="lamp-toolbar-label">Reporting</span>
+              <nz-date-picker [(ngModel)]="lampReportDate" nzSize="small"></nz-date-picker>
+              <span class="lamp-toolbar-label">Compare</span>
+              <nz-date-picker [(ngModel)]="lampCompareDate" nzSize="small"></nz-date-picker>
+            </div>
+          </div>
+          <div class="dash-table-scroll dash-table-scroll--tall">
+            <table class="dash-data-table">
+              <thead>
+                <tr>
+                  <th>Source</th>
+                  <th class="col-num">Count (R)</th>
+                  <th class="col-num">Notional (R)</th>
+                  <th class="col-num">Count (C)</th>
+                  <th class="col-num">Notional (C)</th>
+                  <th class="col-num dod-th" title="Day over day — change vs comparison date">DoD</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (r of lampFeedStats; track r.source) {
+                  <tr>
+                    <td class="cell-strong">{{ r.source }}</td>
+                    <td class="col-num mono">{{ r.countReporting }}</td>
+                    <td class="col-num mono">{{ r.notionalReporting }}</td>
+                    <td class="col-num mono">{{ r.countCompare }}</td>
+                    <td class="col-num mono">{{ r.notionalCompare }}</td>
+                    <td
+                      class="col-num"
+                      [class.cell-neg]="dodTone(r.dod) === 'neg'"
+                      [class.cell-pos]="dodTone(r.dod) === 'pos'"
+                      [class.cell-dod-neutral]="dodTone(r.dod) === 'neutral'"
+                    >{{ r.dod }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+          <div class="lamp-feed-footer">Demo only · <a routerLink="/product/deposits">Product analysis</a></div>
+        </nz-card>
+
+        <div class="lamp-exceptions-row">
+          <nz-card class="chart-card lamp-exception-card">
+            <div class="card-title">REJECT exceptions</div>
+            <div class="card-update">Reporting {{ formatLampDate(lampReportDate) }} · compare {{ formatLampDate(lampCompareDate) }}</div>
+            <div class="lamp-mini-dates">
+              <nz-date-picker [(ngModel)]="lampReportDate" nzSize="small"></nz-date-picker>
+              <nz-date-picker [(ngModel)]="lampCompareDate" nzSize="small"></nz-date-picker>
+            </div>
+            <div class="dash-table-scroll">
+              <table class="dash-data-table dash-data-table--dense">
+                <thead>
+                  <tr>
+                    <th>Group</th>
+                    <th class="col-num dod-th" title="Day over day — net change in exception rows vs comparison">DoD</th>
+                    <th class="col-num">Rows R</th>
+                    <th class="col-num">Notl R</th>
+                    <th class="col-num">Rows C</th>
+                    <th class="col-num">Notl C</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (r of lampRejectExceptions; track r.group) {
+                    <tr>
+                      <td class="cell-strong">{{ r.group }}</td>
+                      <td
+                        class="col-num"
+                        [class.cell-neg]="dodTone(r.dod) === 'neg'"
+                        [class.cell-pos]="dodTone(r.dod) === 'pos'"
+                        [class.cell-dod-neutral]="dodTone(r.dod) === 'neutral'"
+                      >{{ r.dod }}</td>
+                      <td class="col-num mono">{{ r.rowCountR }}</td>
+                      <td class="col-num mono">{{ r.notionalR }}</td>
+                      <td class="col-num mono">{{ r.rowCountC }}</td>
+                      <td class="col-num mono">{{ r.notionalC }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </nz-card>
+
+          <nz-card class="chart-card lamp-exception-card">
+            <div class="card-title">DISCARD exceptions</div>
+            <div class="card-update">Reporting {{ formatLampDate(lampReportDate) }} · compare {{ formatLampDate(lampCompareDate) }}</div>
+            <div class="lamp-mini-dates">
+              <nz-date-picker [(ngModel)]="lampReportDate" nzSize="small"></nz-date-picker>
+              <nz-date-picker [(ngModel)]="lampCompareDate" nzSize="small"></nz-date-picker>
+            </div>
+            <div class="dash-table-scroll">
+              <table class="dash-data-table dash-data-table--dense">
+                <thead>
+                  <tr>
+                    <th>Group</th>
+                    <th class="col-num dod-th" title="Day over day — net change in exception rows vs comparison">DoD</th>
+                    <th class="col-num">Rows R</th>
+                    <th class="col-num">Notl R</th>
+                    <th class="col-num">Rows C</th>
+                    <th class="col-num">Notl C</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (r of lampDiscardExceptions; track r.group) {
+                    <tr>
+                      <td class="cell-strong">{{ r.group }}</td>
+                      <td
+                        class="col-num"
+                        [class.cell-neg]="dodTone(r.dod) === 'neg'"
+                        [class.cell-pos]="dodTone(r.dod) === 'pos'"
+                        [class.cell-dod-neutral]="dodTone(r.dod) === 'neutral'"
+                      >{{ r.dod }}</td>
+                      <td class="col-num mono">{{ r.rowCountR }}</td>
+                      <td class="col-num mono">{{ r.notionalR }}</td>
+                      <td class="col-num mono">{{ r.rowCountC }}</td>
+                      <td class="col-num mono">{{ r.notionalC }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </nz-card>
+        </div>
+      </section>
     </div>
 
     <div class="sidebar-column">
       <nz-card class="activities-card">
         <div class="card-title">Recent Activity</div>
+        <div class="sidebar-feed-scroll">
         <div class="activity-date">Today</div>
         <div class="activity-item">
           <div class="activity-avatar">YL</div>
@@ -141,10 +322,12 @@
             <div class="activity-meta">9:21 am • View</div>
           </div>
         </div>
+        </div>
       </nz-card>
 
       <nz-card class="notifications-card">
         <div class="card-title">Notifications</div>
+        <div class="sidebar-feed-scroll">
         <div class="notification-item">
           <div class="notification-icon warning"><span>!</span></div>
           <div class="notification-details">
@@ -176,6 +359,7 @@
             <div class="notification-meta">Some data sources need synchronization</div>
             <div class="notification-time">2 days ago</div>
           </div>
+        </div>
         </div>
       </nz-card>
     </div>

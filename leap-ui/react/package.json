@@ -1,0 +1,43 @@
+{
+  "name": "@leap/ui-react",
+  "version": "1.0.0",
+  "description": "LEAP UI component library - React (TD brand)",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./theme": {
+      "import": "./dist/theme.js",
+      "require": "./dist/theme.cjs",
+      "types": "./dist/theme.d.ts"
+    }
+  },
+  "files": ["dist", "README.md"],
+  "scripts": {
+    "build": "vite build && tsc --emitDeclarationOnly --outDir dist",
+    "dev": "vite build --watch"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0",
+    "antd": ">=5.0.0",
+    "@ant-design/icons": ">=5.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "antd": "^5.12.0",
+    "@ant-design/icons": "^5.2.6",
+    "typescript": "^5.2.0",
+    "vite": "^5.0.0",
+    "vite-plugin-dts": "^3.6.0",
+    "sass": "^1.69.0"
+  }
+}

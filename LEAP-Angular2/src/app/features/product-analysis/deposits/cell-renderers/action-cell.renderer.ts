@@ -19,8 +19,8 @@ interface ActionContext {
           <circle cx="9" cy="7" r="1" fill="#8C8C8C"/>
           <circle cx="11.5" cy="7" r="1" fill="#8C8C8C"/>
         </svg>
-        @if (hasAlert) {
-          <span class="alert-dot"></span>
+        @if (hasComments) {
+          <span class="comment-dot" title="Has comments"></span>
         }
       </button>
     </div>
@@ -54,7 +54,8 @@ interface ActionContext {
     .icon-btn:hover svg path {
       stroke: #00843D;
     }
-    .alert-dot {
+    /* Comment indicator: rows (incl. aggregate) that have at least one comment. */
+    .comment-dot {
       position: absolute;
       top: 3px;
       right: 3px;
@@ -66,13 +67,13 @@ interface ActionContext {
   `],
 })
 export class ActionCellRendererComponent implements ICellRendererAngularComp {
-  hasAlert = false
+  hasComments = false
   private params!: ICellRendererParams
 
   agInit(params: ICellRendererParams): void {
     this.params = params
-    const data = params.data as { hasAlert?: boolean }
-    this.hasAlert = !!data?.hasAlert
+    const data = params.data as { hasComments?: boolean }
+    this.hasComments = !!data?.hasComments
   }
 
   refresh(params: ICellRendererParams): boolean {

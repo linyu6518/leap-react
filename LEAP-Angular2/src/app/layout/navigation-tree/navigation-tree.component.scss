@@ -4,12 +4,15 @@ $spacing-xs: 8px;
 $spacing-sm: 16px;
 $spacing-md: 24px;
 $duration-base: 200ms;
+$nav-motion-duration: 0.28s;
+$nav-motion-ease: cubic-bezier(0.4, 0, 0.2, 1);
 
 .navigation-tree {
-  padding: calc(#{$spacing-sm} - 20px) 0 80px 0;
+  padding: 50px 0 80px 0;
   display: flex;
   flex-direction: column;
   min-height: 0;
+  overflow-anchor: none;
 
   &.sidebar-collapsed {
     .nav-label,
@@ -17,15 +20,24 @@ $duration-base: 200ms;
     .nav-children {
       display: none !important;
     }
-    .nav-item-content { justify-content: center; padding: 0 !important; }
-    .nav-icon { margin-right: 0 !important; }
+    .nav-item {
+      margin-left: calc(#{$spacing-xs} + 1px) !important;
+      margin-right: calc(#{$spacing-xs} - 1px) !important;
+    }
+    .nav-item-content {
+      justify-content: center;
+      padding: 0 0 0 1px !important;
+    }
+    .nav-icon {
+      margin-right: 0 !important;
+    }
   }
 }
 
 /* Menu font weight: 400 default and active (selected text not bold) */
 .nav-item {
   cursor: pointer;
-  transition: all $duration-base ease;
+  transition: background-color $duration-base ease, color $duration-base ease;
   color: #96a496;
   margin: 2px $spacing-xs;
   border-radius: 8px;
@@ -35,11 +47,19 @@ $duration-base: 200ms;
     display: flex;
     align-items: center;
     height: 40px;
+    max-height: 40px;
+    min-height: 40px;
     padding: 0 $spacing-sm;
     font-size: 15px;
     font-weight: 400;
+    line-height: 1;
     color: inherit;
-    transition: all $duration-base ease;
+    overflow: hidden;
+    box-sizing: border-box;
+    transition:
+      background-color $duration-base ease,
+      color $duration-base ease,
+      padding $nav-motion-duration $nav-motion-ease;
   }
 
   &:hover {
@@ -68,20 +88,40 @@ $duration-base: 200ms;
       height: 18px;
       color: #96a496;
       font-weight: 200;
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 0;
+      transition: margin-right $nav-motion-duration $nav-motion-ease, color $duration-base ease;
     }
     .nav-label {
       flex: 1;
+      min-width: 0;
       font-size: 15px;
       letter-spacing: 0.1px;
       font-weight: 400;
+      line-height: 1.25;
       color: #96a496;
       font-family: $font-family;
+      align-self: center;
+      /* Avoid wrap while sider width animates — extra lines were shifting icon/text vertically */
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     &:hover .nav-icon,
     &:hover .nav-label { color: rgba(255, 255, 255, 0.9); }
     &.active .nav-icon,
     &.has-active-child .nav-icon { color: #00b624; }
     &.active .nav-label { color: #fff; font-weight: 400; }
+    /* nz-icon renders .anticon — kill stray baseline so row doesn’t nudge down when text mounts */
+    .nav-icon .anticon {
+      line-height: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
   }
 
   &.level-2 {
@@ -104,12 +144,17 @@ $duration-base: 200ms;
     }
     .nav-label {
       flex: 1;
+      min-width: 0;
       font-size: 15px;
       letter-spacing: 0.1px;
       font-weight: 400;
+      line-height: 1.25;
       color: #96a496;
       margin-left: 12px;
       font-family: $font-family;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     &:hover .nav-label { color: rgba(255, 255, 255, 0.9); }
     &:hover .nav-dot { background-color: rgba(255, 255, 255, 0.7); }
@@ -155,11 +200,17 @@ $duration-base: 200ms;
     }
 
     .nav-label {
+      flex: 1;
+      min-width: 0;
       font-size: 14px;
       font-weight: 400;
+      line-height: 1.25;
       color: #96a496;
       margin-left: 12px;
       font-family: $font-family;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     &:hover .nav-label { color: rgba(255, 255, 255, 0.85); }
@@ -170,16 +221,29 @@ $duration-base: 200ms;
 }
 
 .expand-icon {
-  font-size: 0; width: 14px; height: 14px; margin-left: auto; margin-top: -2px;
+  flex-shrink: 0;
+  align-self: center;
+  font-size: 0;
+  width: 14px;
+  height: 14px;
+  margin-left: auto;
+  margin-top: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   color: rgba(255, 255, 255, 0.4);
   &::after {
-    content: ''; display: block; width: 6px; height: 6px;
-    border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor;
-    transform: rotate(45deg) scale(0.9);
+    content: '';
+    display: block;
+    width: 6px;
+    height: 6px;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    transform: rotate(45deg) scale(0.9) translateY(-0.5px);
   }
   &.expanded {
     color: rgba(255, 255, 255, 0.7);
-    &::after { transform: rotate(225deg) scale(0.9); }
+    &::after { transform: rotate(225deg) scale(0.9) translateY(-0.5px); }
   }
 }
 

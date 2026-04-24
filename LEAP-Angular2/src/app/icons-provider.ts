@@ -12,6 +12,8 @@ import {
   UserOutline,
   SettingOutline,
   LogoutOutline,
+  UploadOutline,
+  DownloadOutline,
 } from '@ant-design/icons-angular/icons'
 
 export const iconsProvider = provideNzIcons([
@@ -27,4 +29,6 @@ export const iconsProvider = provideNzIcons([
   UserOutline,
   SettingOutline,
   LogoutOutline,
+  UploadOutline,
+  DownloadOutline,
 ])
