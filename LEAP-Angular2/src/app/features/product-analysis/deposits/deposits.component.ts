@@ -26,6 +26,16 @@ import { AdjustmentPanelComponent } from './adjustment-panel/adjustment-panel.co
 import type { UsLcrRow } from './us-lcr-data'
 import { US_LCR_DATA_MAP } from './us-lcr-data'
 import type { FR2052AData, Fr2052AmountField } from './fr2052a-data'
+import { EntityTreeAccordionComponent } from '../../../shared/entity-tree/entity-tree-accordion.component'
+import {
+  defaultEntitiesFor,
+  normaliseRegion,
+  normaliseStoredSegments,
+  regionShowsEntityTree,
+  segmentLabelFor,
+  segmentOptionsFor,
+  segmentsRequiredValidator,
+} from '../../../shared/entity-tree/entity-data'
 
 export type { FR2052AData, Fr2052AmountField } from './fr2052a-data'
 
@@ -33,10 +43,56 @@ const STORAGE_KEY = 'leap_deposits_query_params'
 
 interface StoredParams {
   region: string | null
-  segment: string | null
+  segment: string | string[] | null
   prior: string | null
   current: string | null
   tabIndex: number | null
+  entities?: string[]
+}
+
+/**
+ * Plausible legal-entity tags for deposit leaves. Used only to demo the
+ * Entity tree filter — keys match leaf nodeIds in dataStructure.
+ */
+const DEPOSIT_LEAF_ENTITIES: Record<string, string[]> = {
+  'personal-demand': ['TDBNA', 'TDCT'],
+  'personal-cds': ['TDBNA', 'TDCT', 'TDW'],
+  'personal-savings': ['TDBNA', 'TDBUSA', 'TDCT'],
+  'personal-third': ['TDBNA', 'TDBUSA'],
+
+  'non-personal-sweep': ['TDBNA', 'TDBUSA', 'TDBUSH'],
+  'non-personal-brokered': ['TDBUSA', 'TDS USA'],
+  'non-personal-banking': ['TDBNA', 'TDBUSH', 'TDCT'],
+
+  'wholesale-cds': ['NYB', 'TDS USA', 'TDPS USA'],
+  'wholesale-term': ['NYB', 'TDS USA', 'TDH'],
+
+  'wholesale-gtb-operational-retail-insured': ['TDBNA', 'TDBUSA'],
+  'wholesale-gtb-operational-retail-uninsured': ['TDBNA', 'TDBUSA'],
+  'wholesale-gtb-operational-bank-insured': ['NYB', 'TDS USA'],
+  'wholesale-gtb-operational-bank-uninsured': ['NYB', 'TDS USA'],
+  'wholesale-gtb-operational-broker-insured': ['TDPS USA', 'TDS USA'],
+  'wholesale-gtb-operational-broker-uninsured': ['TDPS USA', 'TDS USA'],
+  'wholesale-gtb-operational-ia-insured': ['TDII', 'TD Capital USA'],
+  'wholesale-gtb-operational-ia-uninsured': ['TDII', 'TD Capital USA'],
+  'wholesale-gtb-operational-pension-insured': ['TDH', 'TDH-USA'],
+  'wholesale-gtb-operational-pension-uninsured': ['TDH', 'TDH-USA'],
+  'wholesale-gtb-operational-pse-insured': ['NYB', 'TDNY'],
+  'wholesale-gtb-operational-pse-uninsured': ['NYB', 'TDNY'],
+
+  'wholesale-gtb-excess-retail-insured': ['TDBNA'],
+  'wholesale-gtb-excess-retail-uninsured': ['TDBNA'],
+  'wholesale-gtb-excess-bank': ['NYB', 'TDS USA'],
+  'wholesale-gtb-excess-broker': ['TDPS USA'],
+  'wholesale-gtb-excess-ia': ['TDII'],
+  'wholesale-gtb-excess-pension': ['TDH'],
+  'wholesale-gtb-excess-pse': ['TDNY'],
+  'wholesale-gtb-excess-nonfin': ['TDBUSH', 'TDBUSH-O', 'EIP'],
+
+  'pwm-cds': ['TDW', 'TDCT'],
+  'pwm-term': ['TDW', 'TDCT'],
+  'pwm-demand': ['TDW', 'TDCT'],
+  'pwm-savings': ['TDW', 'TDCT'],
 }
 
 function loadParams(): Partial<StoredParams> {
@@ -49,23 +105,53 @@ function loadParams(): Partial<StoredParams> {
 
 function saveParams(p: {
   region?: string | null
-  segment?: string | null
+  segment?: string[] | null
   prior?: Date | string | null
   current?: Date | string | null
   tabIndex?: number | null
+  entities?: string[]
 }) {
   try {
     sessionStorage.setItem(
       STORAGE_KEY,
       JSON.stringify({
         region: p.region ?? null,
-        segment: p.segment ?? null,
+        segment: p.segment ?? [],
         prior: p.prior instanceof Date ? p.prior.toISOString().slice(0, 10) : p.prior ?? null,
         current: p.current instanceof Date ? p.current.toISOString().slice(0, 10) : p.current ?? null,
         tabIndex: p.tabIndex ?? null,
+        entities: p.entities ?? [],
       })
     )
   } catch (_) {}
+}
+
+/**
+ * Apply legal-entity filter to a flat deposits row array. Mirrors the LCR
+ * approach: a row is kept when it matches itself OR any descendant matches.
+ */
+function filterDepositsRowsByEntities<T extends { level: number; entities?: string[] }>(
+  rows: T[],
+  selected: string[],
+): T[] {
+  if (!rows.length || !selected.length) return rows
+  const sel = new Set(selected)
+  const matchesSelf = (row: T): boolean => {
+    if (!row.entities || row.entities.length === 0) return true
+    return row.entities.some((c) => sel.has(c))
+  }
+  const visible = new Array<boolean>(rows.length).fill(false)
+  for (let i = rows.length - 1; i >= 0; i--) {
+    const row = rows[i]
+    let descendantVisible = false
+    for (let k = i + 1; k < rows.length && rows[k].level > row.level; k++) {
+      if (visible[k]) { descendantVisible = true; break }
+    }
+    visible[i] = descendantVisible || matchesSelf(row)
+  }
+  const out: T[] = []
+  for (let i = 0; i < rows.length; i++) if (visible[i]) out.push(rows[i])
+  return out
 }
 
 const COUNTERPARTY_GROUPS = [
@@ -356,6 +442,7 @@ function attachTrend(cp: Cp): Cp {
     CommentPanelComponent,
     EscalationPanelComponent,
     AdjustmentPanelComponent,
+    EntityTreeAccordionComponent,
   ],
   templateUrl: './deposits.component.html',
   styleUrls: ['./deposits.component.scss'],
@@ -364,6 +451,15 @@ export class DepositsComponent implements OnInit {
   form: FormGroup
   regionOpen = signal(false)
   segmentOpen = signal(false)
+  /** Signal mirrors of the form's region/segment for reactive computeds. */
+  regionSig = signal<string | null>(null)
+  segmentsSig = signal<string[]>([])
+  /** Selected legal-entity codes from the entity tree. */
+  entities = signal<string[]>([])
+  /** Region-aware Segment options reflected in the dropdown. */
+  segmentOptions = signal<string[]>(segmentOptionsFor(null))
+  /** Suppresses the default-reset right after restoring a stored selection. */
+  private restoringEntities = false
   activeTabIndex = signal(0)
   expandedNodes = signal<Set<string>>(
     new Set([
@@ -437,31 +533,97 @@ export class DepositsComponent implements OnInit {
     const state = nav?.extras?.state as StoredParams | undefined
     const fromState = state && (state.region != null || state.segment != null || state.prior != null || state.current != null)
     const saved = fromState ? state : loadParams()
+    const region = normaliseRegion(saved.region ?? null)
+    const segment = normaliseStoredSegments(region, saved.segment ?? null)
     const prior = saved.prior ? new Date(saved.prior) : null
     const current = saved.current ? new Date(saved.current) : null
     const tabIndex = typeof saved.tabIndex === 'number' ? saved.tabIndex : 0
     this.activeTabIndex.set(tabIndex)
+    this.segmentOptions.set(segmentOptionsFor(region))
+    this.regionSig.set(region)
+    this.segmentsSig.set(segment)
     this.form = this.fb.group({
-      region: [saved.region ?? null, Validators.required],
-      segment: [saved.segment ?? null, Validators.required],
+      region: [region, Validators.required],
+      segment: [segment, [Validators.required, segmentsRequiredValidator]],
       prior: [prior, Validators.required],
       current: [current, Validators.required],
     })
+
+    const restored = (saved as StoredParams).entities
+    if (restored && restored.length) {
+      this.restoringEntities = true
+      this.entities.set([...restored])
+      queueMicrotask(() => { this.restoringEntities = false })
+    } else {
+      this.entities.set(defaultEntitiesFor(region, segment))
+    }
+
     effect(() => {
       this.activeTabIndex()
       this.expandedNodes()
+      this.entities()
+      this.regionSig()
       this.rowData.set(this.getRowDataForCurrentTab())
     })
   }
 
   ngOnInit(): void {
     this.form.valueChanges.subscribe(() => this.rowData.set(this.getRowDataForCurrentTab()))
+    this.form.get('region')?.valueChanges.subscribe((region: string | null) => {
+      this.regionSig.set(region)
+      this.segmentOptions.set(segmentOptionsFor(region))
+      this.form.get('segment')?.setValue([], { emitEvent: true })
+      this.segmentsSig.set([])
+      this.applyDefaultEntitiesIfClean()
+    })
+    this.form.get('segment')?.valueChanges.subscribe((segment: string[]) => {
+      this.segmentsSig.set(segment ?? [])
+      this.applyDefaultEntitiesIfClean()
+    })
     this.rowData.set(this.getRowDataForCurrentTab())
+  }
+
+  private applyDefaultEntitiesIfClean(): void {
+    if (this.restoringEntities) return
+    this.entities.set(defaultEntitiesFor(this.regionSig(), this.segmentsSig()))
+  }
+
+  selectedSegment(): string | null {
+    const seg = this.form.get('segment')?.value as string[] | undefined
+    return seg?.[0] ?? null
+  }
+
+  segmentOptionLabel(code: string): string {
+    return this.regionSig() === 'US' ? segmentLabelFor(code) : code
+  }
+
+  onSegmentChange(value: string | null): void {
+    this.form.get('segment')?.setValue(value ? [value] : [])
+  }
+
+  segmentFieldActive(): boolean {
+    const seg = this.form.get('segment')?.value as string[] | undefined
+    return !!(seg && seg.length)
+  }
+
+  onEntitiesChange(next: string[]): void {
+    this.entities.set([...next])
+  }
+
+  showEntityTree(): boolean {
+    return regionShowsEntityTree(this.regionSig())
   }
 
   isFormComplete(): boolean {
     const v = this.form.value
-    return !!(v.region && v.segment && v.prior && v.current)
+    const segment = v.segment as string[] | undefined
+    return !!(
+      v.region &&
+      Array.isArray(segment) &&
+      segment.length > 0 &&
+      v.prior &&
+      v.current
+    )
   }
 
   onQuery(): void {
@@ -472,6 +634,7 @@ export class DepositsComponent implements OnInit {
       prior: v.prior,
       current: v.current,
       tabIndex: this.activeTabIndex(),
+      entities: this.entities(),
     })
     this.rowData.set(this.getRowDataForCurrentTab())
   }
@@ -485,6 +648,7 @@ export class DepositsComponent implements OnInit {
       prior: v.prior,
       current: v.current,
       tabIndex: index,
+      entities: this.entities(),
     })
     this.rowData.set(this.getRowDataForCurrentTab())
   }
@@ -504,11 +668,19 @@ export class DepositsComponent implements OnInit {
       case 1:
         return this.getFR2052AData()
       case 2:
-        return this.buildUsLcrRowData()
+        return this.applyEntityFilterToSummary(this.buildUsLcrRowData())
       case 0:
       default:
-        return this.buildSummaryRowData()
+        return this.applyEntityFilterToSummary(this.buildSummaryRowData())
     }
+  }
+
+  /** Filter the summary/UsLcr row arrays by selected entities (no-op when filter inactive). */
+  private applyEntityFilterToSummary<T extends SummaryRowData>(rows: T[]): T[] {
+    if (!regionShowsEntityTree(this.regionSig())) return rows
+    const ents = this.entities()
+    if (!ents.length) return rows
+    return filterDepositsRowsByEntities(rows, ents)
   }
 
   getRowId(params: { data?: unknown; rowIndex?: number }): string {
@@ -1176,6 +1348,7 @@ export class DepositsComponent implements OnInit {
         hasAlert: !!node.hasAlert,
         hasComments: hasAnyComments(node),
         counterparties: attachTrend(computeCp(node)),
+        entities: DEPOSIT_LEAF_ENTITIES[node.id],
       })
       if (isExpanded) {
         for (const c of node.children!) pushRow(c, level + 1)

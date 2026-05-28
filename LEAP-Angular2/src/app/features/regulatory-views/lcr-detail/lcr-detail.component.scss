@@ -8,11 +8,6 @@
   flex-direction: column;
   opacity: 1;
   animation: none;
-
-  /* 固定底栏不占文档流，预留高度避免表格被挡住 */
-  &--analytics {
-    padding-bottom: 96px;
-  }
 }
 
 .page-header-wrapper {
@@ -114,6 +109,16 @@
     min-width: 200px;
     max-width: 200px;
   }
+
+  .entity-drawer-field {
+    flex: 0 0 220px;
+    min-width: 220px;
+    max-width: 220px;
+  }
+}
+
+.query-form .entity-accordion-row {
+  margin-top: 16px;
 }
 
 .lcr-query-select-wrapper {
@@ -290,59 +295,6 @@
   margin-top: 20px;
 }
 
-.lcr-status-bar-actions {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-top: -20px;
-}
-
-/* 白底绿标；hover 绿底白标 */
-button.lcr-toolbar-icon.ant-btn {
-  box-sizing: border-box !important;
-  width: 40px !important;
-  height: 40px !important;
-  min-width: 40px !important;
-  padding: 0 !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  color: #00843d !important;
-  background-color: #ffffff !important;
-  border: none !important;
-  border-radius: 4px !important;
-  box-shadow: none !important;
-  outline: none !important;
-  transition: background-color 0.38s ease-out, color 0.38s ease-out;
-
-  &:hover {
-    color: #ffffff !important;
-    background-color: #00843d !important;
-    border: none !important;
-    box-shadow: none !important;
-    outline: none !important;
-  }
-
-  .anticon {
-    font-size: 19px;
-    color: inherit !important;
-    transition: color 0.38s ease-out;
-  }
-}
-
-/* upload/download 为填充路径：同色细描边 + paint-order 略加厚轮廓 */
-:host ::ng-deep button.lcr-toolbar-icon .anticon svg path {
-  stroke: currentColor;
-  stroke-width: 24;
-  stroke-linejoin: round;
-  stroke-linecap: round;
-  paint-order: stroke fill;
-}
-
-.lcr-status-bar-actions .lcr-submit-button {
-  margin-top: 0 !important;
-}
-
 .lcr-status-bar {
   display: flex;
   align-items: center;
@@ -428,100 +380,9 @@ button.lcr-toolbar-icon.ant-btn {
   }
 }
 
-/* Publish button (checker mode): solid green when enabled */
-.lcr-publish-button:not(:disabled) {
-  background-color: #00843D !important;
-  color: #ffffff !important;
-  border-color: #00843D !important;
-  transition: background-color 0.2s ease, box-shadow 0.2s ease;
-
-  &:hover {
-    background-color: #006b32 !important;
-    border-color: #006b32 !important;
-    box-shadow: 0 2px 8px rgba(0, 132, 61, 0.28) !important;
-  }
-}
-
 .lcr-grid-wrapper {
   margin-top: -12px;
   width: 100%;
-}
-
-/* 底部货币栏：fixed 贴齐视口底 + 主内容列宽度（由 TS 同步 .content-area 几何） */
-.lcr-currency-sticky {
-  position: fixed;
-  bottom: 0;
-  z-index: 25;
-  display: flex;
-  justify-content: flex-start;
-  margin: 0;
-  padding: 10px 12px max(8px, env(safe-area-inset-bottom, 0px));
-  background: $color-bg-page;
-  border-top: 1px solid #ebebeb;
-  box-shadow: 0 -6px 16px rgba(0, 0, 0, 0.06);
-  box-sizing: border-box;
-}
-
-.lcr-currency-bar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 4px;
-  max-width: 100%;
-  padding: 5px;
-  background: #ffffff;
-  border: 1px solid #e6e6e6;
-  border-radius: 10px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
-}
-
-.lcr-currency-tab {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  min-height: 36px;
-  padding: 6px 12px;
-  border: none;
-  border-radius: 8px;
-  background: transparent;
-  color: #4a4a4a;
-  cursor: pointer;
-  font-family: $font-family;
-  font-size: 13px;
-  font-weight: 500;
-  transition: background-color 0.15s ease, color 0.15s ease;
-
-  &:focus {
-    outline: none;
-  }
-
-  &:focus-visible {
-    outline: 2px solid $color-pending;
-    outline-offset: 2px;
-  }
-
-  &:hover:not(.active) {
-    background: #f5f5f5;
-    color: #1a1a1a;
-  }
-
-  &.active {
-    background: $color-pending;
-    color: #ffffff;
-  }
-
-  .lcr-currency-tab__flag {
-    font-size: 15px;
-    line-height: 1;
-    flex-shrink: 0;
-  }
-
-  .lcr-currency-tab__label {
-    white-space: nowrap;
-    letter-spacing: 0.01em;
-  }
 }
 
 .lcr-grid-wrapper .ag-theme-material,
@@ -603,92 +464,5 @@ button.lcr-toolbar-icon.ant-btn {
       flex: 1 1 100%;
       max-width: none;
     }
-  }
-}
-
-// ─── LCR checker action toasts ───────────────────────────────────────────────
-
-.lcr-toast {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  z-index: 1200;
-  width: min(360px, calc(100vw - 40px));
-  min-height: 72px;
-  display: flex;
-  align-items: flex-start;
-  gap: 15px;
-  padding: 16px 56px 16px 28px;
-  box-shadow: 0 8px 24px rgba(17, 24, 39, 0.08);
-  animation: lcrToastIn 0.22s cubic-bezier(0.4, 0, 0.2, 1) both;
-
-  &--escalate {
-    border: 1px solid #ffc6a8;
-    background: #fff8f5;
-  }
-
-  &--signoff {
-    border: 1px solid #b7dfb8;
-    background: #f5fbf2;
-  }
-
-  &--publish {
-    border: 1px solid #b7dfb8;
-    background: #f5fbf2;
-  }
-}
-
-@keyframes lcrToastIn {
-  from { opacity: 0; transform: translateY(-12px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-.toast-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  margin-top: 4px;
-}
-
-.toast-copy {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding-right: 8px;
-}
-
-.toast-title {
-  font-size: 15px;
-  line-height: 1.2;
-  font-weight: 600;
-  color: #111111;
-}
-
-.toast-body {
-  font-size: 13px;
-  line-height: 1.4;
-  font-weight: 400;
-  color: #2b2b2b;
-}
-
-.toast-close {
-  position: absolute;
-  top: 18px;
-  right: 18px;
-  width: 28px;
-  height: 28px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: none;
-  border: none;
-  color: #888888;
-  cursor: pointer;
-  padding: 0;
-
-  &:hover {
-    color: #3f3f3f;
   }
 }

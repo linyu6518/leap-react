@@ -7,14 +7,27 @@ import { NzSelectModule } from 'ng-zorro-antd/select'
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker'
 import { NzButtonModule } from 'ng-zorro-antd/button'
 import { NzIconModule } from 'ng-zorro-antd/icon'
+import { EntityTreeSelectComponent } from '../../../shared/entity-tree/entity-tree-select.component'
+import {
+  defaultEntitiesFor,
+  normaliseRegion,
+  normaliseStoredSegments,
+  regionShowsEntityTree,
+  segmentLabelFor,
+  segmentOptionsFor,
+  segmentsRequiredValidator,
+} from '../../../shared/entity-tree/entity-data'
 
 const STORAGE_KEY = 'leap_lcr_view_params'
 
 interface StoredParams {
-  enterprise: string | null
-  segment: string | null
+  region: string | null
+  /** Legacy field, used as fallback when restoring older sessions. */
+  enterprise?: string | null
+  segment: string | string[] | null
   prior: string | null
   current: string | null
+  entities?: string[]
 }
 
 function loadParams(): Partial<StoredParams> {
@@ -26,19 +39,21 @@ function loadParams(): Partial<StoredParams> {
 }
 
 function saveParams(p: {
-  enterprise?: string | null
-  segment?: string | null
+  region?: string | null
+  segment?: string[] | null
   prior?: Date | string | null
   current?: Date | string | null
+  entities?: string[]
 }) {
   try {
     sessionStorage.setItem(
       STORAGE_KEY,
       JSON.stringify({
-        enterprise: p.enterprise ?? null,
-        segment: p.segment ?? null,
+        region: p.region ?? null,
+        segment: p.segment ?? [],
         prior: p.prior instanceof Date ? p.prior.toISOString().slice(0, 10) : p.prior ?? null,
         current: p.current instanceof Date ? p.current.toISOString().slice(0, 10) : p.current ?? null,
+        entities: p.entities ?? [],
       })
     )
   } catch (_) {}
@@ -57,6 +72,7 @@ function saveParams(p: {
     NzDatePickerModule,
     NzButtonModule,
     NzIconModule,
+    EntityTreeSelectComponent,
   ],
   templateUrl: './lcr-view.component.html',
   styleUrls: ['./lcr-view.component.scss'],
@@ -64,34 +80,102 @@ function saveParams(p: {
 export class LcrViewComponent implements OnInit {
   form: FormGroup
   canSubmit = signal(false)
-  enterpriseOpen = signal(false)
+  regionOpen = signal(false)
   segmentOpen = signal(false)
+  entities = signal<string[]>([])
+  segmentOptions = signal<string[]>(segmentOptionsFor(null))
+  segmentsSig = signal<string[]>([])
+
+  private restoringEntities = false
 
   constructor(
     private router: Router,
     private fb: FormBuilder
   ) {
     const saved = loadParams()
+    const restoredRegion = normaliseRegion(saved.region ?? saved.enterprise ?? null)
+    const restoredSegment = normaliseStoredSegments(restoredRegion, saved.segment ?? null)
+    this.segmentOptions.set(segmentOptionsFor(restoredRegion))
+    this.segmentsSig.set(restoredSegment)
     this.form = this.fb.group({
-      enterprise: [saved.enterprise ?? null, Validators.required],
-      segment: [saved.segment ?? null, Validators.required],
+      region: [restoredRegion, Validators.required],
+      segment: [restoredSegment, [Validators.required, segmentsRequiredValidator]],
       prior: [saved.prior ? new Date(saved.prior) : null, Validators.required],
       current: [saved.current ? new Date(saved.current) : null, Validators.required],
     })
+    if (saved.entities && saved.entities.length) {
+      this.restoringEntities = true
+      this.entities.set([...saved.entities])
+      queueMicrotask(() => { this.restoringEntities = false })
+    } else {
+      this.entities.set(defaultEntitiesFor(restoredRegion, restoredSegment))
+    }
   }
 
   ngOnInit(): void {
     this.form.valueChanges.subscribe(() => this.updateCanSubmit())
     this.form.statusChanges.subscribe(() => this.updateCanSubmit())
+    this.form.get('region')?.valueChanges.subscribe((region: string | null) => this.onRegionChange(region))
+    this.form.get('segment')?.valueChanges.subscribe((segment: string[]) => {
+      this.segmentsSig.set(segment ?? [])
+      this.applyDefaultEntitiesIfClean()
+    })
     this.updateCanSubmit()
   }
 
+  selectedSegment(): string | null {
+    const seg = this.form.get('segment')?.value as string[] | undefined
+    return seg?.[0] ?? null
+  }
+
+  segmentOptionLabel(code: string): string {
+    return this.form.get('region')?.value === 'US' ? segmentLabelFor(code) : code
+  }
+
+  onSegmentChange(value: string | null): void {
+    this.form.get('segment')?.setValue(value ? [value] : [])
+    this.form.get('segment')?.markAsDirty()
+  }
+
+  segmentFieldActive(): boolean {
+    const seg = this.form.get('segment')?.value as string[] | undefined
+    return !!(seg && seg.length)
+  }
+
+  private onRegionChange(region: string | null): void {
+    this.segmentOptions.set(segmentOptionsFor(region))
+    this.form.get('segment')?.setValue([], { emitEvent: true })
+    this.segmentsSig.set([])
+    this.applyDefaultEntitiesIfClean()
+  }
+
+  private applyDefaultEntitiesIfClean(): void {
+    if (this.restoringEntities) return
+    const region = this.form.get('region')?.value
+    const segment = this.form.get('segment')?.value as string[]
+    this.entities.set(defaultEntitiesFor(region, segment))
+  }
+
+  onEntitiesChange(next: string[]): void {
+    this.entities.set([...next])
+  }
+
+  showEntityTree(): boolean {
+    return regionShowsEntityTree(this.form.get('region')?.value)
+  }
+
   private updateCanSubmit(): void {
-    const valid = this.form.valid
     const v = this.form.value
-    const filled = !!(v.enterprise && v.segment && v.prior && v.current)
+    const segment = v.segment as string[] | undefined
+    const filled = !!(
+      v.region &&
+      Array.isArray(segment) &&
+      segment.length > 0 &&
+      v.prior &&
+      v.current
+    )
     const touched = this.form.dirty
-    this.canSubmit.set(valid && filled && touched)
+    this.canSubmit.set(this.form.valid && filled && touched)
   }
 
   view(): void {
@@ -99,18 +183,22 @@ export class LcrViewComponent implements OnInit {
     const v = this.form.getRawValue()
     const priorStr = v.prior instanceof Date ? v.prior.toISOString().slice(0, 10) : v.prior
     const currentStr = v.current instanceof Date ? v.current.toISOString().slice(0, 10) : v.current
+    const ents = this.entities()
+    const segment = v.segment as string[]
     saveParams({
-      enterprise: v.enterprise,
-      segment: v.segment,
+      region: v.region,
+      segment,
       prior: v.prior,
       current: v.current,
+      entities: ents,
     })
     this.router.navigate(['/regulatory/lcr/detail'], {
       state: {
-        enterprise: v.enterprise ?? null,
-        segment: v.segment ?? null,
+        region: v.region ?? null,
+        segment,
         prior: priorStr ?? null,
         current: currentStr ?? null,
+        entities: ents,
       },
     })
   }

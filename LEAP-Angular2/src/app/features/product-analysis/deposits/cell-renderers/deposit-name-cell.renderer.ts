@@ -12,6 +12,7 @@ export interface SummaryRowData {
   /** True when this row (or any descendant) has at least one comment in the mock store. */
   hasComments?: boolean
   counterparties?: Record<string, unknown>
+  entities?: string[]
 }
 
 @Component({

@@ -27,36 +27,37 @@
                 (nzOpenChange)="regionOpen.set($event)"
               >
                 <nz-option nzValue="US" nzLabel="US"></nz-option>
-                <nz-option nzValue="CAD" nzLabel="CAD"></nz-option>
-                <nz-option nzValue="Europe" nzLabel="Europe"></nz-option>
                 <nz-option nzValue="Enterprise" nzLabel="Enterprise"></nz-option>
               </nz-select>
               <span class="floating-label">Region</span>
             </div>
           </nz-form-control>
         </nz-form-item>
-        <nz-form-item class="filter-field">
-          <nz-form-control nzErrorTip="Segment is required">
-            <div
-              class="deposits-select-wrapper"
-              [class.floating-label-active]="segmentOpen() || form.get('segment')?.value"
-            >
-              <nz-select
-                formControlName="segment"
-                [nzPlaceHolder]="(segmentOpen() || form.get('segment')?.value) ? 'Select a segment' : ''"
-                nzSize="large"
-                class="deposits-select"
-                (nzOpenChange)="segmentOpen.set($event)"
+        @if (regionSig() === 'US' || regionSig() === 'Enterprise') {
+          <nz-form-item class="filter-field">
+            <nz-form-control nzErrorTip="Segment is required">
+              <div
+                class="deposits-select-wrapper"
+                [class.floating-label-active]="segmentOpen() || segmentFieldActive()"
               >
-                <nz-option nzValue="Enterprise" nzLabel="Enterprise"></nz-option>
-                <nz-option nzValue="CAD Retail" nzLabel="CAD Retail"></nz-option>
-                <nz-option nzValue="US Retail" nzLabel="US Retail"></nz-option>
-                <nz-option nzValue="Wholesale" nzLabel="Wholesale"></nz-option>
-              </nz-select>
-              <span class="floating-label">Segment</span>
-            </div>
-          </nz-form-control>
-        </nz-form-item>
+                <nz-select
+                  [ngModel]="selectedSegment()"
+                  (ngModelChange)="onSegmentChange($event)"
+                  [ngModelOptions]="{ standalone: true }"
+                  [nzPlaceHolder]="(segmentOpen() || segmentFieldActive()) ? 'Select a segment' : ''"
+                  nzSize="large"
+                  class="deposits-select"
+                  (nzOpenChange)="segmentOpen.set($event)"
+                >
+                  @for (opt of segmentOptions(); track opt) {
+                    <nz-option [nzValue]="opt" [nzLabel]="segmentOptionLabel(opt)"></nz-option>
+                  }
+                </nz-select>
+                <span class="floating-label">Segment</span>
+              </div>
+            </nz-form-control>
+          </nz-form-item>
+        }
         <nz-form-item class="date-field">
           <nz-form-control nzErrorTip="Prior date is required">
             <nz-date-picker
@@ -91,6 +92,15 @@
           </button>
         </nz-form-item>
       </div>
+      @if (showEntityTree()) {
+        <app-entity-tree-accordion
+          class="entity-accordion-row"
+          [region]="regionSig()"
+          [segments]="segmentsSig()"
+          [selectedCodes]="entities()"
+          (selectedCodesChange)="onEntitiesChange($event)"
+        ></app-entity-tree-accordion>
+      }
     </form>
   </div>
 
