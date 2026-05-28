@@ -201,9 +201,9 @@ export function normaliseStoredSegments(
   const asArray = normaliseSegments(raw)
   if (region === 'US') {
     const migrated = asArray.flatMap((s) => migrateLegacyUsSegment(s))
-    const allowed = new Set<string>(US_SELECTABLE_SEGMENT_CODES)
+    const allowed = new Set<string>(flattenEntityCodes(US_ENTITY_TREE))
     const unique = [...new Set(migrated.filter((c) => allowed.has(c)))]
-    return unique.length ? [unique[0]!] : []
+    return unique
   }
 
   if (region === 'Enterprise') {
@@ -299,4 +299,54 @@ export function normaliseRegion(value: string | null | undefined): string | null
 export function segmentsRequiredValidator(control: AbstractControl): ValidationErrors | null {
   const v = control.value
   return Array.isArray(v) && v.length > 0 ? null : { required: true }
+}
+
+/**
+ * Given a set of selected codes, return one column entry for every selected
+ * node and every descendant of a selected parent, in tree traversal order.
+ *
+ * Example: CUSO selected
+ *   → columns start with [CUSO, TDGUS, TDBUSH, ...] and include descendants.
+ *
+ * Enterprise pseudo-group wrappers use their visible labels
+ * (e.g. "CAD Retail", "USD Retail") as column codes.
+ */
+export function columnRootsFromSelection(
+  region: string | null | undefined,
+  selectedCodes: string[],
+): { code: string; label: string }[] {
+  if (!selectedCodes.length) return []
+  const tree = entityTreeFor(region)
+  const selected = new Set(selectedCodes)
+  const result: { code: string; label: string }[] = []
+  const seen = new Set<string>()
+
+  const displayCode = (n: EntityNode) => isEnterpriseGroupCode(n.code) ? n.label : n.code
+
+  const addNode = (n: EntityNode) => {
+    if (n.inactive) return
+    const code = displayCode(n)
+    if (seen.has(code)) return
+    seen.add(code)
+    result.push({ code, label: n.label })
+  }
+
+  const addNodeAndDescendants = (n: EntityNode) => {
+    if (n.inactive) return
+    addNode(n)
+    for (const child of n.children ?? []) addNodeAndDescendants(child)
+  }
+
+  const walk = (nodes: EntityNode[], ancestorSelected = false) => {
+    for (const n of nodes) {
+      const nodeSelected = selected.has(displayCode(n))
+      if (ancestorSelected || nodeSelected) {
+        addNodeAndDescendants(n)
+        continue
+      }
+      if (n.children?.length) walk(n.children, false)
+    }
+  }
+  walk(tree)
+  return result
 }

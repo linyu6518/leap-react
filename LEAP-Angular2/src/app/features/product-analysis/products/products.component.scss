@@ -59,19 +59,10 @@
   max-width: 516px;
   min-width: 0;
   box-sizing: border-box;
-  min-width: 0;
-  box-sizing: border-box;
-  min-width: 0;
-  box-sizing: border-box;
   background: $color-bg-card;
   border-radius: 0 !important;
   box-shadow: 0 2px 3px rgba(0, 0, 0, 0.08);
   border: none;
-  transition: max-width 420ms cubic-bezier(0.22, 0.61, 0.36, 1);
-
-  .entity-tree-form-item {
-    margin-bottom: 16px !important;
-  }
 
   ::ng-deep .ant-card-body {
     padding: 40px !important;
@@ -100,10 +91,6 @@
   }
 }
 
-.selection-card.has-entities {
-  max-width: min(1460px, 100%);
-}
-
 .compact-form {
   display: flex;
   flex-direction: column;
@@ -111,50 +98,12 @@
   min-width: 0;
   width: 100%;
 
-  &.with-entities {
-    display: block;
-    position: relative;
-    overflow: hidden;
-    width: 100%;
-    min-width: 0;
-  }
-
   .config-main {
     min-width: 0;
     width: 100%;
-    max-width: 516px;
     display: flex;
     flex-direction: column;
     gap: 16px;
-  }
-
-  &.with-entities .config-main {
-    max-width: 516px;
-  }
-
-  &.with-entities .config-entities {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: calc(516px + 20px);
-    right: 0;
-    width: auto;
-    min-width: 0;
-    max-width: none;
-    height: auto;
-    display: flex;
-    flex-direction: column;
-    box-sizing: border-box;
-    animation: entityPanelIn 320ms cubic-bezier(0.22, 0.61, 0.36, 1) 240ms both;
-    will-change: opacity, transform;
-
-    app-entity-tree-select {
-      flex: 1;
-      min-height: 0;
-      height: 100%;
-      width: 100%;
-      max-width: 100%;
-    }
   }
 
   .date-row {
@@ -208,7 +157,6 @@
   }
 }
 
-// Select wrapper with floating label (match React TDSelect)
 .products-select-wrapper {
   position: relative;
   width: 100%;
@@ -237,91 +185,9 @@
   }
 }
 
-// Select & DatePicker：使用设计系统下拉样式（见 styles/_select-dropdown.scss）
 :host ::ng-deep {
   @include leap-dropdown.leap-select-trigger('.products-select');
   @include leap-dropdown.leap-datepicker-trigger('.products-datepicker');
-}
-
-@keyframes entityPanelIn {
-  from {
-    opacity: 0;
-    transform: translateX(-8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .selection-card,
-  .compact-form {
-    transition: none !important;
-  }
-  .compact-form .config-entities {
-    animation: none !important;
-  }
-}
-
-@media (max-width: 1199px) {
-  .selection-card.has-entities {
-    max-width: 516px;
-  }
-
-  .compact-form.with-entities {
-    overflow: visible;
-  }
-
-  .compact-form.with-entities .config-entities {
-    position: static;
-    left: auto;
-    right: auto;
-    width: 100%;
-    height: 380px;
-    max-height: 380px;
-    margin-top: 16px;
-  }
-}
-
-@media (max-width: 1199px) {
-  .selection-card.has-entities {
-    max-width: 516px;
-  }
-
-  .compact-form.with-entities {
-    overflow: visible;
-  }
-
-  .compact-form.with-entities .config-entities {
-    position: static;
-    left: auto;
-    right: auto;
-    width: 100%;
-    height: 380px;
-    max-height: 380px;
-    margin-top: 16px;
-  }
-}
-
-@media (max-width: 1199px) {
-  .selection-card.has-entities {
-    max-width: 516px;
-  }
-
-  .compact-form.with-entities {
-    overflow: visible;
-  }
-
-  .compact-form.with-entities .config-entities {
-    position: static;
-    left: auto;
-    right: auto;
-    width: 100%;
-    height: 380px;
-    max-height: 380px;
-    margin-top: 16px;
-  }
 }
 
 @media (max-width: 600px) {
@@ -335,26 +201,5 @@
 
   .date-row {
     flex-direction: column !important;
-  }
-
-  .compact-form.with-entities {
-    display: flex;
-    flex-direction: column;
-    overflow: visible;
-    position: static;
-  }
-
-  .compact-form.with-entities .config-main {
-    max-width: none;
-  }
-
-  .compact-form.with-entities .config-entities {
-    position: static;
-    width: 100%;
-    left: auto;
-    right: auto;
-    height: 320px;
-    max-height: 320px;
-    margin-top: 16px;
   }
 }

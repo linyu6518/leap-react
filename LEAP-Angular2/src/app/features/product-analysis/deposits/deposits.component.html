@@ -35,26 +35,12 @@
         </nz-form-item>
         @if (regionSig() === 'US' || regionSig() === 'Enterprise') {
           <nz-form-item class="filter-field">
-            <nz-form-control nzErrorTip="Segment is required">
-              <div
-                class="deposits-select-wrapper"
-                [class.floating-label-active]="segmentOpen() || segmentFieldActive()"
-              >
-                <nz-select
-                  [ngModel]="selectedSegment()"
-                  (ngModelChange)="onSegmentChange($event)"
-                  [ngModelOptions]="{ standalone: true }"
-                  [nzPlaceHolder]="(segmentOpen() || segmentFieldActive()) ? 'Select a segment' : ''"
-                  nzSize="large"
-                  class="deposits-select"
-                  (nzOpenChange)="segmentOpen.set($event)"
-                >
-                  @for (opt of segmentOptions(); track opt) {
-                    <nz-option [nzValue]="opt" [nzLabel]="segmentOptionLabel(opt)"></nz-option>
-                  }
-                </nz-select>
-                <span class="floating-label">Segment</span>
-              </div>
+            <nz-form-control>
+              <app-segment-tree-picker
+                [region]="regionSig()"
+                [selectedCodes]="segmentsSig()"
+                (selectedCodesChange)="onSegmentsChange($event)"
+              ></app-segment-tree-picker>
             </nz-form-control>
           </nz-form-item>
         }
@@ -92,15 +78,6 @@
           </button>
         </nz-form-item>
       </div>
-      @if (showEntityTree()) {
-        <app-entity-tree-accordion
-          class="entity-accordion-row"
-          [region]="regionSig()"
-          [segments]="segmentsSig()"
-          [selectedCodes]="entities()"
-          (selectedCodesChange)="onEntitiesChange($event)"
-        ></app-entity-tree-accordion>
-      }
     </form>
   </div>
 

@@ -1,4 +1,4 @@
-import { Component, signal, computed, effect } from '@angular/core'
+import { Component, signal, computed } from '@angular/core'
 import { Router } from '@angular/router'
 import { FormsModule } from '@angular/forms'
 import { NzLayoutModule } from 'ng-zorro-antd/layout'
@@ -6,8 +6,11 @@ import { NzBadgeModule } from 'ng-zorro-antd/badge'
 import { NzIconModule } from 'ng-zorro-antd/icon'
 import { NzInputModule } from 'ng-zorro-antd/input'
 import { NzButtonModule } from 'ng-zorro-antd/button'
+import { NzSelectModule } from 'ng-zorro-antd/select'
 import { AuthService } from '../../core/services/auth.service'
 import { ViewModeService } from '../../core/services/view-mode.service'
+import { ReportScopeService } from '../../core/services/report-scope.service'
+import { SegmentTreePickerComponent } from '../../shared/entity-tree/segment-tree-picker.component'
 
 @Component({
   selector: 'app-header',
@@ -19,6 +22,8 @@ import { ViewModeService } from '../../core/services/view-mode.service'
     NzIconModule,
     NzInputModule,
     NzButtonModule,
+    NzSelectModule,
+    SegmentTreePickerComponent,
   ],
   template: `
     <ng-template #suffixClearTpl>
@@ -28,8 +33,39 @@ import { ViewModeService } from '../../core/services/view-mode.service'
         </button>
       }
     </ng-template>
+
     <header class="app-header">
-      <div class="header-left">
+      <!-- LEFT: Global Scope controls -->
+      <div class="header-scope">
+        <div class="scope-region-wrap">
+          <nz-select
+            class="scope-select"
+            nzPlaceHolder="Region"
+            [ngModel]="scopeSvc.globalScope().region"
+            (nzOpenChange)="regionOpen.set($event)"
+            (ngModelChange)="onRegionChange($event)"
+          >
+            <nz-option nzValue="US" nzLabel="US"></nz-option>
+            <nz-option nzValue="Enterprise" nzLabel="Enterprise"></nz-option>
+          </nz-select>
+          <span class="scope-region-arrow" [class.scope-region-arrow--open]="regionOpen()"></span>
+        </div>
+
+        @if (scopeSvc.globalScope().region) {
+          <div class="scope-segment-wrap">
+            <app-segment-tree-picker
+              variant="header"
+              [region]="scopeSvc.globalScope().region"
+              [selectedCodes]="scopeSvc.globalScope().segments"
+              placeholder="Segment"
+              (selectedCodesChange)="onSegmentsChange($event)"
+            ></app-segment-tree-picker>
+          </div>
+        }
+      </div>
+
+      <!-- RIGHT: Search + Bell + User -->
+      <div class="header-right">
         <div class="search-box">
           <nz-input-group nzPrefixIcon="search" [nzSuffix]="suffixClearTpl" class="search-input-wrapper">
             <input
@@ -40,15 +76,13 @@ import { ViewModeService } from '../../core/services/view-mode.service'
             />
           </nz-input-group>
         </div>
-      </div>
-      <div class="header-right">
+
         <nz-badge [nzCount]="3" nzSize="small" [nzOffset]="[-25, 5]">
           <button class="notification-button" nz-button nzType="text" aria-label="Notifications">
             <span nz-icon nzType="bell"></span>
           </button>
         </nz-badge>
 
-        <!-- Custom user menu -->
         <div class="user-menu-wrap">
           <button
             class="user-menu-button"
@@ -63,8 +97,6 @@ import { ViewModeService } from '../../core/services/view-mode.service'
           @if (menuOpen()) {
             <div class="menu-backdrop" (click)="closeMenu()"></div>
             <div class="user-dropdown-card" role="menu">
-
-              <!-- User info header -->
               <div class="dropdown-header">
                 <div class="dropdown-avatar">{{ currentUser().avatar }}</div>
                 <div class="dropdown-user-info">
@@ -78,7 +110,6 @@ import { ViewModeService } from '../../core/services/view-mode.service'
 
               <div class="dropdown-divider"></div>
 
-              <!-- Switch View -->
               <button class="dropdown-item dropdown-item--switch" type="button" (click)="switchView()">
                 <span class="dropdown-item-icon">
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -91,7 +122,6 @@ import { ViewModeService } from '../../core/services/view-mode.service'
                 </span>
               </button>
 
-              <!-- Profile -->
               <button class="dropdown-item" type="button">
                 <span class="dropdown-item-icon">
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -102,7 +132,6 @@ import { ViewModeService } from '../../core/services/view-mode.service'
                 <span>Profile</span>
               </button>
 
-              <!-- Settings -->
               <button class="dropdown-item" type="button">
                 <span class="dropdown-item-icon">
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -115,7 +144,6 @@ import { ViewModeService } from '../../core/services/view-mode.service'
 
               <div class="dropdown-divider"></div>
 
-              <!-- Sign out -->
               <button class="dropdown-item dropdown-item--danger" type="button" (click)="handleLogout()">
                 <span class="dropdown-item-icon">
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -125,7 +153,6 @@ import { ViewModeService } from '../../core/services/view-mode.service'
                 </span>
                 <span>Sign out</span>
               </button>
-
             </div>
           }
         </div>
@@ -137,6 +164,7 @@ import { ViewModeService } from '../../core/services/view-mode.service'
 export class HeaderComponent {
   searchVal = ''
   menuOpen = signal(false)
+  regionOpen = signal(false)
   currentUser = signal({ name: 'YL', role: 'Maker', avatar: 'YL' })
   currentViewMode!: ViewModeService['viewMode']
 
@@ -144,6 +172,7 @@ export class HeaderComponent {
     private auth: AuthService,
     private router: Router,
     private viewModeService: ViewModeService,
+    public scopeSvc: ReportScopeService,
   ) {
     this.currentViewMode = viewModeService.viewMode
     const user = this.auth.getCurrentUser() ?? this.auth.user
@@ -156,13 +185,16 @@ export class HeaderComponent {
     }
   }
 
-  toggleMenu(): void {
-    this.menuOpen.update(v => !v)
+  onRegionChange(region: string | null): void {
+    this.scopeSvc.setGlobal(region, [])
   }
 
-  closeMenu(): void {
-    this.menuOpen.set(false)
+  onSegmentsChange(segments: string[]): void {
+    this.scopeSvc.setGlobal(this.scopeSvc.globalScope().region, segments)
   }
+
+  toggleMenu(): void { this.menuOpen.update(v => !v) }
+  closeMenu(): void { this.menuOpen.set(false) }
 
   switchView(): void {
     this.viewModeService.toggle()
@@ -175,7 +207,5 @@ export class HeaderComponent {
     this.router.navigate(['/login'])
   }
 
-  clearSearch(): void {
-    this.searchVal = ''
-  }
+  clearSearch(): void { this.searchVal = '' }
 }

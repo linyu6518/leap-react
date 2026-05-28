@@ -15,6 +15,8 @@ export interface LcrTreeNode {
   wholesale: LcrSegmentValue
   usRetail: LcrSegmentValue
   children?: LcrTreeNode[]
+  /** Dynamic segment columns keyed by entity code (populated by getColumnDefs). */
+  segments?: Record<string, LcrSegmentValue>
 }
 
 export interface LcrRowData extends LcrTreeNode {
@@ -123,6 +125,32 @@ export const LCR_TREE: LcrTreeNode[] = [
   node('surplus', 'Surplus', 0, true, { e: 21000 }),
 ]
 
+/** Scale factors per entity code for mock segment data in LCR table. */
+const LCR_SEGMENT_SCALES: Record<string, number> = {
+  CUSO: 1.0,
+  TDGUS: 0.72,
+  TDBUSH: 0.55,
+  TDH: 0.28,
+  NYB: 0.18,
+  TDBNA: 0.40,
+  TDBUSA: 0.12,
+  TDCT: 0.60,
+  TDW: 0.25,
+  TDBEL: 0.08,
+}
+
+function mockSegmentsForNode(node: LcrTreeNode): Record<string, LcrSegmentValue> {
+  // Build a segments record using enterprise value as base
+  const base = node.enterprise.current
+  const result: Record<string, LcrSegmentValue> = {}
+  for (const [code, scale] of Object.entries(LCR_SEGMENT_SCALES)) {
+    const curr = Math.round(base * scale)
+    const prev = Math.round(base * scale * 1.03)
+    result[code] = { current: curr, previous: prev, variance: curr - prev }
+  }
+  return result
+}
+
 export function buildLcrRowData(expandedNodes: Set<string>): LcrRowData[] {
   const rows: LcrRowData[] = []
 
@@ -135,6 +163,7 @@ export function buildLcrRowData(expandedNodes: Set<string>): LcrRowData[] {
         level: parentLevel + 1,
         isExpanded,
         isLeaf: !hasChildren,
+        segments: mockSegmentsForNode(child),
       })
       if (hasChildren && isExpanded && child.children) {
         addChildren(child.children, parentLevel + 1)
@@ -149,6 +178,7 @@ export function buildLcrRowData(expandedNodes: Set<string>): LcrRowData[] {
       ...item,
       isExpanded,
       isLeaf: !hasChildren,
+      segments: mockSegmentsForNode(item),
     })
     if (hasChildren && isExpanded && item.children) {
       addChildren(item.children, 0)

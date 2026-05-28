@@ -13,6 +13,8 @@ export interface SummaryRowData {
   hasComments?: boolean
   counterparties?: Record<string, unknown>
   entities?: string[]
+  /** Dynamic segment columns keyed by entity code. */
+  segments?: Record<string, { previous: number; current: number; variance: number }>
 }
 
 @Component({

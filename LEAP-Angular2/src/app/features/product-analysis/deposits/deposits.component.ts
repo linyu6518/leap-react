@@ -26,15 +26,12 @@ import { AdjustmentPanelComponent } from './adjustment-panel/adjustment-panel.co
 import type { UsLcrRow } from './us-lcr-data'
 import { US_LCR_DATA_MAP } from './us-lcr-data'
 import type { FR2052AData, Fr2052AmountField } from './fr2052a-data'
-import { EntityTreeAccordionComponent } from '../../../shared/entity-tree/entity-tree-accordion.component'
+import { SegmentTreePickerComponent } from '../../../shared/entity-tree/segment-tree-picker.component'
+import { ReportScopeService } from '../../../core/services/report-scope.service'
 import {
-  defaultEntitiesFor,
   normaliseRegion,
   normaliseStoredSegments,
-  regionShowsEntityTree,
-  segmentLabelFor,
-  segmentOptionsFor,
-  segmentsRequiredValidator,
+  columnRootsFromSelection,
 } from '../../../shared/entity-tree/entity-data'
 
 export type { FR2052AData, Fr2052AmountField } from './fr2052a-data'
@@ -417,6 +414,23 @@ function attachTrend(cp: Cp): Cp {
   return out
 }
 
+/** Deterministic scale factor per entity code for mock segment data variety. */
+function segmentMockScale(code: string): number {
+  const scales: Record<string, number> = {
+    CUSO: 1.0,
+    TDGUS: 0.72,
+    TDBUSH: 0.55,
+    TDH: 0.28,
+    NYB: 0.18,
+    TDBNA: 0.40,
+    TDBUSA: 0.12,
+    TDCT: 0.60,
+    TDW: 0.25,
+    TDBEL: 0.08,
+  }
+  return scales[code] ?? 0.3
+}
+
 @Component({
   selector: 'app-deposits',
   standalone: true,
@@ -442,7 +456,7 @@ function attachTrend(cp: Cp): Cp {
     CommentPanelComponent,
     EscalationPanelComponent,
     AdjustmentPanelComponent,
-    EntityTreeAccordionComponent,
+    SegmentTreePickerComponent,
   ],
   templateUrl: './deposits.component.html',
   styleUrls: ['./deposits.component.scss'],
@@ -450,16 +464,9 @@ function attachTrend(cp: Cp): Cp {
 export class DepositsComponent implements OnInit {
   form: FormGroup
   regionOpen = signal(false)
-  segmentOpen = signal(false)
   /** Signal mirrors of the form's region/segment for reactive computeds. */
   regionSig = signal<string | null>(null)
   segmentsSig = signal<string[]>([])
-  /** Selected legal-entity codes from the entity tree. */
-  entities = signal<string[]>([])
-  /** Region-aware Segment options reflected in the dropdown. */
-  segmentOptions = signal<string[]>(segmentOptionsFor(null))
-  /** Suppresses the default-reset right after restoring a stored selection. */
-  private restoringEntities = false
   activeTabIndex = signal(0)
   expandedNodes = signal<Set<string>>(
     new Set([
@@ -528,99 +535,74 @@ export class DepositsComponent implements OnInit {
     openScopedPanel: (data: unknown, scope: ScopeKey) => this.openScopedPanel(data, scope),
   }
 
-  constructor(private fb: FormBuilder, private router: Router) {
+  constructor(
+    private fb: FormBuilder,
+    private router: Router,
+    private scopeSvc: ReportScopeService,
+  ) {
     const nav = this.router.getCurrentNavigation()
     const state = nav?.extras?.state as StoredParams | undefined
     const fromState = state && (state.region != null || state.segment != null || state.prior != null || state.current != null)
     const saved = fromState ? state : loadParams()
-    const region = normaliseRegion(saved.region ?? null)
-    const segment = normaliseStoredSegments(region, saved.segment ?? null)
+    const scope = this.scopeSvc.effectiveScope('deposits')
+    const region = normaliseRegion(saved.region ?? scope.region ?? null)
+    const segment = saved.segment
+      ? normaliseStoredSegments(region, saved.segment)
+      : scope.segments.length ? scope.segments : []
     const prior = saved.prior ? new Date(saved.prior) : null
     const current = saved.current ? new Date(saved.current) : null
     const tabIndex = typeof saved.tabIndex === 'number' ? saved.tabIndex : 0
     this.activeTabIndex.set(tabIndex)
-    this.segmentOptions.set(segmentOptionsFor(region))
     this.regionSig.set(region)
     this.segmentsSig.set(segment)
     this.form = this.fb.group({
       region: [region, Validators.required],
-      segment: [segment, [Validators.required, segmentsRequiredValidator]],
       prior: [prior, Validators.required],
       current: [current, Validators.required],
     })
 
-    const restored = (saved as StoredParams).entities
-    if (restored && restored.length) {
-      this.restoringEntities = true
-      this.entities.set([...restored])
-      queueMicrotask(() => { this.restoringEntities = false })
-    } else {
-      this.entities.set(defaultEntitiesFor(region, segment))
-    }
-
     effect(() => {
       this.activeTabIndex()
       this.expandedNodes()
-      this.entities()
+      this.segmentsSig()
       this.regionSig()
       this.rowData.set(this.getRowDataForCurrentTab())
+    })
+
+    // Sync form when global scope changes (only if no page-level override)
+    effect(() => {
+      const scope = this.scopeSvc.globalScope()
+      if (!this.scopeSvc.isPageOverridden('deposits')) {
+        const r = normaliseRegion(scope.region ?? null)
+        this.form.patchValue({ region: r }, { emitEvent: false })
+        this.regionSig.set(r)
+        this.segmentsSig.set(scope.segments)
+        this.rowData.set(this.getRowDataForCurrentTab())
+      }
     })
   }
 
   ngOnInit(): void {
-    this.form.valueChanges.subscribe(() => this.rowData.set(this.getRowDataForCurrentTab()))
     this.form.get('region')?.valueChanges.subscribe((region: string | null) => {
       this.regionSig.set(region)
-      this.segmentOptions.set(segmentOptionsFor(region))
-      this.form.get('segment')?.setValue([], { emitEvent: true })
       this.segmentsSig.set([])
-      this.applyDefaultEntitiesIfClean()
-    })
-    this.form.get('segment')?.valueChanges.subscribe((segment: string[]) => {
-      this.segmentsSig.set(segment ?? [])
-      this.applyDefaultEntitiesIfClean()
+      this.scopeSvc.setPageOverride('deposits', region, [])
+      this.rowData.set(this.getRowDataForCurrentTab())
     })
     this.rowData.set(this.getRowDataForCurrentTab())
   }
 
-  private applyDefaultEntitiesIfClean(): void {
-    if (this.restoringEntities) return
-    this.entities.set(defaultEntitiesFor(this.regionSig(), this.segmentsSig()))
-  }
-
-  selectedSegment(): string | null {
-    const seg = this.form.get('segment')?.value as string[] | undefined
-    return seg?.[0] ?? null
-  }
-
-  segmentOptionLabel(code: string): string {
-    return this.regionSig() === 'US' ? segmentLabelFor(code) : code
-  }
-
-  onSegmentChange(value: string | null): void {
-    this.form.get('segment')?.setValue(value ? [value] : [])
-  }
-
-  segmentFieldActive(): boolean {
-    const seg = this.form.get('segment')?.value as string[] | undefined
-    return !!(seg && seg.length)
-  }
-
-  onEntitiesChange(next: string[]): void {
-    this.entities.set([...next])
-  }
-
-  showEntityTree(): boolean {
-    return regionShowsEntityTree(this.regionSig())
+  onSegmentsChange(codes: string[]): void {
+    this.segmentsSig.set(codes)
+    this.scopeSvc.setPageOverride('deposits', this.regionSig(), codes)
+    this.rowData.set(this.getRowDataForCurrentTab())
   }
 
   isFormComplete(): boolean {
     const v = this.form.value
-    const segment = v.segment as string[] | undefined
     return !!(
       v.region &&
-      Array.isArray(segment) &&
-      segment.length > 0 &&
+      this.segmentsSig().length > 0 &&
       v.prior &&
       v.current
     )
@@ -630,12 +612,12 @@ export class DepositsComponent implements OnInit {
     const v = this.form.value
     saveParams({
       region: v.region,
-      segment: v.segment,
+      segment: this.segmentsSig(),
       prior: v.prior,
       current: v.current,
       tabIndex: this.activeTabIndex(),
-      entities: this.entities(),
     })
+    this.scopeSvc.setPageOverride('deposits', v.region, this.segmentsSig())
     this.rowData.set(this.getRowDataForCurrentTab())
   }
 
@@ -644,11 +626,10 @@ export class DepositsComponent implements OnInit {
     const v = this.form.value
     saveParams({
       region: v.region,
-      segment: v.segment,
+      segment: this.segmentsSig(),
       prior: v.prior,
       current: v.current,
       tabIndex: index,
-      entities: this.entities(),
     })
     this.rowData.set(this.getRowDataForCurrentTab())
   }
@@ -675,12 +656,9 @@ export class DepositsComponent implements OnInit {
     }
   }
 
-  /** Filter the summary/UsLcr row arrays by selected entities (no-op when filter inactive). */
+  /** Placeholder — entity filtering removed; tree picker now selects segment columns directly. */
   private applyEntityFilterToSummary<T extends SummaryRowData>(rows: T[]): T[] {
-    if (!regionShowsEntityTree(this.regionSig())) return rows
-    const ents = this.entities()
-    if (!ents.length) return rows
-    return filterDepositsRowsByEntities(rows, ents)
+    return rows
   }
 
   getRowId(params: { data?: unknown; rowIndex?: number }): string {
@@ -1111,27 +1089,72 @@ export class DepositsComponent implements OnInit {
     }
     const numberCellStyle = { textAlign: 'right' as const, fontWeight: 500, color: '#000000' }
 
-    const groups: ColGroupDef[] = COUNTERPARTY_GROUPS.map((g) => {
-      const children: ColDef[] = []
-      if (g.hasPrevious) {
-        children.push({
-          field: `counterparties.${g.key}.previous`,
+    const segRoots = columnRootsFromSelection(this.regionSig(), this.segmentsSig())
+
+    if (!segRoots.length) {
+      // No segment selected: show Total column only
+      const groups: ColGroupDef[] = COUNTERPARTY_GROUPS.filter(g => g.key === 'TOTAL').map((g) => {
+        const children: ColDef[] = []
+        if (g.hasPrevious) {
+          children.push({
+            field: `counterparties.${g.key}.previous`,
+            headerName: 'Previous',
+            width: 130,
+            valueFormatter,
+            cellStyle: numberCellStyle,
+          })
+        }
+        children.push(
+          {
+            field: `counterparties.${g.key}.current`,
+            headerName: 'Current',
+            width: 130,
+            valueFormatter,
+            cellStyle: numberCellStyle,
+          },
+          {
+            field: `counterparties.${g.key}.variance`,
+            headerName: 'Variance',
+            width: 130,
+            cellRenderer: VarianceCellRendererComponent,
+            cellStyle: numberCellStyle,
+          },
+          {
+            headerName: '',
+            width: 80,
+            cellRenderer: ActionCellRendererComponent,
+            cellStyle: {
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '8px',
+            },
+          }
+        )
+        return { headerName: g.headerName, children }
+      })
+      return [nameCol, ...groups]
+    }
+
+    const groups: ColGroupDef[] = segRoots.map(({ code, label }) => ({
+      headerName: label,
+      children: [
+        {
+          field: `segments.${code}.previous`,
           headerName: 'Previous',
           width: 130,
           valueFormatter,
           cellStyle: numberCellStyle,
-        })
-      }
-      children.push(
+        },
         {
-          field: `counterparties.${g.key}.current`,
+          field: `segments.${code}.current`,
           headerName: 'Current',
           width: 130,
           valueFormatter,
           cellStyle: numberCellStyle,
         },
         {
-          field: `counterparties.${g.key}.variance`,
+          field: `segments.${code}.variance`,
           headerName: 'Variance',
           width: 130,
           cellRenderer: VarianceCellRendererComponent,
@@ -1147,10 +1170,9 @@ export class DepositsComponent implements OnInit {
             justifyContent: 'center',
             padding: '8px',
           },
-        }
-      )
-      return { headerName: g.headerName, children }
-    })
+        },
+      ],
+    }))
 
     return [nameCol, ...groups]
   }
@@ -1339,6 +1361,17 @@ export class DepositsComponent implements OnInit {
     const pushRow = (node: TreeNode, level: number): void => {
       const hasChildren = Array.isArray(node.children) && node.children.length > 0
       const isExpanded = hasChildren && expanded.has(node.id)
+      const cp = computeCp(node)
+      const segRoots = columnRootsFromSelection(this.regionSig(), this.segmentsSig())
+      const segments: Record<string, { previous: number; current: number; variance: number }> = {}
+      for (const { code } of segRoots) {
+        // Use TOTAL as base and scale by a deterministic factor per code for mock variety
+        const base = cp['TOTAL']?.current ?? 0
+        const scale = segmentMockScale(code)
+        const prev = Math.round(base * scale * 1.03)
+        const curr = Math.round(base * scale)
+        segments[code] = { previous: prev, current: curr, variance: curr - prev }
+      }
       rows.push({
         nodeId: node.id,
         name: node.name,
@@ -1349,6 +1382,7 @@ export class DepositsComponent implements OnInit {
         hasComments: hasAnyComments(node),
         counterparties: attachTrend(computeCp(node)),
         entities: DEPOSIT_LEAF_ENTITIES[node.id],
+        segments,
       })
       if (isExpanded) {
         for (const c of node.children!) pushRow(c, level + 1)

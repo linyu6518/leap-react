@@ -37,28 +37,17 @@
             </div>
           </nz-form-control>
         </nz-form-item>
-        <nz-form-item class="filter-field">
-          <nz-form-control nzErrorTip="Segment is required">
-            <div
-              class="lcr-query-select-wrapper"
-              [class.floating-label-active]="segmentOpen() || form.get('segment')?.value"
-            >
-              <nz-select
-                formControlName="segment"
-                [nzPlaceHolder]="(segmentOpen() || form.get('segment')?.value) ? 'Select a segment' : ''"
-                nzSize="large"
-                class="lcr-query-select"
-                (nzOpenChange)="segmentOpen.set($event)"
-              >
-                <nz-option nzValue="Enterprise" nzLabel="Enterprise"></nz-option>
-                <nz-option nzValue="CAD Retail" nzLabel="CAD Retail"></nz-option>
-                <nz-option nzValue="US Retail" nzLabel="US Retail"></nz-option>
-                <nz-option nzValue="Wholesale" nzLabel="Wholesale"></nz-option>
-              </nz-select>
-              <span class="floating-label">Segment</span>
-            </div>
-          </nz-form-control>
-        </nz-form-item>
+        @if (regionSig()) {
+          <nz-form-item class="filter-field">
+            <nz-form-control>
+              <app-segment-tree-picker
+                [region]="regionSig()"
+                [selectedCodes]="segmentsSig()"
+                (selectedCodesChange)="onSegmentsChange($event)"
+              ></app-segment-tree-picker>
+            </nz-form-control>
+          </nz-form-item>
+        }
         <nz-form-item class="date-field">
           <nz-form-control nzErrorTip="Prior date is required">
             <nz-date-picker
@@ -93,15 +82,6 @@
           </button>
         </nz-form-item>
       </div>
-      @if (showEntityTree()) {
-        <app-entity-tree-accordion
-          class="entity-accordion-row"
-          [region]="regionSig()"
-          [segments]="segmentsSig()"
-          [selectedCodes]="entities()"
-          (selectedCodesChange)="onEntitiesChange($event)"
-        ></app-entity-tree-accordion>
-      }
     </form>
   </div>
 

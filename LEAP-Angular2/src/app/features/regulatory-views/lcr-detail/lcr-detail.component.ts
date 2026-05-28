@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, computed } from '@angular/core'
+import { Component, OnInit, signal, computed, effect } from '@angular/core'
 import { DecimalPipe } from '@angular/common'
 import { Router, ActivatedRoute, RouterLink } from '@angular/router'
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms'
@@ -16,17 +16,16 @@ import { LcrVarianceCellRendererComponent } from './cell-renderers/lcr-variance-
 import { LcrEnterpriseHeaderRendererComponent } from './cell-renderers/lcr-enterprise-header.renderer'
 import { AnimatedNumberComponent } from '../../../shared/animated-number/animated-number.component'
 import { buildLcrRowData, type LcrRowData } from './lcr-detail-data'
-import { EntityTreeAccordionComponent } from '../../../shared/entity-tree/entity-tree-accordion.component'
-import {
-  defaultEntitiesFor,
-  regionShowsEntityTree,
-} from '../../../shared/entity-tree/entity-data'
+import { SegmentTreePickerComponent } from '../../../shared/entity-tree/segment-tree-picker.component'
+import { ReportScopeService } from '../../../core/services/report-scope.service'
+import { columnRootsFromSelection } from '../../../shared/entity-tree/entity-data'
 
+const ROUTE_KEY = 'lcr-detail'
 const STORAGE_KEY = 'leap_lcr_query_params'
 
 interface StoredParams {
   region: string | null
-  segment: string | null
+  segment: string | string[] | null
   prior: string | null
   current: string | null
 }
@@ -41,7 +40,7 @@ function loadParams(): Partial<StoredParams> {
 
 function saveParams(p: {
   region?: string | null
-  segment?: string | null
+  segment?: string[] | null
   prior?: Date | string | null
   current?: Date | string | null
 }) {
@@ -50,20 +49,13 @@ function saveParams(p: {
       STORAGE_KEY,
       JSON.stringify({
         region: p.region ?? null,
-        segment: p.segment ?? null,
+        segment: p.segment ?? [],
         prior: p.prior instanceof Date ? p.prior.toISOString().slice(0, 10) : p.prior ?? null,
         current: p.current instanceof Date ? p.current.toISOString().slice(0, 10) : p.current ?? null,
       })
     )
   } catch (_) {}
 }
-
-const SEGMENTS = [
-  { key: 'enterprise', headerName: 'Enterprise' },
-  { key: 'cadRetail', headerName: 'CAD Retail' },
-  { key: 'wholesale', headerName: 'Wholesale' },
-  { key: 'usRetail', headerName: 'US Retail' },
-] as const
 
 @Component({
   selector: 'app-lcr-detail',
@@ -85,7 +77,7 @@ const SEGMENTS = [
     LcrVarianceCellRendererComponent,
     LcrEnterpriseHeaderRendererComponent,
     AnimatedNumberComponent,
-    EntityTreeAccordionComponent,
+    SegmentTreePickerComponent,
   ],
   templateUrl: './lcr-detail.component.html',
   styleUrls: ['./lcr-detail.component.scss'],
@@ -93,7 +85,6 @@ const SEGMENTS = [
 export class LcrDetailComponent implements OnInit {
   form: FormGroup
   regionOpen = signal(false)
-  segmentOpen = signal(false)
   lastUpdateDate = ''
   lcrRatio = 128
   totalHqla = 5250
@@ -105,32 +96,44 @@ export class LcrDetailComponent implements OnInit {
   gridContext = { toggleNode: (id: string) => this.toggleNode(id) }
   regionSig = signal<string | null>(null)
   segmentsSig = signal<string[]>([])
-  entities = signal<string[]>([])
 
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private scopeSvc: ReportScopeService,
   ) {
     const nav = this.router.getCurrentNavigation()
     const state = nav?.extras?.state as (StoredParams & { enterprise?: string | null }) | undefined
     const fromState = state && (state.region != null || state.enterprise != null || state.segment != null || state.prior != null || state.current != null)
     const saved = fromState ? state : loadParams()
-    const region = saved.region ?? (saved as { enterprise?: string | null }).enterprise ?? null
+    const scope = this.scopeSvc.effectiveScope(ROUTE_KEY)
+    const region = saved.region ?? (saved as { enterprise?: string | null }).enterprise ?? scope.region ?? null
     const prior = saved.prior ? new Date(saved.prior) : null
     const current = saved.current ? new Date(saved.current) : null
+    const rawSeg = saved.segment
+    const segments: string[] = rawSeg
+      ? (Array.isArray(rawSeg) ? rawSeg : [rawSeg])
+      : scope.segments
     this.form = this.fb.group({
       region: [region, Validators.required],
-      segment: [saved.segment ?? null, Validators.required],
       prior: [prior, Validators.required],
       current: [current, Validators.required],
     })
-    if (fromState && region) saveParams({ region, segment: saved.segment ?? null, prior: saved.prior ?? null, current: saved.current ?? null })
+    if (fromState && region) saveParams({ region, segment: segments, prior: saved.prior ?? null, current: saved.current ?? null })
     this.regionSig.set(region)
-    const seg = saved.segment
-    this.segmentsSig.set(Array.isArray(seg) ? seg : seg ? [seg] : [])
-    this.entities.set(defaultEntitiesFor(region, this.segmentsSig()))
+    this.segmentsSig.set(segments)
     this.updateLastUpdateDate()
+
+    effect(() => {
+      const scope = this.scopeSvc.globalScope()
+      if (!this.scopeSvc.isPageOverridden(ROUTE_KEY)) {
+        const r = scope.region ?? null
+        this.form.patchValue({ region: r }, { emitEvent: false })
+        this.regionSig.set(r)
+        this.segmentsSig.set(scope.segments)
+      }
+    })
   }
 
   ngOnInit(): void {
@@ -138,37 +141,19 @@ export class LcrDetailComponent implements OnInit {
       if (qp['region'] || qp['enterprise']) {
         this.form.patchValue({
           region: qp['region'] ?? qp['enterprise'] ?? this.form.value.region,
-          segment: qp['segment'] ?? this.form.value.segment,
         })
       }
     })
-    const saved = loadParams()
-    if (saved.region || saved.segment || saved.prior || saved.current) {
-      this.form.patchValue({
-        region: saved.region ?? this.form.value.region,
-        segment: saved.segment ?? this.form.value.segment,
-        prior: saved.prior ? new Date(saved.prior) : this.form.value.prior,
-        current: saved.current ? new Date(saved.current) : this.form.value.current,
-      })
-    }
     this.form.get('region')?.valueChanges.subscribe((r: string | null) => {
       this.regionSig.set(r)
       this.segmentsSig.set([])
-      this.entities.set(defaultEntitiesFor(r, []))
-    })
-    this.form.get('segment')?.valueChanges.subscribe((s: string | string[] | null) => {
-      const arr = Array.isArray(s) ? s : s ? [s] : []
-      this.segmentsSig.set(arr)
-      this.entities.set(defaultEntitiesFor(this.regionSig(), arr))
+      this.scopeSvc.setPageOverride(ROUTE_KEY, r, [])
     })
   }
 
-  showEntityTree(): boolean {
-    return regionShowsEntityTree(this.regionSig())
-  }
-
-  onEntitiesChange(next: string[]): void {
-    this.entities.set([...next])
+  onSegmentsChange(codes: string[]): void {
+    this.segmentsSig.set(codes)
+    this.scopeSvc.setPageOverride(ROUTE_KEY, this.regionSig(), codes)
   }
 
   private updateLastUpdateDate(): void {
@@ -178,11 +163,9 @@ export class LcrDetailComponent implements OnInit {
 
   isFormComplete(): boolean {
     const v = this.form.value
-    const segment = v.segment as string[] | undefined
     return !!(
       v.region &&
-      Array.isArray(segment) &&
-      segment.length > 0 &&
+      this.segmentsSig().length > 0 &&
       v.prior &&
       v.current
     )
@@ -190,7 +173,8 @@ export class LcrDetailComponent implements OnInit {
 
   onQuery(): void {
     const v = this.form.getRawValue()
-    saveParams({ region: v.region, segment: v.segment, prior: v.prior, current: v.current })
+    saveParams({ region: v.region, segment: this.segmentsSig(), prior: v.prior, current: v.current })
+    this.scopeSvc.setPageOverride(ROUTE_KEY, v.region, this.segmentsSig())
     this.updateLastUpdateDate()
   }
 
@@ -235,27 +219,83 @@ export class LcrDetailComponent implements OnInit {
       cellStyle: (params: CellClassParams) => this.cellStyleForRow(params),
     }
 
-    const groups: ColGroupDef[] = SEGMENTS.map((seg) => ({
-      headerName: seg.headerName,
+    const segRoots = columnRootsFromSelection(this.regionSig(), this.segmentsSig())
+
+    if (!segRoots.length) {
+      // Fallback: show the static enterprise/cadRetail/wholesale/usRetail columns
+      const FALLBACK = [
+        { key: 'enterprise', headerName: 'Enterprise' },
+        { key: 'cadRetail', headerName: 'CAD Retail' },
+        { key: 'wholesale', headerName: 'Wholesale' },
+        { key: 'usRetail', headerName: 'US Retail' },
+      ] as const
+      const groups: ColGroupDef[] = FALLBACK.map((seg) => ({
+        headerName: seg.headerName,
+        children: [
+          {
+            field: `${seg.key}.current`,
+            headerName: 'Current',
+            flex: 1,
+            minWidth: 100,
+            valueFormatter: numFmt,
+            cellStyle: (params: CellClassParams) => ({ ...numberStyle, ...this.cellStyleForRow(params) }),
+          },
+          {
+            field: `${seg.key}.previous`,
+            headerName: 'Previous',
+            flex: 1,
+            minWidth: 100,
+            valueFormatter: numFmt,
+            cellStyle: (params: CellClassParams) => ({ ...numberStyle, ...this.cellStyleForRow(params) }),
+          },
+          {
+            field: `${seg.key}.variance`,
+            headerName: 'Variance',
+            flex: 1,
+            minWidth: 100,
+            cellRenderer: LcrVarianceCellRendererComponent,
+            cellStyle: (params: CellClassParams) => ({ textAlign: 'right' as const, ...this.cellStyleForRow(params) }),
+          },
+          {
+            headerName: '',
+            flex: 0.5,
+            minWidth: 70,
+            maxWidth: 90,
+            cellRenderer: ActionCellRendererComponent,
+            cellStyle: (params: CellClassParams) => ({
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '8px',
+              ...this.cellStyleForRow(params),
+            }),
+          },
+        ],
+      }))
+      return [nameCol, ...groups]
+    }
+
+    const groups: ColGroupDef[] = segRoots.map(({ code, label }) => ({
+      headerName: label,
       children: [
         {
-          field: `${seg.key}.current`,
-          headerName: '29-Sep',
+          field: `segments.${code}.current`,
+          headerName: 'Current',
           flex: 1,
           minWidth: 100,
           valueFormatter: numFmt,
           cellStyle: (params: CellClassParams) => ({ ...numberStyle, ...this.cellStyleForRow(params) }),
         },
         {
-          field: `${seg.key}.previous`,
-          headerName: '31-Aug',
+          field: `segments.${code}.previous`,
+          headerName: 'Previous',
           flex: 1,
           minWidth: 100,
           valueFormatter: numFmt,
           cellStyle: (params: CellClassParams) => ({ ...numberStyle, ...this.cellStyleForRow(params) }),
         },
         {
-          field: `${seg.key}.variance`,
+          field: `segments.${code}.variance`,
           headerName: 'Variance',
           flex: 1,
           minWidth: 100,

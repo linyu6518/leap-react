@@ -18,18 +18,118 @@
   box-sizing: border-box !important;
 }
 
-.header-left {
+/* ── Global Scope controls (left side of header) ── */
+.header-scope {
   display: flex;
   align-items: center;
+  gap: 8px;
   flex: 1;
   min-width: 0;
   height: 100%;
 }
 
+/* Shared chevron — matches app-segment-tree-picker .seg-arrow */
+@mixin header-field-chevron($open: false) {
+  content: '';
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  border-right: 1.5px solid #616161;
+  border-bottom: 1.5px solid #616161;
+  pointer-events: none;
+  @if $open {
+    transform: translateY(calc(-50% + 2px)) rotate(225deg) scale(0.9);
+  } @else {
+    transform: translateY(calc(-50% - 2px)) rotate(45deg) scale(0.9);
+  }
+}
+
+.scope-region-wrap {
+  position: relative;
+  width: 180px;
+  flex-shrink: 0;
+
+  ::ng-deep .scope-select {
+    width: 100%;
+  }
+
+  ::ng-deep .scope-select .ant-select-selector {
+    height: 44px !important;
+    min-height: 44px !important;
+    box-sizing: border-box !important;
+    border-color: #8c8c8c !important;
+    border-radius: 4px 4px 0 0 !important;
+    border-width: 1px !important;
+    padding: 0 32px 0 12px !important;
+    position: relative;
+
+    &:hover {
+      border-color: #8c8c8c !important;
+    }
+
+  }
+
+  /* Hide default ant icon — use custom chevron above */
+  ::ng-deep .scope-select .ant-select-arrow {
+    display: none !important;
+  }
+
+  .scope-region-arrow {
+    @include header-field-chevron(false);
+    z-index: 3;
+  }
+
+  .scope-region-arrow--open {
+    @include header-field-chevron(true);
+  }
+
+  ::ng-deep .scope-select .ant-select-selection-item,
+  ::ng-deep .scope-select .ant-select-selection-placeholder {
+    line-height: 42px !important;
+    font-size: 16px !important;
+    margin: 0 !important;
+  }
+
+  ::ng-deep .scope-select .ant-select-selection-search {
+    left: 12px !important;
+    right: 32px !important;
+  }
+
+  ::ng-deep .scope-select .ant-select-selection-search-input {
+    height: 42px !important;
+    line-height: 42px !important;
+  }
+
+  ::ng-deep .scope-select .ant-select-selection-item {
+    font-weight: 500 !important;
+    color: $color-text-primary !important;
+  }
+
+  ::ng-deep .scope-select .ant-select-selection-placeholder {
+    font-weight: 400 !important;
+    color: #1c1c1c !important;
+  }
+
+  ::ng-deep .scope-select.ant-select-focused .ant-select-selector,
+  ::ng-deep .scope-select.ant-select-open .ant-select-selector {
+    border-color: #008a00 !important;
+    border-width: 1px 1px 3px 1px !important;
+    box-shadow: none !important;
+  }
+}
+
+.scope-segment-wrap {
+  width: 360px;
+  flex-shrink: 0;
+  position: relative;
+}
+
 .search-box {
   display: flex;
   align-items: center;
-  width: 400px !important;
+  width: 260px !important;
   margin-left: 0;
   margin-top: 0;
   position: relative;
