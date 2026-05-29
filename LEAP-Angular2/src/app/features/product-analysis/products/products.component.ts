@@ -126,7 +126,10 @@ export class ProductsComponent implements OnInit {
     const currentStr = v.current instanceof Date ? v.current.toISOString().slice(0, 10) : v.current
     const segments = this.segmentsSig()
     saveParams({ region: v.region, prior: v.prior, current: v.current })
+    // Persist the scope under the DESTINATION page so the deposits page treats
+    // it as a page override and doesn't clobber Region from the (empty) global scope.
     this.scopeSvc.setPageOverride(ROUTE_KEY, v.region, segments)
+    this.scopeSvc.setPageOverride('deposits', v.region, segments)
     this.router.navigate(['/product/deposits'], {
       state: {
         region: v.region ?? null,
