@@ -62,7 +62,7 @@ import {
               [nzData]="treeData()"
               [nzCheckable]="true"
               [nzMultiple]="true"
-              [nzCheckStrictly]="false"
+              [nzCheckStrictly]="true"
               [nzCheckedKeys]="checkedKeys()"
               [nzExpandedKeys]="expandedKeys()"
               [nzBlockNode]="true"
@@ -72,6 +72,10 @@ import {
             ></nz-tree>
           </div>
           <div class="seg-dropdown-footer">
+            <div class="seg-footer-actions">
+              <button type="button" class="seg-link-btn" (click)="selectAll()">Select all</button>
+              <button type="button" class="seg-link-btn" (click)="clearAll()">Clear all</button>
+            </div>
             <button type="button" class="seg-confirm-btn" (click)="confirmSelection()">Confirm</button>
           </div>
         </div>
@@ -198,8 +202,27 @@ import {
       border-top: 1px solid #f0f0f0;
       padding: 8px 12px;
       display: flex;
-      justify-content: flex-end;
+      align-items: center;
+      justify-content: space-between;
       background: #fff;
+    }
+
+    .seg-footer-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .seg-link-btn {
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      color: #058901;
+      &:hover { text-decoration: underline; }
     }
 
     .seg-confirm-btn {
@@ -364,11 +387,29 @@ export class SegmentTreePickerComponent implements OnChanges {
     const node = event.node
     if (!node || node.isDisabled || node.isDisableCheckbox) return
     node.setChecked(!node.isChecked)
-    // After cascade, collect all checked keys from the tree
+    // Strict mode: toggling a node never affects its parent/children
     const checked = (this.treeRef?.getCheckedNodeList() ?? []).map(n => n.key)
     this._checked.set(checked)
     const real = checked.filter(c => !isEnterpriseGroupCode(c))
     this.selectedCodesChange.emit(real)
+  }
+
+  selectAll(): void {
+    const keys: string[] = []
+    const walk = (nodes: NzTreeNodeOptions[]) => {
+      for (const n of nodes) {
+        if (!n.disabled) keys.push(String(n.key))
+        if (n.children?.length) walk(n.children)
+      }
+    }
+    walk(this.treeData())
+    this._checked.set(keys)
+    this.selectedCodesChange.emit(keys.filter(c => !isEnterpriseGroupCode(c)))
+  }
+
+  clearAll(): void {
+    this._checked.set([])
+    this.selectedCodesChange.emit([])
   }
 
   confirmSelection(): void {

@@ -11,6 +11,15 @@
   animation: none;
 }
 
+/* Clickable Previous/Current numbers -> open drill-down drawer */
+::ng-deep .ag-cell.drill-clickable {
+  cursor: pointer;
+  color: #047001;
+}
+::ng-deep .ag-cell.drill-clickable:hover {
+  text-decoration: underline;
+}
+
 .page-header {
   margin-bottom: 12px;
   margin-top: 7px;
@@ -342,9 +351,12 @@
       }
     }
 
-    .ag-cell:last-child {
-      border-right: none;
-    }
+  }
+
+  /* Divider after the pinned "Deposits" column (header + body) */
+  .ag-pinned-left-header,
+  .ag-pinned-left-cols-container {
+    border-right: 1px solid #d9d9d9;
   }
 
   .ag-cell {

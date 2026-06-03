@@ -140,6 +140,12 @@
   (saved)="onAdjustmentSaved($event)"
 />
 
+<app-drilldown-panel
+  [visible]="drilldownOpen()"
+  [context]="drilldownContext()"
+  (closed)="closeDrilldown()"
+/>
+
 @if (escalationNoticeVisible()) {
   <div class="escalation-toast" role="status" aria-live="polite">
     <div class="toast-icon" aria-hidden="true">

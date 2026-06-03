@@ -4,7 +4,7 @@ import { ICellRendererParams } from 'ag-grid-community'
 import type { LcrRowData, LcrSegmentKey } from '../lcr-detail-data'
 
 interface LcrAmountContext {
-  onLcrEditClick?: (payload: { row: LcrRowData; segment: LcrSegmentKey; segmentLabel: string }) => void
+  onLcrEditClick?: (payload: { row: LcrRowData; segment: LcrSegmentKey; segmentLabel: string; currentValue: number }) => void
   isCheckerMode?: boolean
   signedOffBySegment?: Record<string, Partial<Record<LcrSegmentKey, boolean>>>
 }
@@ -14,6 +14,13 @@ const SEGMENT_LABELS: Record<string, string> = {
   cadRetail: 'CAD Retail',
   wholesale: 'Wholesale',
   usRetail: 'US Retail',
+}
+
+/** Field can be `segments.<code>.current` (dynamic) or `<key>.current` (static). */
+function segmentFromField(field: string): string {
+  const parts = field.split('.')
+  if (parts.length >= 3 && parts[0] === 'segments') return parts[1]
+  return parts[0] || 'enterprise'
 }
 
 @Component({
@@ -188,7 +195,7 @@ export class LcrCurrentCellRendererComponent implements ICellRendererAngularComp
       : ''
 
     const field = params.colDef?.field ?? ''
-    this.segment = (field.split('.')[0] as LcrSegmentKey) || 'enterprise'
+    this.segment = segmentFromField(field)
 
     const prevRaw = data?.adjustedFrom?.[this.segment]
     this.hasAdjustment = typeof prevRaw === 'number'
@@ -216,6 +223,7 @@ export class LcrCurrentCellRendererComponent implements ICellRendererAngularComp
       row: data,
       segment: this.segment,
       segmentLabel: SEGMENT_LABELS[this.segment] ?? this.segment,
+      currentValue: typeof this.params.value === 'number' ? this.params.value : 0,
     })
   }
 }

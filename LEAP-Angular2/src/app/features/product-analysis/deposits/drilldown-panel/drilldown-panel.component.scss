@@ -1,0 +1,230 @@
+@use '../../../../../styles/variables' as *;
+@use '../../../../../styles/select-dropdown' as leap-dropdown;
+
+.panel-overlay {
+  position: fixed; inset: 0; z-index: 1001; pointer-events: none;
+  background: transparent; transition: background 0.25s;
+}
+.panel-overlay.visible { pointer-events: all; background: rgba(0, 0, 0, 0.12); }
+
+.drilldown-panel {
+  position: absolute;
+  top: 10px; right: 10px; bottom: 10px;
+  width: min(1520px, 96vw);
+  background: #fff;
+  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  transform: translateX(calc(100% + 10px));
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  border-radius: 0;
+  font-family: $font-family;
+}
+.drilldown-panel.open { transform: translateX(0); }
+
+/* Header — matches the other deposit panels */
+.panel-header { position: relative; padding: 20px 36px 12px; flex-shrink: 0; }
+.panel-title-area { display: flex; flex-direction: column; gap: 4px; }
+.panel-eyebrow {
+  font-size: 12px; font-weight: 600; letter-spacing: 0.04em;
+  color: #8c8c8c; text-transform: uppercase; font-family: $font-family;
+}
+.panel-title-row { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+.panel-title {
+  font-size: 22px; font-weight: 500; color: #1a5c2a; margin: 0;
+  line-height: 1.2; font-family: $font-family;
+}
+.panel-amount {
+  font-size: 22px; font-weight: 600; color: #1a1a1a;
+  font-family: $font-family; font-variant-numeric: tabular-nums; line-height: 1.2;
+}
+.panel-amount-unit { font-size: 13px; font-weight: 500; color: #8c8c8c; margin-left: 4px; }
+.panel-sub { font-size: 13px; font-weight: 500; color: #5a5a5a; font-family: $font-family; }
+.close-btn {
+  position: absolute; top: 20px; right: 20px; border: none; background: transparent;
+  cursor: pointer; padding: 4px; border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+}
+.close-btn:hover { background: #f5f5f5; }
+
+/* Filters — inputs + button span the full table width */
+.filter-row {
+  display: flex; align-items: stretch; gap: 16px;
+  padding: 8px 36px 16px; flex-shrink: 0;
+}
+.filter-field { flex: 1 1 0; min-width: 0; align-self: flex-end; }
+
+.deposits-select-wrapper {
+  position: relative;
+  width: 100%;
+
+  .floating-label {
+    position: absolute;
+    left: 12px;
+    top: 18px;
+    font-family: $font-family;
+    font-size: 16px;
+    font-weight: 400;
+    color: #1c1c1c;
+    pointer-events: none;
+    transition: all 0.2s ease;
+    background-color: #fff;
+    padding: 0 4px;
+    z-index: 2;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  &.floating-label-active .floating-label {
+    top: 6px !important;
+    font-size: 12px !important;
+    color: #1c1c1c !important;
+  }
+}
+
+.dd-reset {
+  flex: 0 0 auto;
+  min-width: 150px;
+  height: 40px;
+  align-self: center;
+  padding: 0 28px;
+  border: 2px solid #008a00;
+  border-radius: 0;
+  background: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  color: #008a00;
+  font-family: $font-family;
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+.dd-reset:hover { background: rgba(0, 138, 0, 0.05); color: #008a00; border-color: #008a00; }
+
+/* Records count — above the table, green bold number + gray label */
+.dd-count-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0 8px;
+}
+.dd-count {
+  font-size: 13px;
+  font-weight: 400;
+  color: #8c8c8c;
+  font-family: $font-family;
+}
+.dd-count-num {
+  color: #008a00;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.dd-download {
+  box-sizing: border-box;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #00843d;
+  background-color: #ffffff;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  cursor: pointer;
+  outline: none;
+  transition: background-color 0.38s ease-out, color 0.38s ease-out, border-color 0.38s ease-out;
+
+  &:hover {
+    color: #ffffff;
+    background-color: #00843d;
+    border-color: #00843d;
+  }
+
+  .anticon {
+    font-size: 18px;
+    color: inherit;
+    transition: color 0.38s ease-out;
+  }
+}
+
+:host ::ng-deep .dd-download .anticon svg path {
+  stroke: currentColor;
+  stroke-width: 24;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  paint-order: stroke fill;
+}
+
+:host ::ng-deep {
+  @include leap-dropdown.leap-select-trigger('.deposits-select');
+  @include leap-dropdown.leap-datepicker-trigger('.deposits-datepicker');
+}
+
+/* Align the date value with the floating label like the selects (value sits just below the label) */
+:host ::ng-deep .deposits-select-wrapper .deposits-datepicker .ant-picker-input {
+  align-items: flex-start !important;
+}
+:host ::ng-deep .deposits-select-wrapper .deposits-datepicker .ant-picker-input input {
+  height: auto !important;
+  line-height: 1.2 !important;
+  padding: 18px 0 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* Body / grid */
+.panel-body { flex: 1; min-height: 0; display: flex; flex-direction: column; padding: 12px 36px 24px; }
+.dd-grid-wrapper { flex: 1; min-height: 0; width: 100%; }
+
+/* AG Grid — identical look to the Deposits summary grid */
+.dd-grid-wrapper .ag-theme-material,
+:host ::ng-deep .dd-grid-wrapper .ag-theme-material {
+  width: 100%;
+  height: 100%;
+  display: block;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  overflow: hidden;
+  box-sizing: border-box;
+
+  .ag-header {
+    background-color: #fafafa;
+    border-bottom: 1px solid #d9d9d9;
+
+    .ag-header-cell {
+      border-right: 1px solid #d9d9d9;
+      font-weight: 600;
+      font-size: 14px;
+      color: #6b8e6b;
+
+      .ag-header-cell-text {
+        font-weight: 600;
+        color: #6b8e6b;
+      }
+    }
+  }
+
+  .ag-row {
+    border-bottom: 1px solid #f0f0f0;
+
+    &:hover { background-color: #fafafa; }
+
+    .ag-cell:last-child { border-right: none; }
+  }
+
+  .ag-cell {
+    border-right: 1px solid #f0f0f0;
+    font-size: 13px;
+    font-weight: 400;
+    font-family: $font-family;
+    color: rgba(0, 0, 0, 0.87);
+    box-sizing: border-box;
+
+    .ag-cell-value,
+    span {
+      font-weight: 400;
+    }
+  }
+}

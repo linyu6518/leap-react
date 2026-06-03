@@ -1,8 +1,13 @@
+import { entityTreeFor, flattenEntityCodes } from '../../../shared/entity-tree/entity-data'
+
 export interface LcrSegmentValue {
   current: number
   previous: number
   variance: number
 }
+
+/** Segment column identifier — a dynamic entity code (e.g. "CUSO") or a static key. */
+export type LcrSegmentKey = string
 
 export interface LcrTreeNode {
   nodeId: string
@@ -17,6 +22,8 @@ export interface LcrTreeNode {
   children?: LcrTreeNode[]
   /** Dynamic segment columns keyed by entity code (populated by getColumnDefs). */
   segments?: Record<string, LcrSegmentValue>
+  /** Original value per segment key, present when a cell has been adjusted. */
+  adjustedFrom?: Record<string, number>
 }
 
 export interface LcrRowData extends LcrTreeNode {
@@ -139,14 +146,47 @@ const LCR_SEGMENT_SCALES: Record<string, number> = {
   TDBEL: 0.08,
 }
 
+/** Every segment code we may render a column for (US + Enterprise entities + group labels). */
+const ALL_SEGMENT_CODES: string[] = Array.from(new Set<string>([
+  ...Object.keys(LCR_SEGMENT_SCALES),
+  ...flattenEntityCodes(entityTreeFor('US')),
+  ...flattenEntityCodes(entityTreeFor('Enterprise')),
+  'CAD Retail',
+  'USD Retail',
+]))
+
+/** Deterministic 32-bit string hash so mock values are stable across renders. */
+function hashStr(s: string): number {
+  let h = 0
+  for (let i = 0; i < s.length; i++) h = (Math.imul(h, 31) + s.charCodeAt(i)) >>> 0
+  return h
+}
+
+/** Size factor for a code: known scales win; otherwise derive a stable 0.10–0.89. */
+function scaleForCode(code: string): number {
+  const known = LCR_SEGMENT_SCALES[code]
+  if (known != null) return known
+  return Math.round((0.1 + (hashStr(code) % 80) / 100) * 100) / 100
+}
+
 function mockSegmentsForNode(node: LcrTreeNode): Record<string, LcrSegmentValue> {
-  // Build a segments record using enterprise value as base
   const base = node.enterprise.current
+  const isRatio = node.name === 'LCR Ratio'
   const result: Record<string, LcrSegmentValue> = {}
-  for (const [code, scale] of Object.entries(LCR_SEGMENT_SCALES)) {
-    const curr = Math.round(base * scale)
-    const prev = Math.round(base * scale * 1.03)
-    result[code] = { current: curr, previous: prev, variance: curr - prev }
+  for (const code of ALL_SEGMENT_CODES) {
+    const h = hashStr(code + '|' + node.nodeId)
+    const up = h % 2 === 0 // ~half rise (green), ~half fall (red)
+    if (isRatio) {
+      const curr = Math.round((base + (h % 9) - 4) * 10) / 10
+      const delta = (((h % 5) + 1) * 0.1) * (up ? 1 : -1)
+      const prev = Math.round((curr - delta) * 10) / 10
+      result[code] = { current: curr, previous: prev, variance: Math.round(delta * 10) / 10 }
+    } else {
+      const curr = Math.round(base * scaleForCode(code))
+      const pct = ((h % 6) + 1) / 100 // 1%–6% move
+      const prev = up ? Math.round(curr * (1 - pct)) : Math.round(curr * (1 + pct))
+      result[code] = { current: curr, previous: prev, variance: curr - prev }
+    }
   }
   return result
 }

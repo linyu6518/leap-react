@@ -1,6 +1,14 @@
 @use '../../../../styles/variables' as *;
 @use '../../../../styles/select-dropdown' as leap-dropdown;
 
+/* Clickable Previous/Current numbers -> open drill-down drawer */
+::ng-deep .ag-cell.drill-clickable {
+  cursor: pointer;
+}
+::ng-deep .ag-cell.drill-clickable:hover {
+  text-decoration: underline;
+}
+
 .lcr-detail-container {
   width: 100%;
   margin: 0;
@@ -380,6 +388,134 @@
   }
 }
 
+.lcr-status-bar-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: -20px;
+}
+
+/* 白底绿标；hover 绿底白标 */
+button.lcr-toolbar-icon.ant-btn {
+  box-sizing: border-box !important;
+  width: 40px !important;
+  height: 40px !important;
+  min-width: 40px !important;
+  padding: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #00843d !important;
+  background-color: #ffffff !important;
+  border: none !important;
+  border-radius: 4px !important;
+  box-shadow: none !important;
+  outline: none !important;
+  transition: background-color 0.38s ease-out, color 0.38s ease-out;
+
+  &:hover {
+    color: #ffffff !important;
+    background-color: #00843d !important;
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+  }
+
+  .anticon {
+    font-size: 19px;
+    color: inherit !important;
+    transition: color 0.38s ease-out;
+  }
+}
+
+/* upload/download 为填充路径：同色细描边 + paint-order 略加厚轮廓 */
+:host ::ng-deep button.lcr-toolbar-icon .anticon svg path {
+  stroke: currentColor;
+  stroke-width: 24;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  paint-order: stroke fill;
+}
+
+.lcr-status-bar-actions .lcr-submit-button {
+  margin-top: 0 !important;
+}
+
+.lcr-toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1200;
+  width: min(360px, calc(100vw - 40px));
+  min-height: 72px;
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  padding: 16px 56px 16px 28px;
+  box-shadow: 0 8px 24px rgba(17, 24, 39, 0.08);
+  animation: lcrToastIn 0.22s cubic-bezier(0.4, 0, 0.2, 1) both;
+
+  &--publish {
+    border: 1px solid #b7dfb8;
+    background: #f5fbf2;
+  }
+}
+
+@keyframes lcrToastIn {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.toast-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+.toast-copy {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-right: 8px;
+}
+
+.toast-title {
+  font-size: 15px;
+  line-height: 1.2;
+  font-weight: 600;
+  color: #111111;
+}
+
+.toast-body {
+  font-size: 13px;
+  line-height: 1.4;
+  font-weight: 400;
+  color: #2b2b2b;
+}
+
+.toast-close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: #888888;
+  cursor: pointer;
+  padding: 0;
+
+  &:hover {
+    color: #3f3f3f;
+  }
+}
+
 .lcr-grid-wrapper {
   margin-top: -12px;
   width: 100%;
@@ -432,9 +568,12 @@
       background-color: #fafafa;
     }
 
-    .ag-cell:last-child {
-      border-right: none;
-    }
+  }
+
+  /* Divider after the pinned name column (header + body) */
+  .ag-pinned-left-header,
+  .ag-pinned-left-cols-container {
+    border-right: 1px solid #d9d9d9;
   }
 
   .ag-cell {

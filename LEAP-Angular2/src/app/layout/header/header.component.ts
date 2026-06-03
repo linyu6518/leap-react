@@ -35,31 +35,50 @@ import { SegmentTreePickerComponent } from '../../shared/entity-tree/segment-tre
     </ng-template>
 
     <header class="app-header">
-      <!-- LEFT: Global Scope controls -->
+      <!-- LEFT: Global Scope — collapsed to an icon, expands to a slide-out panel -->
       <div class="header-scope">
-        <div class="scope-region-wrap">
-          <nz-select
-            class="scope-select"
-            nzPlaceHolder="Region"
-            [ngModel]="scopeSvc.globalScope().region"
-            (nzOpenChange)="regionOpen.set($event)"
-            (ngModelChange)="onRegionChange($event)"
-          >
-            <nz-option nzValue="US" nzLabel="US"></nz-option>
-            <nz-option nzValue="Enterprise" nzLabel="Enterprise"></nz-option>
-          </nz-select>
-          <span class="scope-region-arrow" [class.scope-region-arrow--open]="regionOpen()"></span>
-        </div>
+        <button
+          type="button"
+          class="scope-toggle-btn"
+          [class.scope-toggle-btn--open]="scopeOpen()"
+          (click)="toggleScope()"
+          aria-label="Report scope"
+          title="Global scope"
+        >
+          <span nz-icon nzType="control" nzTheme="outline"></span>
+          @if (scopeSvc.globalScope().region) {
+            <span class="scope-dot"></span>
+          }
+        </button>
 
-        @if (scopeSvc.globalScope().region) {
-          <div class="scope-segment-wrap">
-            <app-segment-tree-picker
-              variant="header"
-              [region]="scopeSvc.globalScope().region"
-              [selectedCodes]="scopeSvc.globalScope().segments"
-              placeholder="Segment"
-              (selectedCodesChange)="onSegmentsChange($event)"
-            ></app-segment-tree-picker>
+        @if (scopeOpen()) {
+          <div class="scope-backdrop" (click)="closeScope()"></div>
+          <div class="scope-inline" role="dialog">
+            <div class="scope-region-wrap">
+              <nz-select
+                class="scope-select"
+                nzPlaceHolder="Region"
+                [ngModel]="scopeSvc.globalScope().region"
+                (nzOpenChange)="regionOpen.set($event)"
+                (ngModelChange)="onRegionChange($event)"
+              >
+                <nz-option nzValue="US" nzLabel="US"></nz-option>
+                <nz-option nzValue="Enterprise" nzLabel="Enterprise"></nz-option>
+              </nz-select>
+              <span class="scope-region-arrow" [class.scope-region-arrow--open]="regionOpen()"></span>
+            </div>
+
+            @if (scopeSvc.globalScope().region) {
+              <div class="scope-segment-wrap">
+                <app-segment-tree-picker
+                  variant="header"
+                  [region]="scopeSvc.globalScope().region"
+                  [selectedCodes]="scopeSvc.globalScope().segments"
+                  placeholder="Select a segment"
+                  (selectedCodesChange)="onSegmentsChange($event)"
+                ></app-segment-tree-picker>
+              </div>
+            }
           </div>
         }
       </div>
@@ -165,6 +184,7 @@ export class HeaderComponent {
   searchVal = ''
   menuOpen = signal(false)
   regionOpen = signal(false)
+  scopeOpen = signal(false)
   currentUser = signal({ name: 'YL', role: 'Maker', avatar: 'YL' })
   currentViewMode!: ViewModeService['viewMode']
 
@@ -192,6 +212,9 @@ export class HeaderComponent {
   onSegmentsChange(segments: string[]): void {
     this.scopeSvc.setGlobal(this.scopeSvc.globalScope().region, segments)
   }
+
+  toggleScope(): void { this.scopeOpen.update(v => !v) }
+  closeScope(): void { this.scopeOpen.set(false) }
 
   toggleMenu(): void { this.menuOpen.update(v => !v) }
   closeMenu(): void { this.menuOpen.set(false) }

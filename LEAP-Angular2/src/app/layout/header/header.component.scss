@@ -18,14 +18,69 @@
   box-sizing: border-box !important;
 }
 
-/* ── Global Scope controls (left side of header) ── */
+/* ── Global Scope — collapsed icon + slide-out panel (left side of header) ── */
 .header-scope {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 8px;
-  flex: 1;
-  min-width: 0;
   height: 100%;
+  flex-shrink: 0;
+}
+
+.scope-toggle-btn {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #1c1c1c;
+  flex-shrink: 0;
+  transition: color 0.18s ease, background 0.18s ease;
+
+  .anticon { font-size: 22px; }
+
+  &:hover { color: #008a00; }
+
+  &--open { color: #008a00; }
+}
+
+.scope-dot {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #008a00;
+  border: 1.5px solid #fff;
+}
+
+.scope-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1099;
+}
+
+/* Inline slide-out: Region + Segment slide to the right, inside the header */
+.scope-inline {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: 10px;
+  white-space: nowrap;
+  z-index: 1100;
+  transform-origin: left center;
+  animation: scopeExpand 0.28s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+@keyframes scopeExpand {
+  from { opacity: 0; transform: translateX(-16px); }
+  to   { opacity: 1; transform: translateX(0); }
 }
 
 /* Shared chevron — matches app-segment-tree-picker .seg-arrow */
@@ -48,7 +103,7 @@
 
 .scope-region-wrap {
   position: relative;
-  width: 180px;
+  width: 150px;
   flex-shrink: 0;
 
   ::ng-deep .scope-select {
@@ -121,7 +176,7 @@
 }
 
 .scope-segment-wrap {
-  width: 360px;
+  width: 340px;
   flex-shrink: 0;
   position: relative;
 }

@@ -23,6 +23,8 @@ import { buildRowIndex, rowHasAnyComment, hasScopedComment, type ScopeKey } from
 import { DRIVER_CODES } from './comment-panel/driver-codes'
 import { EscalationPanelComponent } from './escalation-panel/escalation-panel.component'
 import { AdjustmentPanelComponent } from './adjustment-panel/adjustment-panel.component'
+import { DrilldownPanelComponent } from './drilldown-panel/drilldown-panel.component'
+import type { DrilldownContext } from './drilldown-panel/drilldown-data'
 import type { UsLcrRow } from './us-lcr-data'
 import { US_LCR_DATA_MAP } from './us-lcr-data'
 import type { FR2052AData, Fr2052AmountField } from './fr2052a-data'
@@ -456,6 +458,7 @@ function segmentMockScale(code: string): number {
     CommentPanelComponent,
     EscalationPanelComponent,
     AdjustmentPanelComponent,
+    DrilldownPanelComponent,
     SegmentTreePickerComponent,
   ],
   templateUrl: './deposits.component.html',
@@ -525,6 +528,9 @@ export class DepositsComponent implements OnInit {
   adjustmentPanelContext = signal<{ row: FR2052AData; amountField: Fr2052AmountField } | null>(null)
   adjustmentNoticeVisible = signal(false)
   private adjustmentNoticeTimer: ReturnType<typeof setTimeout> | null = null
+
+  drilldownOpen = signal(false)
+  drilldownContext = signal<DrilldownContext | null>(null)
 
   gridContext = {
     toggleNode: (id: string) => this.toggleNode(id),
@@ -717,6 +723,23 @@ export class DepositsComponent implements OnInit {
   closeAdjustmentPanel(): void {
     this.adjustmentPanelOpen.set(false)
     this.adjustmentPanelContext.set(null)
+  }
+
+  openDrilldown(ctx: DrilldownContext): void {
+    this.drilldownContext.set(ctx)
+    this.drilldownOpen.set(true)
+  }
+
+  /** Current report date as ISO yyyy-MM-dd for seeding the drill-down filter. */
+  private currentDateIso(): string | null {
+    const v = this.form?.value?.current
+    if (!v) return null
+    return v instanceof Date ? v.toISOString().slice(0, 10) : String(v)
+  }
+
+  closeDrilldown(): void {
+    this.drilldownOpen.set(false)
+    this.drilldownContext.set(null)
   }
 
   private recalculateFr2052GrandTotal(rows: FR2052AData[]): FR2052AData[] {
@@ -1078,7 +1101,8 @@ export class DepositsComponent implements OnInit {
       field: 'name',
       colId: 'name',
       headerName: 'Deposits',
-      width: 300,
+      flex: 1,
+      minWidth: 280,
       pinned: 'left',
       cellRenderer: DepositNameCellRendererComponent,
       headerComponent: DepositsHeaderRendererComponent,
@@ -1099,29 +1123,52 @@ export class DepositsComponent implements OnInit {
           children.push({
             field: `counterparties.${g.key}.previous`,
             headerName: 'Previous',
-            width: 130,
+            flex: 1,
+            minWidth: 110,
             valueFormatter,
             cellStyle: numberCellStyle,
+            cellClass: 'drill-clickable',
+            onCellClicked: (e) => this.openDrilldown({
+              segmentCode: 'TOTAL',
+              segmentLabel: 'Total',
+              period: 'previous',
+              productName: (e.data as { name?: string } | undefined)?.name ?? '',
+              date: this.currentDateIso(),
+              amount: typeof e.value === 'number' ? e.value : null,
+            }),
           })
         }
         children.push(
           {
             field: `counterparties.${g.key}.current`,
             headerName: 'Current',
-            width: 130,
+            flex: 1,
+            minWidth: 110,
             valueFormatter,
             cellStyle: numberCellStyle,
+            cellClass: 'drill-clickable',
+            onCellClicked: (e) => this.openDrilldown({
+              segmentCode: 'TOTAL',
+              segmentLabel: 'Total',
+              period: 'current',
+              productName: (e.data as { name?: string } | undefined)?.name ?? '',
+              date: this.currentDateIso(),
+              amount: typeof e.value === 'number' ? e.value : null,
+            }),
           },
           {
             field: `counterparties.${g.key}.variance`,
             headerName: 'Variance',
-            width: 130,
+            flex: 1,
+            minWidth: 110,
             cellRenderer: VarianceCellRendererComponent,
             cellStyle: numberCellStyle,
           },
           {
             headerName: '',
-            width: 80,
+            flex: 0.5,
+            minWidth: 70,
+            maxWidth: 90,
             cellRenderer: ActionCellRendererComponent,
             cellStyle: {
               display: 'flex',
@@ -1142,27 +1189,50 @@ export class DepositsComponent implements OnInit {
         {
           field: `segments.${code}.previous`,
           headerName: 'Previous',
-          width: 130,
+          flex: 1,
+          minWidth: 110,
           valueFormatter,
           cellStyle: numberCellStyle,
+          cellClass: 'drill-clickable',
+          onCellClicked: (e) => this.openDrilldown({
+            segmentCode: code,
+            segmentLabel: label,
+            period: 'previous',
+            productName: (e.data as { name?: string } | undefined)?.name ?? '',
+            date: this.currentDateIso(),
+            amount: typeof e.value === 'number' ? e.value : null,
+          }),
         },
         {
           field: `segments.${code}.current`,
           headerName: 'Current',
-          width: 130,
+          flex: 1,
+          minWidth: 110,
           valueFormatter,
           cellStyle: numberCellStyle,
+          cellClass: 'drill-clickable',
+          onCellClicked: (e) => this.openDrilldown({
+            segmentCode: code,
+            segmentLabel: label,
+            period: 'current',
+            productName: (e.data as { name?: string } | undefined)?.name ?? '',
+            date: this.currentDateIso(),
+            amount: typeof e.value === 'number' ? e.value : null,
+          }),
         },
         {
           field: `segments.${code}.variance`,
           headerName: 'Variance',
-          width: 130,
+          flex: 1,
+          minWidth: 110,
           cellRenderer: VarianceCellRendererComponent,
           cellStyle: numberCellStyle,
         },
         {
           headerName: '',
-          width: 80,
+          flex: 0.5,
+          minWidth: 70,
+          maxWidth: 90,
           cellRenderer: ActionCellRendererComponent,
           cellStyle: {
             display: 'flex',

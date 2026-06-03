@@ -14,14 +14,21 @@ import { DepositNameCellRendererComponent } from '../../product-analysis/deposit
 import { ActionCellRendererComponent } from '../../product-analysis/deposits/cell-renderers/action-cell.renderer'
 import { LcrVarianceCellRendererComponent } from './cell-renderers/lcr-variance-cell.renderer'
 import { LcrEnterpriseHeaderRendererComponent } from './cell-renderers/lcr-enterprise-header.renderer'
+import { LcrCurrentCellRendererComponent } from './cell-renderers/lcr-current-cell.renderer'
 import { AnimatedNumberComponent } from '../../../shared/animated-number/animated-number.component'
-import { buildLcrRowData, type LcrRowData } from './lcr-detail-data'
+import { buildLcrRowData, type LcrRowData, type LcrSegmentKey } from './lcr-detail-data'
+import { LcrAdjustPanelComponent, type LcrAdjustContext, type LcrAdjustSaveEvent } from './lcr-adjust-panel/lcr-adjust-panel.component'
 import { SegmentTreePickerComponent } from '../../../shared/entity-tree/segment-tree-picker.component'
 import { ReportScopeService } from '../../../core/services/report-scope.service'
 import { columnRootsFromSelection } from '../../../shared/entity-tree/entity-data'
+import { DrilldownPanelComponent } from '../../product-analysis/deposits/drilldown-panel/drilldown-panel.component'
+import type { DrilldownContext } from '../../product-analysis/deposits/drilldown-panel/drilldown-data'
+import { LcrBulkUploadPanelComponent, type LcrBulkUploadSubmitPayload } from './lcr-bulk-upload-panel/lcr-bulk-upload-panel.component'
 
 const ROUTE_KEY = 'lcr-detail'
 const STORAGE_KEY = 'leap_lcr_query_params'
+const BULK_TEMPLATE_PATH = '/templates/lcr-bulk-upload-template.csv'
+const BULK_TEMPLATE_FILENAME = 'lcr-bulk-upload-template.csv'
 
 interface StoredParams {
   region: string | null
@@ -78,6 +85,10 @@ function saveParams(p: {
     LcrEnterpriseHeaderRendererComponent,
     AnimatedNumberComponent,
     SegmentTreePickerComponent,
+    DrilldownPanelComponent,
+    LcrCurrentCellRendererComponent,
+    LcrAdjustPanelComponent,
+    LcrBulkUploadPanelComponent,
   ],
   templateUrl: './lcr-detail.component.html',
   styleUrls: ['./lcr-detail.component.scss'],
@@ -93,9 +104,20 @@ export class LcrDetailComponent implements OnInit {
   rowData = computed<LcrRowData[]>(() => buildLcrRowData(this.expandedNodes()))
   columnDefs = computed<(ColDef | ColGroupDef)[]>(() => this.getColumnDefs())
   defaultColDef: ColDef = { resizable: true, sortable: false }
-  gridContext = { toggleNode: (id: string) => this.toggleNode(id) }
+  gridContext = {
+    toggleNode: (id: string) => this.toggleNode(id),
+    onLcrEditClick: (payload: { row: LcrRowData; segment: LcrSegmentKey; segmentLabel: string; currentValue: number }) =>
+      this.openLcrAdjustPanel(payload),
+  }
   regionSig = signal<string | null>(null)
   segmentsSig = signal<string[]>([])
+  drilldownOpen = signal(false)
+  drilldownContext = signal<DrilldownContext | null>(null)
+  lcrAdjustPanelOpen = signal(false)
+  lcrAdjustContext = signal<LcrAdjustContext | null>(null)
+  bulkUploadPanelOpen = signal(false)
+  bulkUploadNoticeVisible = signal(false)
+  private bulkUploadNoticeTimer: ReturnType<typeof setTimeout> | null = null
 
   constructor(
     private router: Router,
@@ -178,6 +200,81 @@ export class LcrDetailComponent implements OnInit {
     this.updateLastUpdateDate()
   }
 
+  openDrilldown(ctx: DrilldownContext): void {
+    this.drilldownContext.set(ctx)
+    this.drilldownOpen.set(true)
+  }
+
+  closeDrilldown(): void {
+    this.drilldownOpen.set(false)
+    this.drilldownContext.set(null)
+  }
+
+  openLcrAdjustPanel(payload: { row: LcrRowData; segment: LcrSegmentKey; segmentLabel: string; currentValue: number }): void {
+    this.lcrAdjustContext.set({ ...payload })
+    this.lcrAdjustPanelOpen.set(true)
+  }
+
+  closeLcrAdjustPanel(): void {
+    this.lcrAdjustPanelOpen.set(false)
+    this.lcrAdjustContext.set(null)
+  }
+
+  onLcrAdjustSaved(_event: LcrAdjustSaveEvent): void {
+    this.closeLcrAdjustPanel()
+  }
+
+  openBulkUploadPanel(): void {
+    this.bulkUploadPanelOpen.set(true)
+  }
+
+  closeBulkUploadPanel(): void {
+    this.bulkUploadPanelOpen.set(false)
+  }
+
+  async downloadBulkUploadTemplate(): Promise<void> {
+    try {
+      const res = await fetch(BULK_TEMPLATE_PATH)
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      const blob = await res.blob()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = BULK_TEMPLATE_FILENAME
+      a.rel = 'noopener'
+      document.body.appendChild(a)
+      a.click()
+      a.remove()
+      URL.revokeObjectURL(url)
+    } catch (err) {
+      console.error('LCR template download failed', err)
+    }
+  }
+
+  onBulkUploadSubmitted(_payload: LcrBulkUploadSubmitPayload): void {
+    this.bulkUploadNoticeVisible.set(true)
+    if (this.bulkUploadNoticeTimer) clearTimeout(this.bulkUploadNoticeTimer)
+    this.bulkUploadNoticeTimer = setTimeout(() => {
+      this.bulkUploadNoticeVisible.set(false)
+      this.bulkUploadNoticeTimer = null
+    }, 4500)
+  }
+
+  dismissBulkUploadNotice(): void {
+    this.bulkUploadNoticeVisible.set(false)
+    if (this.bulkUploadNoticeTimer) {
+      clearTimeout(this.bulkUploadNoticeTimer)
+      this.bulkUploadNoticeTimer = null
+    }
+  }
+
+  /** Current report date as ISO yyyy-MM-dd for seeding the drill-down filter. */
+  private currentDateIso(): string | null {
+    const v = this.form?.value?.current
+    if (!v) return null
+    return v instanceof Date ? v.toISOString().slice(0, 10) : String(v)
+  }
+
   toggleNode(nodeId: string): void {
     const set = new Set(this.expandedNodes())
     if (set.has(nodeId)) set.delete(nodeId)
@@ -238,7 +335,17 @@ export class LcrDetailComponent implements OnInit {
             flex: 1,
             minWidth: 100,
             valueFormatter: numFmt,
+            cellRenderer: LcrCurrentCellRendererComponent,
+            cellClass: 'drill-clickable',
             cellStyle: (params: CellClassParams) => ({ ...numberStyle, ...this.cellStyleForRow(params) }),
+            onCellClicked: (e) => this.openDrilldown({
+              segmentCode: seg.key,
+              segmentLabel: seg.headerName,
+              period: 'current',
+              productName: (e.data as { name?: string } | undefined)?.name ?? '',
+              date: this.currentDateIso(),
+              amount: typeof e.value === 'number' ? e.value : null,
+            }),
           },
           {
             field: `${seg.key}.previous`,
@@ -246,7 +353,16 @@ export class LcrDetailComponent implements OnInit {
             flex: 1,
             minWidth: 100,
             valueFormatter: numFmt,
+            cellClass: 'drill-clickable',
             cellStyle: (params: CellClassParams) => ({ ...numberStyle, ...this.cellStyleForRow(params) }),
+            onCellClicked: (e) => this.openDrilldown({
+              segmentCode: seg.key,
+              segmentLabel: seg.headerName,
+              period: 'previous',
+              productName: (e.data as { name?: string } | undefined)?.name ?? '',
+              date: this.currentDateIso(),
+              amount: typeof e.value === 'number' ? e.value : null,
+            }),
           },
           {
             field: `${seg.key}.variance`,
@@ -284,7 +400,17 @@ export class LcrDetailComponent implements OnInit {
           flex: 1,
           minWidth: 100,
           valueFormatter: numFmt,
+          cellRenderer: LcrCurrentCellRendererComponent,
+          cellClass: 'drill-clickable',
           cellStyle: (params: CellClassParams) => ({ ...numberStyle, ...this.cellStyleForRow(params) }),
+          onCellClicked: (e) => this.openDrilldown({
+            segmentCode: code,
+            segmentLabel: label,
+            period: 'current',
+            productName: (e.data as { name?: string } | undefined)?.name ?? '',
+            date: this.currentDateIso(),
+            amount: typeof e.value === 'number' ? e.value : null,
+          }),
         },
         {
           field: `segments.${code}.previous`,
@@ -292,7 +418,16 @@ export class LcrDetailComponent implements OnInit {
           flex: 1,
           minWidth: 100,
           valueFormatter: numFmt,
+          cellClass: 'drill-clickable',
           cellStyle: (params: CellClassParams) => ({ ...numberStyle, ...this.cellStyleForRow(params) }),
+          onCellClicked: (e) => this.openDrilldown({
+            segmentCode: code,
+            segmentLabel: label,
+            period: 'previous',
+            productName: (e.data as { name?: string } | undefined)?.name ?? '',
+            date: this.currentDateIso(),
+            amount: typeof e.value === 'number' ? e.value : null,
+          }),
         },
         {
           field: `segments.${code}.variance`,

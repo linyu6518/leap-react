@@ -302,11 +302,12 @@ export function segmentsRequiredValidator(control: AbstractControl): ValidationE
 }
 
 /**
- * Given a set of selected codes, return one column entry for every selected
- * node and every descendant of a selected parent, in tree traversal order.
+ * Given a set of selected codes, return exactly one column entry per checked
+ * node — no parent/child expansion — in tree traversal order.
  *
- * Example: CUSO selected
- *   → columns start with [CUSO, TDGUS, TDBUSH, ...] and include descendants.
+ * Example: CUSO selected (only) → columns = [CUSO].
+ * Selecting a parent does NOT pull in its children, and selecting a child does
+ * NOT pull in its parent; the columns mirror the checkboxes 1:1.
  *
  * Enterprise pseudo-group wrappers use their visible labels
  * (e.g. "CAD Retail", "USD Retail") as column codes.
@@ -323,28 +324,14 @@ export function columnRootsFromSelection(
 
   const displayCode = (n: EntityNode) => isEnterpriseGroupCode(n.code) ? n.label : n.code
 
-  const addNode = (n: EntityNode) => {
-    if (n.inactive) return
-    const code = displayCode(n)
-    if (seen.has(code)) return
-    seen.add(code)
-    result.push({ code, label: n.label })
-  }
-
-  const addNodeAndDescendants = (n: EntityNode) => {
-    if (n.inactive) return
-    addNode(n)
-    for (const child of n.children ?? []) addNodeAndDescendants(child)
-  }
-
-  const walk = (nodes: EntityNode[], ancestorSelected = false) => {
+  const walk = (nodes: EntityNode[]) => {
     for (const n of nodes) {
-      const nodeSelected = selected.has(displayCode(n))
-      if (ancestorSelected || nodeSelected) {
-        addNodeAndDescendants(n)
-        continue
+      const code = displayCode(n)
+      if (!n.inactive && selected.has(code) && !seen.has(code)) {
+        seen.add(code)
+        result.push({ code, label: n.label })
       }
-      if (n.children?.length) walk(n.children, false)
+      if (n.children?.length) walk(n.children)
     }
   }
   walk(tree)

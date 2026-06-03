@@ -140,7 +140,29 @@
           <span class="status-text">adjustments</span>
         </span>
       </div>
-      <button nz-button class="lcr-submit-button">Submit</button>
+      <div class="lcr-status-bar-actions">
+        <button
+          nz-button
+          nzType="text"
+          type="button"
+          class="lcr-toolbar-icon"
+          aria-label="Bulk upload"
+          (click)="openBulkUploadPanel()"
+        >
+          <span nz-icon nzType="upload" nzTheme="outline"></span>
+        </button>
+        <button
+          nz-button
+          nzType="text"
+          type="button"
+          class="lcr-toolbar-icon"
+          aria-label="Download template"
+          (click)="downloadBulkUploadTemplate()"
+        >
+          <span nz-icon nzType="download" nzTheme="outline"></span>
+        </button>
+        <button nz-button class="lcr-submit-button">Submit</button>
+      </div>
     </div>
 
     <div class="lcr-grid-wrapper">
@@ -157,3 +179,43 @@
     </div>
   }
 </div>
+
+<app-drilldown-panel
+  [visible]="drilldownOpen()"
+  [context]="drilldownContext()"
+  (closed)="closeDrilldown()"
+/>
+
+<app-lcr-adjust-panel
+  [visible]="lcrAdjustPanelOpen()"
+  [context]="lcrAdjustContext()"
+  (closed)="closeLcrAdjustPanel()"
+  (saved)="onLcrAdjustSaved($event)"
+/>
+
+<app-lcr-bulk-upload-panel
+  [visible]="bulkUploadPanelOpen()"
+  (closed)="closeBulkUploadPanel()"
+  (downloadTemplate)="downloadBulkUploadTemplate()"
+  (submitted)="onBulkUploadSubmitted($event)"
+/>
+
+@if (bulkUploadNoticeVisible()) {
+  <div class="lcr-toast lcr-toast--publish" role="status" aria-live="polite">
+    <div class="toast-icon" aria-hidden="true">
+      <svg width="19" height="19" viewBox="0 0 28 28" fill="none">
+        <circle cx="14" cy="14" r="14" fill="#008A00"/>
+        <path d="M8.5 14.2L12 17.7L19.5 10.2" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="toast-copy">
+      <div class="toast-title">Bulk upload received</div>
+      <div class="toast-body">Your file has been recorded for processing (demo).</div>
+    </div>
+    <button class="toast-close" type="button" (click)="dismissBulkUploadNotice()" aria-label="Close">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <path d="M3 3L15 15M15 3L3 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </div>
+}
