@@ -128,17 +128,11 @@
 
     <div class="lcr-status-bar-row">
       <div class="lcr-status-bar">
-        <span class="status-item">
-          <span class="status-dot status-dot-green"></span>
-          <span class="status-number status-number-green">12</span>
-          <span class="status-text">sign-offs</span>
-        </span>
-        <span class="status-separator">|</span>
-        <span class="status-item">
-          <span class="status-dot status-dot-orange"></span>
-          <span class="status-number status-number-orange">3</span>
-          <span class="status-text">adjustments</span>
-        </span>
+        <div class="weight-toggle" role="group" aria-label="Weighting view">
+          <button type="button" class="weight-opt" [class.active]="weightMode() === 'unweighted'" (click)="setWeightMode('unweighted')">Unweighted</button>
+          <button type="button" class="weight-opt" [class.active]="weightMode() === 'weighted'" (click)="setWeightMode('weighted')">Weighted</button>
+          <button type="button" class="weight-opt" [class.active]="weightMode() === 'both'" (click)="setWeightMode('both')">Both</button>
+        </div>
       </div>
       <div class="lcr-status-bar-actions">
         <button

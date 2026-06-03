@@ -16,6 +16,8 @@ export interface DrilldownContext {
   date: string | null
   /** The numeric value of the clicked cell (shown in the panel title). */
   amount?: number | null
+  /** Weighting set of the clicked cell (LCR table only); shown in the subtitle. */
+  weighting?: 'weighted' | 'unweighted'
 }
 
 /** One cashflow-level detail record (26 OSFI LCR columns). */

@@ -16,7 +16,7 @@ import { LcrVarianceCellRendererComponent } from './cell-renderers/lcr-variance-
 import { LcrEnterpriseHeaderRendererComponent } from './cell-renderers/lcr-enterprise-header.renderer'
 import { LcrCurrentCellRendererComponent } from './cell-renderers/lcr-current-cell.renderer'
 import { AnimatedNumberComponent } from '../../../shared/animated-number/animated-number.component'
-import { buildLcrRowData, type LcrRowData, type LcrSegmentKey } from './lcr-detail-data'
+import { buildLcrRowData, type LcrRowData, type LcrSegmentKey, type LcrWeighting } from './lcr-detail-data'
 import { LcrAdjustPanelComponent, type LcrAdjustContext, type LcrAdjustSaveEvent } from './lcr-adjust-panel/lcr-adjust-panel.component'
 import { SegmentTreePickerComponent } from '../../../shared/entity-tree/segment-tree-picker.component'
 import { ReportScopeService } from '../../../core/services/report-scope.service'
@@ -29,6 +29,18 @@ const ROUTE_KEY = 'lcr-detail'
 const STORAGE_KEY = 'leap_lcr_query_params'
 const BULK_TEMPLATE_PATH = '/templates/lcr-bulk-upload-template.csv'
 const BULK_TEMPLATE_FILENAME = 'lcr-bulk-upload-template.csv'
+/** v2: default is 'both'; v1 key ignored so old 'weighted' sessions do not override. */
+const WEIGHT_MODE_KEY = 'leap_lcr_weight_mode_v2'
+
+type WeightMode = 'unweighted' | 'weighted' | 'both'
+
+function loadWeightMode(): WeightMode {
+  try {
+    const s = sessionStorage.getItem(WEIGHT_MODE_KEY)
+    if (s === 'unweighted' || s === 'weighted' || s === 'both') return s
+  } catch (_) {}
+  return 'both'
+}
 
 interface StoredParams {
   region: string | null
@@ -111,6 +123,7 @@ export class LcrDetailComponent implements OnInit {
   }
   regionSig = signal<string | null>(null)
   segmentsSig = signal<string[]>([])
+  weightMode = signal<WeightMode>(loadWeightMode())
   drilldownOpen = signal(false)
   drilldownContext = signal<DrilldownContext | null>(null)
   lcrAdjustPanelOpen = signal(false)
@@ -125,6 +138,9 @@ export class LcrDetailComponent implements OnInit {
     private fb: FormBuilder,
     private scopeSvc: ReportScopeService,
   ) {
+    try {
+      sessionStorage.removeItem('leap_lcr_weight_mode')
+    } catch (_) {}
     const nav = this.router.getCurrentNavigation()
     const state = nav?.extras?.state as (StoredParams & { enterprise?: string | null }) | undefined
     const fromState = state && (state.region != null || state.enterprise != null || state.segment != null || state.prior != null || state.current != null)
@@ -176,6 +192,13 @@ export class LcrDetailComponent implements OnInit {
   onSegmentsChange(codes: string[]): void {
     this.segmentsSig.set(codes)
     this.scopeSvc.setPageOverride(ROUTE_KEY, this.regionSig(), codes)
+  }
+
+  setWeightMode(mode: WeightMode): void {
+    this.weightMode.set(mode)
+    try {
+      sessionStorage.setItem(WEIGHT_MODE_KEY, mode)
+    } catch (_) {}
   }
 
   private updateLastUpdateDate(): void {
@@ -316,144 +339,110 @@ export class LcrDetailComponent implements OnInit {
       cellStyle: (params: CellClassParams) => this.cellStyleForRow(params),
     }
 
-    const segRoots = columnRootsFromSelection(this.regionSig(), this.segmentsSig())
+    const makeActionCol = (): ColDef => ({
+      headerName: '',
+      flex: 0.5,
+      minWidth: 70,
+      maxWidth: 90,
+      cellRenderer: ActionCellRendererComponent,
+      cellStyle: (params: CellClassParams) => ({
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '8px',
+        ...this.cellStyleForRow(params),
+      }),
+    })
 
-    if (!segRoots.length) {
-      // Fallback: show the static enterprise/cadRetail/wholesale/usRetail columns
-      const FALLBACK = [
-        { key: 'enterprise', headerName: 'Enterprise' },
-        { key: 'cadRetail', headerName: 'CAD Retail' },
-        { key: 'wholesale', headerName: 'Wholesale' },
-        { key: 'usRetail', headerName: 'US Retail' },
-      ] as const
-      const groups: ColGroupDef[] = FALLBACK.map((seg) => ({
-        headerName: seg.headerName,
-        children: [
-          {
-            field: `${seg.key}.current`,
-            headerName: 'Current',
-            flex: 1,
-            minWidth: 100,
-            valueFormatter: numFmt,
-            cellRenderer: LcrCurrentCellRendererComponent,
-            cellClass: 'drill-clickable',
-            cellStyle: (params: CellClassParams) => ({ ...numberStyle, ...this.cellStyleForRow(params) }),
-            onCellClicked: (e) => this.openDrilldown({
-              segmentCode: seg.key,
-              segmentLabel: seg.headerName,
-              period: 'current',
-              productName: (e.data as { name?: string } | undefined)?.name ?? '',
-              date: this.currentDateIso(),
-              amount: typeof e.value === 'number' ? e.value : null,
-            }),
-          },
-          {
-            field: `${seg.key}.previous`,
-            headerName: 'Previous',
-            flex: 1,
-            minWidth: 100,
-            valueFormatter: numFmt,
-            cellClass: 'drill-clickable',
-            cellStyle: (params: CellClassParams) => ({ ...numberStyle, ...this.cellStyleForRow(params) }),
-            onCellClicked: (e) => this.openDrilldown({
-              segmentCode: seg.key,
-              segmentLabel: seg.headerName,
-              period: 'previous',
-              productName: (e.data as { name?: string } | undefined)?.name ?? '',
-              date: this.currentDateIso(),
-              amount: typeof e.value === 'number' ? e.value : null,
-            }),
-          },
-          {
-            field: `${seg.key}.variance`,
-            headerName: 'Variance',
-            flex: 1,
-            minWidth: 100,
-            cellRenderer: LcrVarianceCellRendererComponent,
-            cellStyle: (params: CellClassParams) => ({ textAlign: 'right' as const, ...this.cellStyleForRow(params) }),
-          },
-          {
-            headerName: '',
-            flex: 0.5,
-            minWidth: 70,
-            maxWidth: 90,
-            cellRenderer: ActionCellRendererComponent,
-            cellStyle: (params: CellClassParams) => ({
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '8px',
-              ...this.cellStyleForRow(params),
-            }),
-          },
-        ],
-      }))
-      return [nameCol, ...groups]
-    }
+    // Build the Current / Previous / Variance trio for one segment + one weighting set.
+    const metricCols = (
+      base: string,
+      segmentCode: string,
+      label: string,
+      weighting: LcrWeighting,
+      withPencil: boolean,
+    ): ColDef[] => {
+      const field = (m: string) => `${base}.${weighting}.${m}`
+      const clickCtx = (period: 'current' | 'previous', e: { data?: unknown; value?: unknown }) => ({
+        segmentCode,
+        segmentLabel: label,
+        period,
+        weighting,
+        productName: (e.data as { name?: string } | undefined)?.name ?? '',
+        date: this.currentDateIso(),
+        amount: typeof e.value === 'number' ? e.value : null,
+      })
 
-    const groups: ColGroupDef[] = segRoots.map(({ code, label }) => ({
-      headerName: label,
-      children: [
+      const current: ColDef = {
+        field: field('current'),
+        headerName: 'Current',
+        flex: 1,
+        minWidth: 100,
+        valueFormatter: numFmt,
+        cellClass: 'drill-clickable',
+        cellStyle: (params: CellClassParams) => ({ ...numberStyle, ...this.cellStyleForRow(params) }),
+        onCellClicked: (e) => this.openDrilldown(clickCtx('current', e)),
+      }
+      if (withPencil) current.cellRenderer = LcrCurrentCellRendererComponent
+
+      return [
+        current,
         {
-          field: `segments.${code}.current`,
-          headerName: 'Current',
-          flex: 1,
-          minWidth: 100,
-          valueFormatter: numFmt,
-          cellRenderer: LcrCurrentCellRendererComponent,
-          cellClass: 'drill-clickable',
-          cellStyle: (params: CellClassParams) => ({ ...numberStyle, ...this.cellStyleForRow(params) }),
-          onCellClicked: (e) => this.openDrilldown({
-            segmentCode: code,
-            segmentLabel: label,
-            period: 'current',
-            productName: (e.data as { name?: string } | undefined)?.name ?? '',
-            date: this.currentDateIso(),
-            amount: typeof e.value === 'number' ? e.value : null,
-          }),
-        },
-        {
-          field: `segments.${code}.previous`,
+          field: field('previous'),
           headerName: 'Previous',
           flex: 1,
           minWidth: 100,
           valueFormatter: numFmt,
           cellClass: 'drill-clickable',
           cellStyle: (params: CellClassParams) => ({ ...numberStyle, ...this.cellStyleForRow(params) }),
-          onCellClicked: (e) => this.openDrilldown({
-            segmentCode: code,
-            segmentLabel: label,
-            period: 'previous',
-            productName: (e.data as { name?: string } | undefined)?.name ?? '',
-            date: this.currentDateIso(),
-            amount: typeof e.value === 'number' ? e.value : null,
-          }),
+          onCellClicked: (e) => this.openDrilldown(clickCtx('previous', e)),
         },
         {
-          field: `segments.${code}.variance`,
+          field: field('variance'),
           headerName: 'Variance',
           flex: 1,
           minWidth: 100,
           cellRenderer: LcrVarianceCellRendererComponent,
           cellStyle: (params: CellClassParams) => ({ textAlign: 'right' as const, ...this.cellStyleForRow(params) }),
         },
-        {
-          headerName: '',
-          flex: 0.5,
-          minWidth: 70,
-          maxWidth: 90,
-          cellRenderer: ActionCellRendererComponent,
-          cellStyle: (params: CellClassParams) => ({
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '8px',
-            ...this.cellStyleForRow(params),
-          }),
-        },
-      ],
-    }))
+      ]
+    }
 
+    // One segment column group, honoring the active weighting mode.
+    const buildSegmentGroup = (base: string, code: string, label: string): ColGroupDef => {
+      const mode = this.weightMode()
+      if (mode === 'both') {
+        return {
+          headerName: label,
+          children: [
+            { headerName: 'Unweighted', children: metricCols(base, code, label, 'unweighted', false) },
+            { headerName: 'Weighted', children: metricCols(base, code, label, 'weighted', true) },
+            makeActionCol(),
+          ],
+        }
+      }
+      const weighting: LcrWeighting = mode === 'unweighted' ? 'unweighted' : 'weighted'
+      return {
+        headerName: label,
+        children: [...metricCols(base, code, label, weighting, weighting === 'weighted'), makeActionCol()],
+      }
+    }
+
+    const segRoots = columnRootsFromSelection(this.regionSig(), this.segmentsSig())
+
+    if (!segRoots.length) {
+      // Fallback: static enterprise/cadRetail/wholesale/usRetail columns
+      const FALLBACK = [
+        { key: 'enterprise', headerName: 'Enterprise' },
+        { key: 'cadRetail', headerName: 'CAD Retail' },
+        { key: 'wholesale', headerName: 'Wholesale' },
+        { key: 'usRetail', headerName: 'US Retail' },
+      ] as const
+      const groups = FALLBACK.map((seg) => buildSegmentGroup(seg.key, seg.key, seg.headerName))
+      return [nameCol, ...groups]
+    }
+
+    const groups = segRoots.map(({ code, label }) => buildSegmentGroup(`segments.${code}`, code, label))
     return [nameCol, ...groups]
   }
 }

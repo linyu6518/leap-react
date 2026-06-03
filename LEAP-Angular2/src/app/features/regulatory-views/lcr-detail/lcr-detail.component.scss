@@ -395,6 +395,37 @@
   margin-top: -20px;
 }
 
+.weight-toggle {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  overflow: hidden;
+  font-family: $font-family;
+}
+
+.weight-opt {
+  height: 30px;
+  padding: 0 14px;
+  border: none;
+  border-right: 1px solid #d9d9d9;
+  background: #ffffff;
+  color: #595959;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.18s ease, color 0.18s ease;
+
+  &:last-child { border-right: none; }
+
+  &:hover:not(.active) { background: rgba(0, 132, 61, 0.06); }
+
+  &.active {
+    background: #00843d;
+    color: #ffffff;
+  }
+}
+
 /* 白底绿标；hover 绿底白标 */
 button.lcr-toolbar-icon.ant-btn {
   box-sizing: border-box !important;

@@ -15,6 +15,7 @@
           {{ context?.segmentLabel }}
           @if (context?.productName) { &middot; {{ context?.productName }} }
           &middot; {{ context?.period === 'previous' ? 'Previous' : 'Current' }}
+          @if (context?.weighting) { &middot; {{ context?.weighting === 'weighted' ? 'Weighted' : 'Unweighted' }} }
         </span>
       </div>
       <button class="close-btn" (click)="close()" type="button" aria-label="Close">

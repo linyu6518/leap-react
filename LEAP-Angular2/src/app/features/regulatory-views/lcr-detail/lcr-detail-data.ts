@@ -1,10 +1,19 @@
 import { entityTreeFor, flattenEntityCodes } from '../../../shared/entity-tree/entity-data'
 
-export interface LcrSegmentValue {
+export interface LcrMetric {
   current: number
   previous: number
   variance: number
 }
+
+/** A segment carries two metric sets: unweighted (raw) and weighted (post-factor). */
+export interface LcrSegmentValue {
+  unweighted: LcrMetric
+  weighted: LcrMetric
+}
+
+/** Which weighting set is displayed/accessed. */
+export type LcrWeighting = 'unweighted' | 'weighted'
 
 /** Segment column identifier — a dynamic entity code (e.g. "CUSO") or a static key. */
 export type LcrSegmentKey = string
@@ -30,10 +39,27 @@ export interface LcrRowData extends LcrTreeNode {
   isExpanded: boolean
 }
 
-const seg = (c: number, p?: number, v?: number): LcrSegmentValue => ({
+const metric = (c: number, p?: number, v?: number): LcrMetric => ({
   current: c,
   previous: p ?? c,
   variance: v ?? 0,
+})
+
+/** Build a dual (unweighted + weighted) value. Weighted = unweighted scaled by `factor`. */
+const dual = (c: number, p?: number, v?: number, factor = 0.9): LcrSegmentValue => {
+  const prev = p ?? c
+  const wc = Math.round(c * factor)
+  const wp = Math.round(prev * factor)
+  return {
+    unweighted: metric(c, prev, v ?? c - prev),
+    weighted: metric(wc, wp, wc - wp),
+  }
+}
+
+/** Ratio cells: weighting is not meaningful, so both sets are identical. */
+const ratioVal = (c: number, p: number, v: number): LcrSegmentValue => ({
+  unweighted: metric(c, p, v),
+  weighted: metric(c, p, v),
 })
 
 function node(
@@ -54,10 +80,10 @@ function node(
     level,
     isLeaf,
     isSummary: opts?.isSummary,
-    enterprise: seg(e),
-    cadRetail: seg(c),
-    wholesale: seg(w),
-    usRetail: seg(u),
+    enterprise: dual(e),
+    cadRetail: dual(c),
+    wholesale: dual(w),
+    usRetail: dual(u),
     children: opts?.children,
   }
 }
@@ -65,10 +91,10 @@ function node(
 export const LCR_TREE: LcrTreeNode[] = [
   {
     ...node('lcr-ratio', 'LCR Ratio', 0, true, { e: 128.2 }, { isSummary: true }),
-    enterprise: { current: 128.2, previous: 128.4, variance: -0.2 },
-    cadRetail: { current: 128.2, previous: 128.4, variance: -0.2 },
-    wholesale: { current: 128.2, previous: 128.4, variance: -0.2 },
-    usRetail: { current: 128.2, previous: 128.4, variance: -0.2 },
+    enterprise: ratioVal(128.2, 128.4, -0.2),
+    cadRetail: ratioVal(128.2, 128.4, -0.2),
+    wholesale: ratioVal(128.2, 128.4, -0.2),
+    usRetail: ratioVal(128.2, 128.4, -0.2),
   },
   node('hqla', 'HQLA', 0, false, { e: 33671 }, {
     children: [
@@ -169,23 +195,38 @@ function scaleForCode(code: string): number {
   return Math.round((0.1 + (hashStr(code) % 80) / 100) * 100) / 100
 }
 
+/** Build one metric set from a current value + a hash seed (drives red/green direction). */
+function buildMetric(curr: number, h: number, isRatio: boolean): LcrMetric {
+  const up = h % 2 === 0 // ~half rise (green), ~half fall (red)
+  if (isRatio) {
+    const delta = (((h % 5) + 1) * 0.1) * (up ? 1 : -1)
+    const prev = Math.round((curr - delta) * 10) / 10
+    return { current: curr, previous: prev, variance: Math.round(delta * 10) / 10 }
+  }
+  const pct = ((h % 6) + 1) / 100 // 1%–6% move
+  const prev = up ? Math.round(curr * (1 - pct)) : Math.round(curr * (1 + pct))
+  return { current: curr, previous: prev, variance: curr - prev }
+}
+
 function mockSegmentsForNode(node: LcrTreeNode): Record<string, LcrSegmentValue> {
-  const base = node.enterprise.current
+  const base = node.enterprise.unweighted.current
   const isRatio = node.name === 'LCR Ratio'
   const result: Record<string, LcrSegmentValue> = {}
   for (const code of ALL_SEGMENT_CODES) {
     const h = hashStr(code + '|' + node.nodeId)
-    const up = h % 2 === 0 // ~half rise (green), ~half fall (red)
     if (isRatio) {
       const curr = Math.round((base + (h % 9) - 4) * 10) / 10
-      const delta = (((h % 5) + 1) * 0.1) * (up ? 1 : -1)
-      const prev = Math.round((curr - delta) * 10) / 10
-      result[code] = { current: curr, previous: prev, variance: Math.round(delta * 10) / 10 }
+      const m = buildMetric(curr, h, true)
+      result[code] = { unweighted: m, weighted: m }
     } else {
-      const curr = Math.round(base * scaleForCode(code))
-      const pct = ((h % 6) + 1) / 100 // 1%–6% move
-      const prev = up ? Math.round(curr * (1 - pct)) : Math.round(curr * (1 + pct))
-      result[code] = { current: curr, previous: prev, variance: curr - prev }
+      const uwCurr = Math.round(base * scaleForCode(code))
+      // Stable post-factor weighting in 0.50–0.95 so weighted < unweighted.
+      const wFactor = 0.5 + (hashStr('w|' + code + '|' + node.nodeId) % 46) / 100
+      const wCurr = Math.round(uwCurr * wFactor)
+      result[code] = {
+        unweighted: buildMetric(uwCurr, h, false),
+        weighted: buildMetric(wCurr, hashStr('wv|' + code + '|' + node.nodeId), false),
+      }
     }
   }
   return result
