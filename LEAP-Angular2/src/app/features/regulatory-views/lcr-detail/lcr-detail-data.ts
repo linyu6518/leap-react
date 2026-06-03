@@ -39,6 +39,21 @@ export interface LcrRowData extends LcrTreeNode {
   isExpanded: boolean
 }
 
+const STATIC_SEGMENT_KEYS = new Set(['enterprise', 'cadRetail', 'wholesale', 'usRetail'])
+
+/** Resolve segment metrics from a column base path (`segments.CUSO` or `enterprise`). */
+export function lcrSegmentValueAt(row: LcrRowData | undefined, base: string): LcrSegmentValue | null {
+  if (!row) return null
+  if (base.startsWith('segments.')) {
+    const code = base.slice('segments.'.length)
+    return row.segments?.[code] ?? null
+  }
+  if (STATIC_SEGMENT_KEYS.has(base)) {
+    return row[base as keyof LcrRowData] as LcrSegmentValue
+  }
+  return null
+}
+
 const metric = (c: number, p?: number, v?: number): LcrMetric => ({
   current: c,
   previous: p ?? c,

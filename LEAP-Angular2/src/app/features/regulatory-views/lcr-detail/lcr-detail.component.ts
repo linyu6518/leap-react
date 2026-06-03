@@ -15,6 +15,7 @@ import { ActionCellRendererComponent } from '../../product-analysis/deposits/cel
 import { LcrVarianceCellRendererComponent } from './cell-renderers/lcr-variance-cell.renderer'
 import { LcrEnterpriseHeaderRendererComponent } from './cell-renderers/lcr-enterprise-header.renderer'
 import { LcrCurrentCellRendererComponent } from './cell-renderers/lcr-current-cell.renderer'
+import { LcrDualMetricCellRendererComponent } from './cell-renderers/lcr-dual-metric-cell.renderer'
 import { AnimatedNumberComponent } from '../../../shared/animated-number/animated-number.component'
 import { buildLcrRowData, type LcrRowData, type LcrSegmentKey, type LcrWeighting } from './lcr-detail-data'
 import { LcrAdjustPanelComponent, type LcrAdjustContext, type LcrAdjustSaveEvent } from './lcr-adjust-panel/lcr-adjust-panel.component'
@@ -99,6 +100,7 @@ function saveParams(p: {
     SegmentTreePickerComponent,
     DrilldownPanelComponent,
     LcrCurrentCellRendererComponent,
+    LcrDualMetricCellRendererComponent,
     LcrAdjustPanelComponent,
     LcrBulkUploadPanelComponent,
   ],
@@ -120,6 +122,8 @@ export class LcrDetailComponent implements OnInit {
     toggleNode: (id: string) => this.toggleNode(id),
     onLcrEditClick: (payload: { row: LcrRowData; segment: LcrSegmentKey; segmentLabel: string; currentValue: number }) =>
       this.openLcrAdjustPanel(payload),
+    openDrilldown: (ctx: DrilldownContext) => this.openDrilldown(ctx),
+    currentDateIso: () => this.currentDateIso(),
   }
   regionSig = signal<string | null>(null)
   segmentsSig = signal<string[]>([])
@@ -408,17 +412,60 @@ export class LcrDetailComponent implements OnInit {
       ]
     }
 
+    // Both mode: one column per metric, stacked Uw (top) + W (bottom) in each cell.
+    const dualMetricCols = (base: string, code: string, label: string): ColDef[] => {
+      const dualParams = { base, segmentCode: code, segmentLabel: label }
+      const dualStyle = (params: CellClassParams) => ({
+        ...numberStyle,
+        ...this.cellStyleForRow(params),
+        paddingTop: 2,
+        paddingBottom: 2,
+      })
+      return [
+        {
+          field: `${base}.weighted.current`,
+          headerName: 'Current',
+          headerTooltip: 'Unweighted (left) / Weighted (right)',
+          flex: 1,
+          minWidth: 168,
+          cellRenderer: LcrDualMetricCellRendererComponent,
+          cellRendererParams: { ...dualParams, metric: 'current' },
+          cellClass: 'dual-metric-cell',
+          cellStyle: dualStyle,
+        },
+        {
+          field: `${base}.weighted.previous`,
+          headerName: 'Previous',
+          headerTooltip: 'Unweighted (left) / Weighted (right)',
+          flex: 1,
+          minWidth: 168,
+          cellRenderer: LcrDualMetricCellRendererComponent,
+          cellRendererParams: { ...dualParams, metric: 'previous' },
+          cellClass: 'dual-metric-cell',
+          cellStyle: dualStyle,
+        },
+        {
+          field: `${base}.weighted.variance`,
+          headerName: 'Variance',
+          headerTooltip: 'Unweighted (left) / Weighted (right)',
+          flex: 1,
+          minWidth: 168,
+          cellRenderer: LcrDualMetricCellRendererComponent,
+          cellRendererParams: { ...dualParams, metric: 'variance' },
+          cellClass: 'dual-metric-cell',
+          cellStyle: (params: CellClassParams) => ({ textAlign: 'right' as const, ...this.cellStyleForRow(params) }),
+        },
+        makeActionCol(),
+      ]
+    }
+
     // One segment column group, honoring the active weighting mode.
     const buildSegmentGroup = (base: string, code: string, label: string): ColGroupDef => {
       const mode = this.weightMode()
       if (mode === 'both') {
         return {
           headerName: label,
-          children: [
-            { headerName: 'Unweighted', children: metricCols(base, code, label, 'unweighted', false) },
-            { headerName: 'Weighted', children: metricCols(base, code, label, 'weighted', true) },
-            makeActionCol(),
-          ],
+          children: dualMetricCols(base, code, label),
         }
       }
       const weighting: LcrWeighting = mode === 'unweighted' ? 'unweighted' : 'weighted'

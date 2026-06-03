@@ -619,6 +619,16 @@ button.lcr-toolbar-icon.ant-btn {
       font-weight: 500;
       color: #000000;
     }
+
+    &.dual-metric-cell {
+      display: flex;
+      align-items: center;
+      line-height: 1.25;
+    }
+  }
+
+  .ag-row:has(.dual-metric-cell) {
+    min-height: 36px;
   }
 }
 

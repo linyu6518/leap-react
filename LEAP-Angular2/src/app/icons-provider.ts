@@ -14,6 +14,10 @@ import {
   LogoutOutline,
   UploadOutline,
   DownloadOutline,
+  ColumnHeightOutline,
+  PercentageOutline,
+  ArrowUpOutline,
+  ArrowDownOutline,
 } from '@ant-design/icons-angular/icons'
 
 export const iconsProvider = provideNzIcons([
@@ -31,4 +35,8 @@ export const iconsProvider = provideNzIcons([
   LogoutOutline,
   UploadOutline,
   DownloadOutline,
+  ColumnHeightOutline,
+  PercentageOutline,
+  ArrowUpOutline,
+  ArrowDownOutline,
 ])
